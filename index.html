@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Chess — AI Play & PGN Analyzer | QuickUtils</title>
+    <meta name="keywords" content="QuickUtils, chess, play against ai, pgn viewer, stockfish, analyzer">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://chess.quickutils.top/">
+    <meta property="og:title" content="Web Chess — AI Play & PGN Analyzer">
+    <meta property="og:description" content="Play chess against Stockfish AI or paste a PGN to analyze games with an evaluation bar and elegant move viewer.">
+    <meta property="og:url" content="https://chess.quickutils.top/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="description" content="Play chess against Stockfish AI or paste a PGN to analyze games with an evaluation bar and elegant move viewer.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟️</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="quickutils-core.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="brand">♟️ <span>WebChess</span></a>
+        <div class="nav-links">
+            <a href="https://ko-fi.com/dayatin" target="_blank" rel="noopener" class="kofi-link">☕ Support</a>
+            <a href="https://quickutils.top" target="_blank">QuickUtils</a>
+        </div>
+        <button class="theme-btn" id="themeBtn">🌙</button>
+    </div>
+</nav>
+
+<main class="container">
+    <section class="hero text-center" style="padding-top: 5rem; padding-bottom: 2rem;">
+        <h1><span class="gradient-text">Web Chess Pro</span></h1>
+        <p class="hero-sub">Play against Stockfish AI or Analyze PGNs with evaluation metrics.</p>
+    </section>
+
+    <div class="chess-layout">
+        <!-- LEFT: Chess Board & Eval Bar -->
+        <div class="board-column">
+            <div class="eval-container glass-card hidden" id="evalContainer">
+                <div class="eval-bar" id="evalBar"></div>
+                <div class="eval-text" id="evalText">0.0</div>
+            </div>
+            
+            <div class="player-info p-black mb-2" style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="player-name">Black</span>
+                <div class="captured-pieces" id="capturedBlack" style="display:flex; gap:2px; height:1.5rem;"></div>
+            </div>
+            
+            <div class="board-wrapper glass-card">
+                <div class="promotion-modal hidden" id="promotionModal">
+                    <div class="promo-pieces"></div>
+                </div>
+                <div class="chess-board" id="board"></div>
+            </div>
+            
+            <div class="player-info p-white mt-2" style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="player-name">White</span>
+                <div class="captured-pieces" id="capturedWhite" style="display:flex; gap:2px; height:1.5rem;"></div>
+            </div>
+            
+            <!-- Sound Effects -->
+            <audio id="snd-move" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-self.mp3" preload="auto"></audio>
+            <audio id="snd-capture" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/capture.mp3" preload="auto"></audio>
+            <audio id="snd-check" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-check.mp3" preload="auto"></audio>
+            <audio id="snd-castle" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3" preload="auto"></audio>
+            <audio id="snd-end" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3" preload="auto"></audio>
+            <audio id="snd-illegal" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/illegal.mp3" preload="auto"></audio>
+        </div>
+
+        <!-- RIGHT: Controls & PGN -->
+        <div class="controls-column">
+            
+            <div class="glass-card mb-4">
+                <div class="flex-spread mb-3">
+                    <h3 class="card-title m-0">Game Mode</h3>
+                    <div class="engine-status" id="engineStatus"><span class="status-dot"></span> Engine Loading...</div>
+                </div>
+                
+                <div class="tabs mb-3">
+                    <button class="tab-btn active" data-tab="play">Play AI</button>
+                    <button class="tab-btn" data-tab="analyze">Analyze PGN</button>
+                </div>
+                
+                <div id="tab-play" class="tab-content">
+                    <div class="control-group">
+                        <label>AI Strength</label>
+                        <select class="input-modern" id="aiLevel">
+                            <option value="1">Level 1 (Beginner)</option>
+                            <option value="3">Level 3 (Casual)</option>
+                            <option value="5" selected>Level 5 (Intermediate)</option>
+                            <option value="10">Level 10 (Advanced)</option>
+                            <option value="20">Level 20 (Master)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Play As</label>
+                        <select class="input-modern" id="playerColor">
+                            <option value="w">White</option>
+                            <option value="b">Black</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary w-100" id="newGameBtn">Start New Game</button>
+                </div>
+                
+                <div id="tab-analyze" class="tab-content hidden">
+                    <div class="control-group">
+                        <label>Paste PGN</label>
+                        <textarea class="textarea-modern" id="pgnInput" rows="4" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."></textarea>
+                    </div>
+                    <button class="btn btn-primary w-100 mb-2" id="loadPgnBtn">Load PGN</button>
+                    
+                    <div class="control-group mb-2">
+                        <label>Famous Games</label>
+                        <select class="input-modern" id="famousGames">
+                            <option value="">-- Select to Auto-Play --</option>
+                            <option value="opera">The Opera Game (Morphy, 1858)</option>
+                            <option value="century">Game of the Century (Fischer, 1956)</option>
+                            <option value="immortal">Kasparov's Immortal (1999)</option>
+                            <option value="deepblue">Deep Blue vs Kasparov (1997)</option>
+                            <option value="carlsen">Carlsen's Queen Sac (2016)</option>
+                            <option value="evergreen">The Evergreen Game (Anderssen, 1852)</option>
+                            <option value="brilliancy">The Brilliancy Prize (Tal, 1960)</option>
+                            <option value="spassky">Fischer vs Spassky G6 (1972)</option>
+                            <option value="zugzwang">Nimzowitsch Zugzwang (1923)</option>
+                            <option value="alphazero">AlphaZero vs Stockfish (2017)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-secondary w-100" id="resetBoardBtn">Reset Board</button>
+                </div>
+            </div>
+
+            <div class="glass-card flex-grow">
+                <h3 class="card-title mb-3">Moves</h3>
+                <div class="move-controls mb-3">
+                    <button class="btn btn-icon" id="btnStart" title="First Move">⏮</button>
+                    <button class="btn btn-icon" id="btnPrev" title="Previous Move">◀</button>
+                    <button class="btn btn-icon" id="btnNext" title="Next Move">▶</button>
+                    <button class="btn btn-icon" id="btnEnd" title="Last Move">⏭</button>
+                    <button class="btn btn-icon" id="btnAutoPlay" title="Auto Play PGN">⏯</button>
+                </div>
+                <div class="moves-list" id="movesList"></div>
+                <div class="game-result hidden" id="gameResult"></div>
+                <div class="opening-name" id="openingName" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);font-style:italic;"></div>
+                <div class="utility-buttons" style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+                    <button class="btn btn-secondary btn-sm" id="exportPgn" title="Export PGN">📋 Export PGN</button>
+                    <button class="btn btn-secondary btn-sm" id="copyFen" title="Copy FEN">📄 Copy FEN</button>
+                    <button class="btn btn-secondary btn-sm" id="flipBoard" title="Flip Board">🔄 Flip</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner text-center">
+        <p class="copyright">© 2026 QuickUtils. Powered by <a href="https://github.com/jhlywa/chess.js" target="_blank" style="color:var(--primary-color);">chess.js</a> and <a href="https://stockfishchess.org/" target="_blank" style="color:var(--primary-color);">Stockfish</a>.</p>
+    </div>
+</footer>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
