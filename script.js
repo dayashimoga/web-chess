@@ -246,8 +246,13 @@ function renderPosition() {
                 const sqEl = document.getElementById('sq-' + sq);
                 if (sqEl) {
                     const pieceId = `${p.color}${p.type}`;
-                    // Find a stale piece of same type to move
-                    let pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
+                    // Find a stale piece of same type already on this exact square!
+                    let pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.parentElement.id === 'sq-' + sq && el.dataset.pieceType === pieceId);
+                    
+                    // If none, take any stale piece of this type (this handles the piece that actually moved)
+                    if (!pieceEl) {
+                         pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
+                    }
                     if (pieceEl) {
                         pieceEl.dataset.stale = 'false';
                         if (pieceEl.parentElement !== sqEl) {
@@ -268,6 +273,7 @@ function renderPosition() {
         }
     }
 
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
