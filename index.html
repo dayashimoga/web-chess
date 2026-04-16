@@ -64,6 +64,7 @@
                 <div class="eval-text" id="evalText">0.0</div>
             </div>
             
+            <div class="board-stack" style="display:flex; flex-direction:column; flex-grow:1; width:calc(100% - 36px);">
             <div class="player-info p-black mb-2" style="display:flex; justify-content:space-between; align-items:center;">
                 <span class="player-name">Black</span>
                 <div class="captured-pieces" id="capturedBlack" style="display:flex; gap:2px; height:1.5rem;"></div>
@@ -80,7 +81,7 @@
                 <span class="player-name">White</span>
                 <div class="captured-pieces" id="capturedWhite" style="display:flex; gap:2px; height:1.5rem;"></div>
             </div>
-            
+            </div>
             <!-- Sound Effects -->
             <audio id="snd-move" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-self.mp3" preload="auto"></audio>
             <audio id="snd-capture" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/capture.mp3" preload="auto"></audio>
@@ -108,11 +109,11 @@
                     <div class="control-group">
                         <label>AI Strength</label>
                         <select class="input-modern" id="aiLevel">
-                            <option value="1">Level 1 (Beginner)</option>
-                            <option value="3">Level 3 (Casual)</option>
-                            <option value="5" selected>Level 5 (Intermediate)</option>
-                            <option value="10">Level 10 (Advanced)</option>
-                            <option value="20">Level 20 (Master)</option>
+                            <option value="1">Level 1 (Easy)</option>
+                            <option value="5">Level 2 (Medium)</option>
+                            <option value="10" selected>Level 3 (Hard)</option>
+                            <option value="15">Level 4 (Harder)</option>
+                            <option value="20">Level 5 (Grandmaster)</option>
                         </select>
                     </div>
                     <div class="control-group">

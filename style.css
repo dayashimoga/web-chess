@@ -122,7 +122,7 @@ body {
 /* ─── Chess Board ─── */
 .board-wrapper {
     flex-grow: 1; aspect-ratio: 1 / 1; padding: 0; overflow: hidden;
-    position: relative;
+    position: relative; width: 100%;
     box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.05);
     border-radius: 8px;
 }
@@ -172,8 +172,13 @@ body {
     background-position: center; background-repeat: no-repeat;
     z-index: 10; position: relative;
     filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
-    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s;
     pointer-events: none; /* clicks go to the square */
+    animation: piece-drop 0.1s ease-out forwards;
+}
+
+@keyframes piece-drop {
+    from { opacity: 0; transform: translateY(-3px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ─── Promotion Modal ─── */
@@ -341,3 +346,13 @@ body {
     .eval-container { width: 22px; min-width: 22px; }
     .hero h1 { font-size: 1.5rem; }
 }
+
+/* Patched CSS */
+.board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
+.piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
+
+/* Patched CSS */
+.board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
+.piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }

@@ -80,7 +80,8 @@ function onEngineMessage(event) {
     } else if (typeof line === 'string' && line.startsWith('bestmove')) {
         const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
         if (match && mode === 'play') {
-            executeEngineMove(match[1]);
+            // Delay AI move slightly for realistic feel and readability
+            setTimeout(() => { executeEngineMove(match[1]); }, 1200);
         }
         if (mode === 'analyze') {
             setEngineStatus('ready', 'Analysis complete');
@@ -204,8 +205,10 @@ function buildBoard() {
 }
 
 function renderPosition() {
-    // Clear all dynamic state from squares
-    document.querySelectorAll('.piece').forEach(p => p.remove());
+    // Instead of deleting all pieces, we mark them for diffing to allow CSS transitions
+    const existingPieces = Array.from(document.querySelectorAll('.piece'));
+    existingPieces.forEach(p => p.dataset.stale = 'true');
+
     document.querySelectorAll('.square').forEach(sq => {
         sq.classList.remove('highlight', 'in-check', 'selected', 'can-capture');
         const dot = sq.querySelector('.move-dot');
@@ -242,15 +245,31 @@ function renderPosition() {
                 const sq = 'abcdefgh'[f] + (8 - r);
                 const sqEl = document.getElementById('sq-' + sq);
                 if (sqEl) {
-                    const pieceEl = document.createElement('div');
-                    pieceEl.className = 'piece';
-                    pieceEl.style.backgroundImage = `url(${PIECE_URLS[p.color + p.type]})`;
-                    sqEl.appendChild(pieceEl);
+                    const pieceId = `${p.color}${p.type}`;
+                    // Find a stale piece of same type to move
+                    let pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
+                    if (pieceEl) {
+                        pieceEl.dataset.stale = 'false';
+                        if (pieceEl.parentElement !== sqEl) {
+                            sqEl.appendChild(pieceEl); // Move it
+                        }
+                    } else {
+                        // Create new
+                        pieceEl = document.createElement('div');
+                        pieceEl.className = 'piece animate-in-piece';
+                        pieceEl.dataset.pieceType = pieceId;
+                        pieceEl.style.backgroundImage = `url(${PIECE_URLS[pieceId]})`;
+                        sqEl.appendChild(pieceEl);
+                        // Force reflow for transition
+                        void pieceEl.offsetWidth;
+                    }
                 }
             }
         }
     }
 
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
     updateMovesList();
     checkGameEnd();
@@ -710,17 +729,21 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
-// Theme toggle
-document.getElementById('themeBtn').addEventListener('click', () => {
-    const root = document.documentElement;
-    if (root.getAttribute('data-theme') === 'dark') {
-        root.setAttribute('data-theme', 'light');
-        document.getElementById('themeBtn').textContent = '☀️';
-    } else {
-        root.setAttribute('data-theme', 'dark');
-        document.getElementById('themeBtn').textContent = '🌙';
+// Theme toggle — uses shared qu_theme key for cross-project consistency
+(function() {
+    const saved = localStorage.getItem('qu_theme');
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        document.getElementById('themeBtn').textContent = saved === 'light' ? '☀️' : '🌙';
     }
-});
+    document.getElementById('themeBtn').addEventListener('click', () => {
+        const root = document.documentElement;
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('qu_theme', root.getAttribute('data-theme'));
+    });
+})();
 
 // ═══════════════════════════════════════════════════
 // OPENING BOOK — detects common openings
