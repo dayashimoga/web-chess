@@ -35,22 +35,47 @@ let currentMoveIdx = -1; // -1 = starting position
 // ═══════════════════════════════════════════════════
 const ACADEMY_DB = {
     openings: [
-        { id: 'op1', idx: 'I', title: 'Ruy Lopez - Main Line', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4', expected: ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4'] },
-        { id: 'op2', idx: 'I', title: 'Sicilian Defense - Najdorf', pgn: '1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6', expected: ['e4','c5','Nf3','d6','d4','cxd4','Nxd4','Nf6','Nc3','a6'] },
-        { id: 'op3', idx: 'I', title: 'Queen\'s Gambit', pgn: '1. d4 d5 2. c4', expected: ['d4','d5','c4'] }
+        { id: 'op1', idx: 'I', title: 'Ruy López', expected: ['e4','e5','Nf3','Nc6','Bb5'] },
+        { id: 'op2', idx: 'I', title: 'Italian Game', expected: ['e4','e5','Nf3','Nc6','Bc4'] },
+        { id: 'op3', idx: 'I', title: 'Petroff Defense', expected: ['e4','e5','Nf3','Nf6'] },
+        { id: 'op4', idx: 'I', title: 'Sicilian Defense', expected: ['e4','c5'] },
+        { id: 'op5', idx: 'I', title: 'Sicilian Open', expected: ['e4','c5','Nf3','d6','d4'] },
+        { id: 'op6', idx: 'I', title: 'Sicilian Two Knights', expected: ['e4','c5','Nf3','Nc6'] },
+        { id: 'op7', idx: 'I', title: 'French Defense', expected: ['e4','e6'] },
+        { id: 'op8', idx: 'I', title: 'Caro-Kann Defense', expected: ['e4','c6'] },
+        { id: 'op9', idx: 'I', title: 'Scandinavian Defense', expected: ['e4','d5'] },
+        { id: 'op10', idx: 'I', title: "Queen's Gambit", expected: ['d4','d5','c4'] },
+        { id: 'op11', idx: 'I', title: "Queen's Gambit Declined", expected: ['d4','d5','c4','e6'] },
+        { id: 'op12', idx: 'I', title: "Queen's Gambit Accepted", expected: ['d4','d5','c4','dxc4'] },
+        { id: 'op13', idx: 'I', title: "King's Indian Defense", expected: ['d4','Nf6','c4','g6'] },
+        { id: 'op14', idx: 'I', title: 'Nimzo-Indian Defense', expected: ['d4','Nf6','c4','e6','Nc3','Bb4'] },
+        { id: 'op15', idx: 'I', title: "King's Gambit", expected: ['e4','e5','f4'] },
+        { id: 'op16', idx: 'I', title: 'Scotch Game', expected: ['e4','e5','Nf3','Nc6','d4'] },
+        { id: 'op17', idx: 'I', title: 'Réti Opening', expected: ['Nf3','d5','c4'] },
+        { id: 'op18', idx: 'I', title: 'English Opening', expected: ['c4'] },
+        { id: 'op19', idx: 'I', title: 'Open Game', expected: ['e4','e5'] },
+        { id: 'op20', idx: 'I', title: 'Closed Game', expected: ['d4','d5'] }
     ],
     tactics: [
-        { id: 'tac1', idx: 'II', title: 'Mate in 2', fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4', expected: ['Nxe4', 'Qh5#'], hintSq: 'e4', isBlack: true },
-        { id: 'tac2', idx: 'II', title: 'Classic Fork', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], hintSq: 'e5', isBlack: false }
+        { id: 'tac1', idx: 'II', title: 'Mate in 2', fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4', expected: ['Nxe4', 'Qh5#'], isBlack: true },
+        { id: 'tac2', idx: 'II', title: 'Classic Fork', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], isBlack: false },
+        { id: 'tac3', idx: 'II', title: 'Back Rank Mate', fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', expected: ['Re8#'], isBlack: false },
+        { id: 'tac4', idx: 'II', title: 'Discovered Attack', fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w kq - 4 6', expected: ['Nxe5', 'Nxe5', 'd4'], isBlack: false },
+        { id: 'tac5', idx: 'II', title: 'Pin to Win', fen: '2r3k1/5ppp/p7/1p6/4Q3/P6P/1q3PP1/4R1K1 w - - 0 25', expected: ['Qe8+', 'Rxe8', 'Rxe8#'], isBlack: false }
     ],
     endgame: [
-        { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true }
+        { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end2', idx: 'III', title: 'Philidor Position', fen: '8/8/8/8/8/4k3/4p3/4K3 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end3', idx: 'III', title: 'King & Pawn vs King', fen: '8/8/8/8/3K4/3P4/8/3k4 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end4', idx: 'III', title: 'King & Rook vs King', fen: '8/8/8/8/8/8/3R4/K1k5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end5', idx: 'III', title: 'Queen vs Pawn (7th Rank)', fen: '8/8/8/8/8/8/p7/K1Q5 w - - 0 1', expected: null, playVsEngine: true }
     ]
 };
 
 let academyProgress = JSON.parse(localStorage.getItem('chessAcademyXP') || '{"xp":0,"completed":[]}');
 let activeLesson = null;
 let activeLessonStep = 0;
+let academyMode = 'theory'; // theory or practice
 
 // ═══════════════════════════════════════════════════
 // DOM REFERENCES
@@ -1116,8 +1141,9 @@ function calculateStreak() {
 }
 
 function checkAcademyProgress() {
-    if (!activeLesson || !activeLesson.expected) return;
-    if (activeLessonStep >= activeLesson.expected.length) {
+    if (!activeLesson || (!activeLesson.expected && !activeLesson.playVsEngine)) return;
+    
+    if (activeLesson.expected && activeLessonStep >= activeLesson.expected.length) {
         document.getElementById('academyHintText').innerHTML = '<strong>Lesson Complete! 🎉</strong> +50 XP';
         document.getElementById('snd-end')?.play().catch(()=>{});
         
@@ -1127,11 +1153,17 @@ function checkAcademyProgress() {
             saveAcademyProgress();
             buildAcademyList();
         }
-    } else {
+    } else if (activeLesson.expected) {
         const isHumanTurn = activeLesson.isBlack ? (activeLessonStep % 2 !== 0) : (activeLessonStep % 2 === 0);
         if (isHumanTurn) {
-            document.getElementById('academyHintText').textContent = 'Your turn. Find the best move.';
-            document.getElementById('btnAcademyHint')?.classList.remove('hidden');
+            const nextMove = activeLesson.expected[activeLessonStep];
+            if (academyMode === 'theory') {
+                document.getElementById('academyHintText').innerHTML = `Theory Mode: Play <strong class="text-neon-blue" style="font-size: 1.1rem">${nextMove}</strong>`;
+                document.getElementById('btnAcademyHint')?.classList.add('hidden');
+            } else {
+                document.getElementById('academyHintText').textContent = 'Your turn. Find the best move.';
+                document.getElementById('btnAcademyHint')?.classList.remove('hidden');
+            }
         } else {
             document.getElementById('academyHintText').textContent = 'Engine is responding...';
             document.getElementById('btnAcademyHint')?.classList.add('hidden');
@@ -1146,6 +1178,9 @@ function checkAcademyProgress() {
                 }
             }, 800);
         }
+    } else if (activeLesson.playVsEngine) {
+        document.getElementById('academyHintText').textContent = 'Beat Stockfish from this position!';
+        document.getElementById('btnAcademyHint')?.classList.add('hidden');
     }
 }
 
@@ -1189,6 +1224,15 @@ document.getElementById('btnBackToAcademy')?.addEventListener('click', () => {
     document.getElementById('academyCategories').classList.remove('hidden');
     activeLesson = null;
     activeLessonStep = 0;
+});
+
+document.querySelectorAll('.tab-btn[data-atab]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn[data-atab]').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        academyMode = e.target.dataset.atab;
+        checkAcademyProgress(); 
+    });
 });
 
 document.getElementById('btnAcademyHint')?.addEventListener('click', () => {
