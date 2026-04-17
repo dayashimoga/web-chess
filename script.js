@@ -1140,7 +1140,12 @@ function calculateStreak() {
     return 1;
 }
 
+function clearTheoryHighlights() {
+    document.querySelectorAll('.theory-highlight').forEach(el => el.classList.remove('theory-highlight'));
+}
+
 function checkAcademyProgress() {
+    clearTheoryHighlights();
     if (!activeLesson || (!activeLesson.expected && !activeLesson.playVsEngine)) return;
     
     if (activeLesson.expected && activeLessonStep >= activeLesson.expected.length) {
@@ -1160,6 +1165,16 @@ function checkAcademyProgress() {
             if (academyMode === 'theory') {
                 document.getElementById('academyHintText').innerHTML = `Theory Mode: Play <strong class="text-neon-blue" style="font-size: 1.1rem">${nextMove}</strong>`;
                 document.getElementById('btnAcademyHint')?.classList.add('hidden');
+                
+                // Highlight the specific engine squares natively
+                const movesList = chess.moves({ verbose: true });
+                const matchingMove = movesList.find(m => m.san === nextMove);
+                if (matchingMove) {
+                    const sqFrom = document.getElementById(`sq-${matchingMove.from}`);
+                    const sqTo = document.getElementById(`sq-${matchingMove.to}`);
+                    if (sqFrom) sqFrom.classList.add('theory-highlight');
+                    if (sqTo) sqTo.classList.add('theory-highlight');
+                }
             } else {
                 document.getElementById('academyHintText').textContent = 'Your turn. Find the best move.';
                 document.getElementById('btnAcademyHint')?.classList.remove('hidden');
