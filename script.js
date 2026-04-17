@@ -65,8 +65,8 @@ const ACADEMY_DB = {
         { id: 'tac6', idx: 'II', title: "Morphy's Opera Sac", fen: '1n2kb1r/p4ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 w k - 1 17', expected: ['Rd8#'], isBlack: false },
         { id: 'tac7', idx: 'II', title: "The Greek Gift", fen: 'r1bq1rk1/ppp1nppp/2n5/3pP3/1bB5/2N2N2/PP3PPP/R1BQR1K1 w - - 0 10', expected: ['Bxh7+', 'Kxh7', 'Ng5+'], isBlack: false },
         { id: 'tac8', idx: 'II', title: "Smothered Sequence", fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2N/4P3/8/PPPP1PPP/RNBQK2R b KQkq - 0 5', expected: ['Nxh5', 'Qxh5', 'g6'], isBlack: true },
-        { id: 'tac9', idx: 'II', title: "Légal Trap", fen: 'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPPBPPP/RNBQ1RK1 w kq - 0 6', expected: null, playVsEngine: true, isBlack: false },
-        { id: 'tac10', idx: 'II', title: "Fischer's Century", fen: 'rnbq1rk1/pp2ppbp/3p1np1/8/2PN4/2N3P1/PP2PPBP/R1BQK2R w KQ - 1 8', expected: null, playVsEngine: true, isBlack: false }
+        { id: 'tac9', idx: 'II', title: "Légal Trap", fen: 'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPPBPPP/RNBQ1RK1 w kq - 0 6', expected: ['Nxe5', 'Bxd1', 'Bxf7+', 'Ke7', 'Nd5#'], isBlack: false },
+        { id: 'tac10', idx: 'II', title: "Fischer's Century", fen: 'rnbq1rk1/pp2ppbp/3p1np1/8/2PN4/2N3P1/PP2PPBP/R1BQK2R w KQ - 1 8', expected: ['Na5', 'Bg5', 'Nxc3'], isBlack: true }
     ],
     endgame: [
         { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true },
@@ -365,7 +365,28 @@ function renderPosition() {
                     );
                     if (pieceEl) {
                         pieceEl.dataset.stale = 'false';
+                        
+                        // FLIP Physics Animation
+                        const beforeRect = pieceEl.getBoundingClientRect();
                         sqEl.appendChild(pieceEl);
+                        const afterRect = pieceEl.getBoundingClientRect();
+                        
+                        if (beforeRect.left !== 0 && beforeRect.top !== 0 && (beforeRect.left !== afterRect.left || beforeRect.top !== afterRect.top)) {
+                            const dx = beforeRect.left - afterRect.left;
+                            const dy = beforeRect.top - afterRect.top;
+                            
+                            pieceEl.style.transition = 'none';
+                            pieceEl.style.transform = `translate(${dx}px, ${dy}px)`;
+                            
+                            // Force rendering reflow
+                            pieceEl.getBoundingClientRect();
+                            
+                            pieceEl.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+                            pieceEl.style.transform = 'translate(0, 0)';
+                        } else {
+                            pieceEl.style.transition = 'none';
+                            pieceEl.style.transform = 'none';
+                        }
                     } else {
                         // Create brand new piece element
                         pieceEl = document.createElement('div');
