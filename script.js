@@ -61,14 +61,24 @@ const ACADEMY_DB = {
         { id: 'tac2', idx: 'II', title: 'Classic Fork', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], isBlack: false },
         { id: 'tac3', idx: 'II', title: 'Back Rank Mate', fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', expected: ['Re8#'], isBlack: false },
         { id: 'tac4', idx: 'II', title: 'Discovered Attack', fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w kq - 4 6', expected: ['Nxe5', 'Nxe5', 'd4'], isBlack: false },
-        { id: 'tac5', idx: 'II', title: 'Pin to Win', fen: '2r3k1/5ppp/p7/1p6/4Q3/P6P/1q3PP1/4R1K1 w - - 0 25', expected: ['Qe8+', 'Rxe8', 'Rxe8#'], isBlack: false }
+        { id: 'tac5', idx: 'II', title: 'Pin to Win', fen: '2r3k1/5ppp/p7/1p6/4Q3/P6P/1q3PP1/4R1K1 w - - 0 25', expected: ['Qe8+', 'Rxe8', 'Rxe8#'], isBlack: false },
+        { id: 'tac6', idx: 'II', title: "Morphy's Opera Sac", fen: '1n2kb1r/p4ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 w k - 1 17', expected: ['Rd8#'], isBlack: false },
+        { id: 'tac7', idx: 'II', title: "The Greek Gift", fen: 'r1bq1rk1/ppp1nppp/2n5/3pP3/1bB5/2N2N2/PP3PPP/R1BQR1K1 w - - 0 10', expected: ['Bxh7+', 'Kxh7', 'Ng5+'], isBlack: false },
+        { id: 'tac8', idx: 'II', title: "Smothered Sequence", fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2N/4P3/8/PPPP1PPP/RNBQK2R b KQkq - 0 5', expected: ['Nxh5', 'Qxh5', 'g6'], isBlack: true },
+        { id: 'tac9', idx: 'II', title: "Légal Trap", fen: 'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPPBPPP/RNBQ1RK1 w kq - 0 6', expected: null, playVsEngine: true, isBlack: false },
+        { id: 'tac10', idx: 'II', title: "Fischer's Century", fen: 'rnbq1rk1/pp2ppbp/3p1np1/8/2PN4/2N3P1/PP2PPBP/R1BQK2R w KQ - 1 8', expected: null, playVsEngine: true, isBlack: false }
     ],
     endgame: [
         { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true },
         { id: 'end2', idx: 'III', title: 'Philidor Position', fen: '8/8/8/8/8/4k3/4p3/4K3 w - - 0 1', expected: null, playVsEngine: true },
         { id: 'end3', idx: 'III', title: 'King & Pawn vs King', fen: '8/8/8/8/3K4/3P4/8/3k4 w - - 0 1', expected: null, playVsEngine: true },
         { id: 'end4', idx: 'III', title: 'King & Rook vs King', fen: '8/8/8/8/8/8/3R4/K1k5 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end5', idx: 'III', title: 'Queen vs Pawn (7th Rank)', fen: '8/8/8/8/8/8/p7/K1Q5 w - - 0 1', expected: null, playVsEngine: true }
+        { id: 'end5', idx: 'III', title: 'Queen vs Pawn (7th)', fen: '8/8/8/8/8/8/p7/K1Q5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end6', idx: 'III', title: 'Vancura Position', fen: '8/8/8/8/8/p1K5/7R/k7 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end7', idx: 'III', title: 'Pawn Square Rule', fen: '8/8/8/8/6p1/8/8/K1k5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end8', idx: 'III', title: 'Rook & Bishop vs Rook', fen: '8/8/8/8/8/R1B5/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end9', idx: 'III', title: 'Queen vs Rook', fen: '8/8/8/8/8/1Q6/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end10', idx: 'III', title: 'Two Bishops Mate', fen: '8/8/8/8/8/1BB5/8/K1k5 w - - 0 1', expected: null, playVsEngine: true }
     ]
 };
 
@@ -127,14 +137,33 @@ function onEngineMessage(event) {
     } else if (typeof line === 'string' && line.startsWith('bestmove')) {
         const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
         if (match && (mode === 'play' || (mode === 'academy' && activeLesson && activeLesson.playVsEngine))) {
-            // Delay AI move slightly for realistic feel and readability
-            setTimeout(() => { executeEngineMove(match[1]); }, typeof engineDelay !== 'undefined' ? engineDelay : 1200);
+            const isHuman = mode === 'academy' && activeLesson && activeLesson.playVsEngine && chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
+            if (!isHuman) {
+                // Delay AI move slightly for realistic feel and readability
+                setTimeout(() => { executeEngineMove(match[1]); }, typeof engineDelay !== 'undefined' ? engineDelay : 1200);
+            }
         }
         if (mode === 'analyze' || (mode === 'academy' && activeLesson && !activeLesson.playVsEngine)) {
             setEngineStatus('ready', 'Analysis complete');
+        } else if (mode === 'academy' && activeLesson && activeLesson.playVsEngine) {
+            const isHuman = chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
+            if (isHuman) setEngineStatus('ready', 'Awaiting your move...');
         }
     } else if (typeof line === 'string' && line.includes('score')) {
         parseEvalFromInfo(line);
+        const pvMatch = line.match(/pv ([a-h][1-8])([a-h][1-8])[qrbn]?/);
+        if (pvMatch && mode === 'academy' && academyMode === 'theory' && activeLesson && activeLesson.playVsEngine) {
+            const isHuman = chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
+            if (isHuman) {
+                document.getElementById('academyHintText').innerHTML = `Theory Mode Guidance: Play to <strong class="text-neon-blue">${pvMatch[2]}</strong>`;
+                clearTheoryHighlights();
+                const fromEl = document.getElementById(`sq-${pvMatch[1]}`);
+                const toEl = document.getElementById(`sq-${pvMatch[2]}`);
+                if (fromEl) fromEl.classList.add('theory-highlight');
+                if (toEl) toEl.classList.add('theory-highlight');
+                drawTheoryArrow(pvMatch[1], pvMatch[2]);
+            }
+        }
     }
 }
 
@@ -191,9 +220,14 @@ function requestEngineAnalysis(depthOverride) {
         setEngineStatus('thinking', 'Analyzing...');
         engine.postMessage('go depth ' + (depthOverride || 18));
     } else if (mode === 'academy') {
-        if (activeLesson && activeLesson.playVsEngine && chess.turn() !== (activeLesson.isBlack ? 'b' : 'w')) {
-            setEngineStatus('thinking', 'AI thinking...');
-            engine.postMessage('go depth 20');
+        if (activeLesson && activeLesson.playVsEngine) {
+            const isHuman = chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
+            if (!isHuman) {
+                setEngineStatus('thinking', 'AI thinking...');
+                engine.postMessage('go depth 20');
+            } else if (academyMode === 'theory') {
+                engine.postMessage('go depth 12');
+            }
         }
     }
 }
@@ -1140,8 +1174,79 @@ function calculateStreak() {
     return 1;
 }
 
+function drawTheoryArrow(fromMove, toMove) {
+    const board = document.getElementById('board');
+    let svg = document.getElementById('theory-svg');
+    if (!svg) {
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.id = "theory-svg";
+        svg.style.position = "absolute";
+        svg.style.top = "0";
+        svg.style.left = "0";
+        svg.style.width = "100%";
+        svg.style.height = "100%";
+        svg.style.pointerEvents = "none";
+        svg.style.zIndex = "100";
+        
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        marker.id = "arrowhead";
+        marker.setAttribute("markerWidth", "10");
+        marker.setAttribute("markerHeight", "7");
+        marker.setAttribute("refX", "9");
+        marker.setAttribute("refY", "3.5");
+        marker.setAttribute("orient", "auto");
+        const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        polygon.setAttribute("points", "0 0, 10 3.5, 0 7");
+        polygon.setAttribute("fill", "rgba(250, 204, 21, 0.9)");
+        marker.appendChild(polygon);
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+        board.appendChild(svg);
+        board.style.position = "relative";
+        
+        window.addEventListener('resize', () => { if(document.getElementById('theory-arrow-line')) clearTheoryArrow(); });
+    }
+    
+    const fromEl = document.getElementById('sq-' + fromMove);
+    const toEl = document.getElementById('sq-' + toMove);
+    if (!fromEl || !toEl) return;
+    
+    // Account for board flipped state indirectly using bounding client layout
+    const boardRect = board.getBoundingClientRect();
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect = toEl.getBoundingClientRect();
+    
+    const x1 = fromRect.left - boardRect.left + (fromRect.width/2);
+    const y1 = fromRect.top - boardRect.top + (fromRect.height/2);
+    const x2 = toRect.left - boardRect.left + (toRect.width/2);
+    const y2 = toRect.top - boardRect.top + (toRect.height/2);
+    
+    let line = document.getElementById('theory-arrow-line');
+    if (!line) {
+        line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.id = 'theory-arrow-line';
+        line.setAttribute("stroke", "rgba(250, 204, 21, 0.9)");
+        line.setAttribute("stroke-width", "8");
+        line.setAttribute("stroke-linecap", "round");
+        line.setAttribute("stroke-opacity", "0.9");
+        line.setAttribute("marker-end", "url(#arrowhead)");
+        svg.appendChild(line);
+    }
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+}
+
+function clearTheoryArrow() {
+    const line = document.getElementById('theory-arrow-line');
+    if (line) line.remove();
+}
+
 function clearTheoryHighlights() {
     document.querySelectorAll('.theory-highlight').forEach(el => el.classList.remove('theory-highlight'));
+    clearTheoryArrow();
 }
 
 function checkAcademyProgress() {
@@ -1174,6 +1279,7 @@ function checkAcademyProgress() {
                     const sqTo = document.getElementById(`sq-${matchingMove.to}`);
                     if (sqFrom) sqFrom.classList.add('theory-highlight');
                     if (sqTo) sqTo.classList.add('theory-highlight');
+                    drawTheoryArrow(matchingMove.from, matchingMove.to);
                 }
             } else {
                 document.getElementById('academyHintText').textContent = 'Your turn. Find the best move.';
