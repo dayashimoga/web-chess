@@ -31,6 +31,28 @@ let moveHistory = [];    // [{san, from, to, fen}, ...]
 let currentMoveIdx = -1; // -1 = starting position
 
 // ═══════════════════════════════════════════════════
+// ACADEMY DATABASE & STATE
+// ═══════════════════════════════════════════════════
+const ACADEMY_DB = {
+    openings: [
+        { id: 'op1', idx: 'I', title: 'Ruy Lopez - Main Line', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4', expected: ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4'] },
+        { id: 'op2', idx: 'I', title: 'Sicilian Defense - Najdorf', pgn: '1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6', expected: ['e4','c5','Nf3','d6','d4','cxd4','Nxd4','Nf6','Nc3','a6'] },
+        { id: 'op3', idx: 'I', title: 'Queen\'s Gambit', pgn: '1. d4 d5 2. c4', expected: ['d4','d5','c4'] }
+    ],
+    tactics: [
+        { id: 'tac1', idx: 'II', title: 'Mate in 2', fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4', expected: ['Nxe4', 'Qh5#'], hintSq: 'e4', isBlack: true },
+        { id: 'tac2', idx: 'II', title: 'Classic Fork', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], hintSq: 'e5', isBlack: false }
+    ],
+    endgame: [
+        { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true }
+    ]
+};
+
+let academyProgress = JSON.parse(localStorage.getItem('chessAcademyXP') || '{"xp":0,"completed":[]}');
+let activeLesson = null;
+let activeLessonStep = 0;
+
+// ═══════════════════════════════════════════════════
 // DOM REFERENCES
 // ═══════════════════════════════════════════════════
 const boardEl           = document.getElementById('board');
@@ -79,11 +101,11 @@ function onEngineMessage(event) {
         setEngineStatus('ready', 'Engine Ready');
     } else if (typeof line === 'string' && line.startsWith('bestmove')) {
         const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
-        if (match && mode === 'play') {
+        if (match && (mode === 'play' || (mode === 'academy' && activeLesson && activeLesson.playVsEngine))) {
             // Delay AI move slightly for realistic feel and readability
-            setTimeout(() => { executeEngineMove(match[1]); }, 1200);
+            setTimeout(() => { executeEngineMove(match[1]); }, typeof engineDelay !== 'undefined' ? engineDelay : 1200);
         }
-        if (mode === 'analyze') {
+        if (mode === 'analyze' || (mode === 'academy' && activeLesson && !activeLesson.playVsEngine)) {
             setEngineStatus('ready', 'Analysis complete');
         }
     } else if (typeof line === 'string' && line.includes('score')) {
@@ -143,6 +165,11 @@ function requestEngineAnalysis(depthOverride) {
         evalContainer.classList.remove('hidden');
         setEngineStatus('thinking', 'Analyzing...');
         engine.postMessage('go depth ' + (depthOverride || 18));
+    } else if (mode === 'academy') {
+        if (activeLesson && activeLesson.playVsEngine && chess.turn() !== (activeLesson.isBlack ? 'b' : 'w')) {
+            setEngineStatus('thinking', 'AI thinking...');
+            engine.postMessage('go depth 20');
+        }
     }
 }
 
@@ -205,7 +232,7 @@ function buildBoard() {
 }
 
 function renderPosition() {
-    // Instead of deleting all pieces, we mark them for diffing to allow CSS transitions
+    // Mark all existing pieces as stale for diff-based rendering
     const existingPieces = Array.from(document.querySelectorAll('.piece'));
     existingPieces.forEach(p => p.dataset.stale = 'true');
 
@@ -236,8 +263,10 @@ function renderPosition() {
         }
     }
 
-    // Draw pieces
+    // Draw pieces — two-pass approach to prevent scrambling
     const board = chess.board();
+
+    // PASS 1: Claim pieces already on the correct square (these never move in the DOM)
     for (let r = 0; r < 8; r++) {
         for (let f = 0; f < 8; f++) {
             const p = board[r][f];
@@ -246,34 +275,52 @@ function renderPosition() {
                 const sqEl = document.getElementById('sq-' + sq);
                 if (sqEl) {
                     const pieceId = `${p.color}${p.type}`;
-                    // Find a stale piece of same type already on this exact square!
-                    let pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.parentElement.id === 'sq-' + sq && el.dataset.pieceType === pieceId);
-                    
-                    // If none, take any stale piece of this type (this handles the piece that actually moved)
-                    if (!pieceEl) {
-                         pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
-                    }
-                    if (pieceEl) {
-                        pieceEl.dataset.stale = 'false';
-                        if (pieceEl.parentElement !== sqEl) {
-                            sqEl.appendChild(pieceEl); // Move it
-                        }
-                    } else {
-                        // Create new
-                        pieceEl = document.createElement('div');
-                        pieceEl.className = 'piece animate-in-piece';
-                        pieceEl.dataset.pieceType = pieceId;
-                        pieceEl.style.backgroundImage = `url(${PIECE_URLS[pieceId]})`;
-                        sqEl.appendChild(pieceEl);
-                        // Force reflow for transition
-                        void pieceEl.offsetWidth;
+                    const resident = existingPieces.find(el =>
+                        el.dataset.stale === 'true' &&
+                        el.parentElement === sqEl &&
+                        el.dataset.pieceType === pieceId
+                    );
+                    if (resident) {
+                        resident.dataset.stale = 'false';
                     }
                 }
             }
         }
     }
 
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
+    // PASS 2: For squares that still need a piece, grab any remaining stale piece of that type and move it
+    for (let r = 0; r < 8; r++) {
+        for (let f = 0; f < 8; f++) {
+            const p = board[r][f];
+            if (p) {
+                const sq = 'abcdefgh'[f] + (8 - r);
+                const sqEl = document.getElementById('sq-' + sq);
+                if (sqEl) {
+                    // Check if this square already has a claimed piece
+                    const alreadyClaimed = sqEl.querySelector('.piece:not([data-stale="true"])');
+                    if (alreadyClaimed) continue;
+
+                    const pieceId = `${p.color}${p.type}`;
+                    let pieceEl = existingPieces.find(el =>
+                        el.dataset.stale === 'true' && el.dataset.pieceType === pieceId
+                    );
+                    if (pieceEl) {
+                        pieceEl.dataset.stale = 'false';
+                        sqEl.appendChild(pieceEl);
+                    } else {
+                        // Create brand new piece element
+                        pieceEl = document.createElement('div');
+                        pieceEl.className = 'piece';
+                        pieceEl.dataset.pieceType = pieceId;
+                        pieceEl.style.backgroundImage = `url(${PIECE_URLS[pieceId]})`;
+                        sqEl.appendChild(pieceEl);
+                    }
+                }
+            }
+        }
+    }
+
+    // Remove captured pieces (anything still marked stale)
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
@@ -343,6 +390,15 @@ function onSquareClick(e) {
 
     // In play mode, block clicks when it's AI's turn
     if (mode === 'play' && chess.turn() === aiColor && !chess.isGameOver()) return;
+    
+    // In academy mode, block clicks if it's the AI's expected turn
+    if (mode === 'academy') {
+        if (activeLesson && activeLesson.expected) {
+            const isHumanTurn = activeLesson.isBlack ? (activeLessonStep % 2 !== 0) : (activeLessonStep % 2 === 0);
+            if (!isHumanTurn) return; // Wait for engine to auto-play this step
+        }
+        if (activeLesson && activeLesson.playVsEngine && chess.turn() !== (activeLesson.isBlack ? 'b' : 'w')) return;
+    }
 
     // If browsing history in analyze mode, jump to latest before allowing moves
     if (mode === 'analyze' && currentMoveIdx < moveHistory.length - 1) {
@@ -360,8 +416,29 @@ function onSquareClick(e) {
                 // Pawn promotion
                 showPromotionPicker(targetMove.from, targetMove.to);
             } else {
-                const move = chess.move({ from: targetMove.from, to: targetMove.to });
-                if (move) commitMove(move);
+                if (mode === 'academy' && activeLesson && activeLesson.expected) {
+                    const testMove = chess.move({ from: targetMove.from, to: targetMove.to });
+                    if (testMove) {
+                        if (testMove.san === activeLesson.expected[activeLessonStep]) {
+                            document.getElementById('snd-success')?.play().catch(()=>{});
+                            activeLessonStep++;
+                            commitMove(testMove);
+                            checkAcademyProgress();
+                        } else {
+                            chess.undo();
+                            document.getElementById('snd-error')?.play().catch(()=>{});
+                            const pEl = document.querySelector(`#sq-${targetMove.from} .piece`);
+                            if(pEl) {
+                                pEl.classList.remove('shake-error');
+                                void pEl.offsetWidth; // Trigger reflow for reset
+                                pEl.classList.add('shake-error');
+                            }
+                        }
+                    }
+                } else {
+                    const move = chess.move({ from: targetMove.from, to: targetMove.to });
+                    if (move) commitMove(move);
+                }
             }
             clearSelection();
             return;
@@ -843,6 +920,16 @@ let dragGhost = null;
 function onPieceDragStart(e) {
     if (!promotionModal.classList.contains('hidden')) return;
     if (mode === 'play' && chess.turn() === aiColor && !chess.isGameOver()) return;
+    
+    // In academy mode, block clicks if it's the AI's expected turn
+    if (mode === 'academy') {
+        if (activeLesson && activeLesson.expected) {
+            const isHumanTurn = activeLesson.isBlack ? (activeLessonStep % 2 !== 0) : (activeLessonStep % 2 === 0);
+            if (!isHumanTurn) return; // Engine is moving
+        }
+        if (activeLesson && activeLesson.playVsEngine && chess.turn() !== (activeLesson.isBlack ? 'b' : 'w')) return;
+    }
+
     if (mode === 'analyze' && currentMoveIdx < moveHistory.length - 1) {
         jumpToMove(moveHistory.length - 1);
     }
@@ -901,8 +988,29 @@ function onPieceDragEnd(e) {
             if (targetMove.flags.includes('p')) {
                 showPromotionPicker(targetMove.from, targetMove.to);
             } else {
-                const move = chess.move({ from: targetMove.from, to: targetMove.to });
-                if (move) commitMove(move);
+                if (mode === 'academy' && activeLesson && activeLesson.expected) {
+                    const testMove = chess.move({ from: targetMove.from, to: targetMove.to });
+                    if (testMove) {
+                        if (testMove.san === activeLesson.expected[activeLessonStep]) {
+                            document.getElementById('snd-success')?.play().catch(()=>{});
+                            activeLessonStep++;
+                            commitMove(testMove);
+                            checkAcademyProgress();
+                        } else {
+                            chess.undo();
+                            document.getElementById('snd-error')?.play().catch(()=>{});
+                            const pEl = document.querySelector(`#sq-${targetMove.from} .piece`);
+                            if(pEl) {
+                                pEl.classList.remove('shake-error');
+                                void pEl.offsetWidth; // Trigger reflow
+                                pEl.classList.add('shake-error');
+                            }
+                        }
+                    }
+                } else {
+                    const move = chess.move({ from: targetMove.from, to: targetMove.to });
+                    if (move) commitMove(move);
+                }
             }
         }
     }
@@ -934,7 +1042,189 @@ commitMove = function(move) {
 };
 
 // ═══════════════════════════════════════════════════
+// BOARD THEMES
+// ═══════════════════════════════════════════════════
+const BOARD_THEMES = {
+    classic:  { light: '#f0d9b5', dark: '#b58863' },
+    emerald:  { light: '#eeeed2', dark: '#769656' },
+    midnight: { light: '#dee3e6', dark: '#4b7399' },
+    marble:   { light: '#e8e0d0', dark: '#8b7d6b' },
+};
+
+document.getElementById('boardTheme').addEventListener('change', (e) => {
+    const theme = BOARD_THEMES[e.target.value];
+    if (theme) {
+        document.documentElement.style.setProperty('--board-light', theme.light);
+        document.documentElement.style.setProperty('--board-dark', theme.dark);
+    }
+});
+
+// ═══════════════════════════════════════════════════
+// MOVE TIMING SLIDER
+// ═══════════════════════════════════════════════════
+let engineDelay = 1200;
+document.getElementById('moveTimingSlider').addEventListener('input', (e) => {
+    engineDelay = parseInt(e.target.value);
+    document.getElementById('moveTimingVal').textContent = (engineDelay / 1000).toFixed(1) + 's';
+});
+
+// ═══════════════════════════════════════════════════
+// ACADEMY LOGIC & CURRICULUM
+// ═══════════════════════════════════════════════════
+
+function saveAcademyProgress() {
+    localStorage.setItem('chessAcademyXP', JSON.stringify(academyProgress));
+    updateAcademyUI();
+}
+
+function updateAcademyUI() {
+    document.getElementById('academyXp').textContent = academyProgress.xp;
+    document.getElementById('academyStreak').textContent = calculateStreak();
+    
+    // Calculate Elo based on completed
+    let elo = 800 + (academyProgress.completed.length * 25);
+    document.getElementById('academyElo').textContent = academyProgress.completed.length === 0 ? "Unranked" : Math.min(elo, 2500);
+
+    const ops = ACADEMY_DB.openings.length;
+    const tacs = ACADEMY_DB.tactics.length;
+    const ends = ACADEMY_DB.endgame.length;
+
+    const compOps = academyProgress.completed.filter(id => id.startsWith('op')).length;
+    const compTacs = academyProgress.completed.filter(id => id.startsWith('tac')).length;
+    const compEnds = academyProgress.completed.filter(id => id.startsWith('end')).length;
+
+    document.getElementById('ac-prog-ops').textContent = Math.round((compOps / ops) * 100) + '%';
+    document.getElementById('ac-prog-tac').textContent = Math.round((compTacs / tacs) * 100) + '%';
+    document.getElementById('ac-prog-end').textContent = Math.round((compEnds / ends) * 100) + '%';
+}
+
+function calculateStreak() {
+    const today = new Date().toDateString();
+    if (academyProgress.lastActive === today) return academyProgress.streak || 1;
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (academyProgress.lastActive === yesterday.toDateString()) {
+        academyProgress.streak = (academyProgress.streak || 0) + 1;
+        academyProgress.lastActive = today;
+        return academyProgress.streak;
+    }
+    
+    academyProgress.streak = 1;
+    academyProgress.lastActive = today;
+    return 1;
+}
+
+function checkAcademyProgress() {
+    if (!activeLesson || !activeLesson.expected) return;
+    if (activeLessonStep >= activeLesson.expected.length) {
+        document.getElementById('academyHintText').innerHTML = '<strong>Lesson Complete! 🎉</strong> +50 XP';
+        document.getElementById('snd-end')?.play().catch(()=>{});
+        
+        if (!academyProgress.completed.includes(activeLesson.id)) {
+            academyProgress.completed.push(activeLesson.id);
+            academyProgress.xp += 50;
+            saveAcademyProgress();
+            buildAcademyList();
+        }
+    } else {
+        const isHumanTurn = activeLesson.isBlack ? (activeLessonStep % 2 !== 0) : (activeLessonStep % 2 === 0);
+        if (isHumanTurn) {
+            document.getElementById('academyHintText').textContent = 'Your turn. Find the best move.';
+            document.getElementById('btnAcademyHint')?.classList.remove('hidden');
+        } else {
+            document.getElementById('academyHintText').textContent = 'Engine is responding...';
+            document.getElementById('btnAcademyHint')?.classList.add('hidden');
+            
+            // Auto play engine expected move
+            setTimeout(() => {
+                const testMove = chess.move(activeLesson.expected[activeLessonStep]);
+                if (testMove) {
+                    commitMove(testMove);
+                    activeLessonStep++;
+                    checkAcademyProgress();
+                }
+            }, 800);
+        }
+    }
+}
+
+function loadLesson(lesson) {
+    activeLesson = lesson;
+    activeLessonStep = 0;
+    
+    document.getElementById('academyCategories').classList.add('hidden');
+    document.getElementById('academyActiveLesson').classList.remove('hidden');
+    
+    document.getElementById('al-title').textContent = lesson.title;
+    document.getElementById('al-desc').textContent = lesson.desc || "Follow the moves to complete the lesson.";
+    
+    document.getElementById('academyHintText').textContent = "Starting lesson...";
+    document.getElementById('btnAcademyHint')?.classList.add('hidden');
+
+    chess = new Chess();
+    if (lesson.pgn && typeof lesson.pgn === 'string') {
+        const temp = new Chess();
+        temp.loadPgn(lesson.pgn);
+        // Load partial history
+    } else if (lesson.fen) {
+        chess.load(lesson.fen);
+    }
+    
+    moveHistory = [];
+    currentMoveIdx = -1;
+    flipped = activeLesson.isBlack;
+    buildBoard();
+    
+    // Start engine if needed
+    if (activeLesson.playVsEngine) {
+        requestEngineAnalysis();
+    } else {
+        checkAcademyProgress();
+    }
+}
+
+document.getElementById('btnBackToAcademy')?.addEventListener('click', () => {
+    document.getElementById('academyActiveLesson').classList.add('hidden');
+    document.getElementById('academyCategories').classList.remove('hidden');
+    activeLesson = null;
+    activeLessonStep = 0;
+});
+
+document.getElementById('btnAcademyHint')?.addEventListener('click', () => {
+    if (activeLesson && activeLesson.expected && activeLessonStep < activeLesson.expected.length) {
+        const m = activeLesson.expected[activeLessonStep];
+        document.getElementById('academyHintText').innerHTML = `Hint: The move is <strong>${m}</strong>`;
+        academyProgress.xp = Math.max(0, academyProgress.xp - 5); // Penalty
+        saveAcademyProgress();
+    }
+});
+
+function buildAcademyList() {
+    ['openings', 'tactics', 'endgame'].forEach(cat => {
+        const el = document.getElementById('ac-list-' + cat);
+        if (!el) return;
+        el.innerHTML = '';
+        ACADEMY_DB[cat].forEach(item => {
+            const div = document.createElement('div');
+            const isComp = academyProgress.completed.includes(item.id);
+            div.className = 'ac-item ' + (isComp ? 'completed' : '');
+            div.innerHTML = `
+                <div>
+                    <span class="ac-item-title">${item.title}</span>
+                </div>
+            `;
+            div.onclick = () => loadLesson(item);
+            el.appendChild(div);
+        });
+    });
+    updateAcademyUI();
+}
+
+// ═══════════════════════════════════════════════════
 // BOOTSTRAP
 // ═══════════════════════════════════════════════════
 initEngine();
 buildBoard();
+buildAcademyList();
+

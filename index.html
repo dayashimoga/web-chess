@@ -88,21 +88,26 @@
             <audio id="snd-check" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-check.mp3" preload="auto"></audio>
             <audio id="snd-castle" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3" preload="auto"></audio>
             <audio id="snd-end" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3" preload="auto"></audio>
-            <audio id="snd-illegal" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/illegal.mp3" preload="auto"></audio>
+            <audio id="snd-error" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/illegal.mp3" preload="auto"></audio>
+            <audio id="snd-success" src="https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/promote.mp3" preload="auto"></audio>
         </div>
 
         <!-- RIGHT: Controls & PGN -->
         <div class="controls-column">
             
-            <div class="glass-card mb-4">
+            <div class="glass-card mb-4" id="controlsBox">
                 <div class="flex-spread mb-3">
                     <h3 class="card-title m-0">Game Mode</h3>
                     <div class="engine-status" id="engineStatus"><span class="status-dot"></span> Engine Loading...</div>
+                    <div class="academy-progress hidden" id="academyProgress">
+                        <span class="text-neon-green" style="font-size:0.8rem; font-weight:bold;">XP: <span id="academyXp">0</span></span>
+                    </div>
                 </div>
                 
                 <div class="tabs mb-3">
                     <button class="tab-btn active" data-tab="play">Play AI</button>
                     <button class="tab-btn" data-tab="analyze">Analyze PGN</button>
+                    <button class="tab-btn" data-tab="academy"><span style="color:#facc15;">★</span> Academy</button>
                 </div>
                 
                 <div id="tab-play" class="tab-content">
@@ -153,9 +158,64 @@
 
                     <button class="btn btn-secondary w-100" id="resetBoardBtn">Reset Board</button>
                 </div>
+
+                <div id="tab-academy" class="tab-content hidden">
+                    <p class="text-xs text-muted mb-3" style="text-align: center; color: var(--text-muted);">Interactive curriculum to guide you to mastery.</p>
+                    
+                    <div class="academy-progress mb-3 glass-card" style="padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="text-xs text-muted">Daily Streak 🔥 <span id="academyStreak">0</span></span>
+                            <span class="text-xs text-muted">Elo Estimate: <strong id="academyElo">Unranked</strong></span>
+                        </div>
+                        <div class="text-neon-green" style="font-size:1.1rem; font-weight:800; text-shadow: 0 0 5px rgba(34,197,94,0.5);">
+                            XP: <span id="academyXp">0</span>
+                        </div>
+                    </div>
+
+                    <div id="academyCategories">
+                        <div class="academy-category mb-2">
+                            <div class="ac-header d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color:#60a5fa; font-size: 1.05rem;">I. Openings</span>
+                                <span class="text-xs text-muted" id="ac-prog-ops">0%</span>
+                            </div>
+                            <div class="ac-list" id="ac-list-openings"></div>
+                        </div>
+                        
+                        <div class="academy-category mb-2 mt-3">
+                            <div class="ac-header d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color:#c084fc; font-size: 1.05rem;">II. Middlegame & Tactics</span>
+                                <span class="text-xs text-muted" id="ac-prog-tac">0%</span>
+                            </div>
+                            <div class="ac-list" id="ac-list-tactics"></div>
+                        </div>
+
+                        <div class="academy-category mb-2 mt-3">
+                            <div class="ac-header d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color:#34d399; font-size: 1.05rem;">III. Endgames</span>
+                                <span class="text-xs text-muted" id="ac-prog-end">0%</span>
+                            </div>
+                            <div class="ac-list" id="ac-list-endgame"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="academyActiveLesson" class="hidden">
+                        <button class="btn btn-secondary btn-sm mb-3 w-100" id="btnBackToAcademy">← Back to Curriculum</button>
+                        <h4 id="al-title" style="color: var(--primary-color); margin-bottom: 0.5rem;"></h4>
+                        <p id="al-desc" class="text-xs text-muted mb-3"></p>
+                        
+                        <div class="tabs mb-2" style="border-bottom: 1px solid var(--panel-border);">
+                            <button class="tab-btn active" data-atab="theory" style="padding: 5px; font-size: 0.8rem;">Theory Mode</button>
+                            <button class="tab-btn" data-atab="practice" style="padding: 5px; font-size: 0.8rem;">Practice Mode</button>
+                        </div>
+                        
+                        <div class="academy-instructions mt-2 p-3 glass-card" style="border-left: 3px solid var(--primary-color);">
+                            <p class="text-xs m-0" id="academyHintText">Loading lesson...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="glass-card flex-grow">
+            <div class="glass-card flex-grow" id="movesPanelBox">
                 <h3 class="card-title mb-3">Moves</h3>
                 <div class="move-controls mb-3">
                     <button class="btn btn-icon" id="btnStart" title="First Move">⏮</button>
@@ -168,9 +228,25 @@
                 <div class="game-result hidden" id="gameResult"></div>
                 <div class="opening-name" id="openingName" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);font-style:italic;"></div>
                 <div class="utility-buttons" style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-                    <button class="btn btn-secondary btn-sm" id="exportPgn" title="Export PGN">📋 Export PGN</button>
-                    <button class="btn btn-secondary btn-sm" id="copyFen" title="Copy FEN">📄 Copy FEN</button>
-                    <button class="btn btn-secondary btn-sm" id="flipBoard" title="Flip Board">🔄 Flip</button>
+                    <button class="btn btn-secondary btn-sm" id="exportPgn" title="Export PGN">&#x1F4CB; Export PGN</button>
+                    <button class="btn btn-secondary btn-sm" id="copyFen" title="Copy FEN">&#x1F4C4; Copy FEN</button>
+                    <button class="btn btn-secondary btn-sm" id="flipBoard" title="Flip Board">&#x1F504; Flip</button>
+                </div>
+                <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border-color);">
+                    <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                        <label style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">&#x1F3A8; Theme</label>
+                        <select id="boardTheme" class="btn btn-secondary btn-sm" style="flex:1;padding:4px 8px;font-size:0.8rem;">
+                            <option value="classic">Classic Wood</option>
+                            <option value="emerald">Emerald</option>
+                            <option value="midnight">Midnight Blue</option>
+                            <option value="marble">Marble</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                        <label style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">&#x23F1; AI Delay</label>
+                        <input type="range" id="moveTimingSlider" min="200" max="3000" step="100" value="1200" style="flex:1;accent-color:var(--primary-color);">
+                        <span id="moveTimingVal" style="font-size:0.75rem;color:var(--text-muted);min-width:32px;">1.2s</span>
+                    </div>
                 </div>
             </div>
 
