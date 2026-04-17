@@ -596,6 +596,16 @@ function commitMove(move) {
     // Play sound based on move characteristics
     playSound(move);
 
+    if (move.captured) {
+        const sqEl = document.getElementById('sq-' + move.to);
+        if (sqEl) {
+            const ripple = document.createElement('div');
+            ripple.className = 'capture-ripple';
+            sqEl.appendChild(ripple);
+            setTimeout(() => { if (ripple.parentNode) ripple.remove(); }, 600);
+        }
+    }
+
     renderPosition();
 
     // Request engine analysis or AI move
@@ -965,8 +975,20 @@ document.getElementById('copyFen').addEventListener('click', () => {
 });
 
 document.getElementById('flipBoard').addEventListener('click', () => {
-    flipped = !flipped;
-    buildBoard();
+    const wrap = document.querySelector('.board-wrapper');
+    if (wrap) {
+        wrap.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        wrap.style.transform = flipped ? 'rotateY(-180deg)' : 'rotateY(180deg)';
+        setTimeout(() => {
+            flipped = !flipped;
+            buildBoard();
+            wrap.style.transition = 'none';
+            wrap.style.transform = 'none';
+        }, 300);
+    } else {
+        flipped = !flipped;
+        buildBoard();
+    }
 });
 
 // ═══════════════════════════════════════════════════
@@ -1191,14 +1213,15 @@ function drawTheoryArrow(fromMove, toMove) {
         const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
         const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
         marker.id = "arrowhead";
-        marker.setAttribute("markerWidth", "10");
-        marker.setAttribute("markerHeight", "7");
-        marker.setAttribute("refX", "9");
-        marker.setAttribute("refY", "3.5");
+        marker.setAttribute("markerWidth", "6");
+        marker.setAttribute("markerHeight", "5");
+        marker.setAttribute("refX", "4.5");
+        marker.setAttribute("refY", "2.5");
         marker.setAttribute("orient", "auto");
         const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-        polygon.setAttribute("points", "0 0, 10 3.5, 0 7");
-        polygon.setAttribute("fill", "rgba(250, 204, 21, 0.9)");
+        polygon.setAttribute("points", "0 0, 6 2.5, 0 5");
+        polygon.setAttribute("fill", "rgba(59, 130, 246, 0.8)"); // Premium Blue
+
         marker.appendChild(polygon);
         defs.appendChild(marker);
         svg.appendChild(defs);
@@ -1226,10 +1249,10 @@ function drawTheoryArrow(fromMove, toMove) {
     if (!line) {
         line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.id = 'theory-arrow-line';
-        line.setAttribute("stroke", "rgba(250, 204, 21, 0.9)");
-        line.setAttribute("stroke-width", "8");
+        line.setAttribute("stroke", "rgba(59, 130, 246, 0.8)"); // Premium Blue
+        line.setAttribute("stroke-width", "4.5");
         line.setAttribute("stroke-linecap", "round");
-        line.setAttribute("stroke-opacity", "0.9");
+        line.setAttribute("stroke-opacity", "1");
         line.setAttribute("marker-end", "url(#arrowhead)");
         svg.appendChild(line);
     }
