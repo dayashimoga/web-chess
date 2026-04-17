@@ -139,8 +139,8 @@ function onEngineMessage(event) {
         if (match && (mode === 'play' || (mode === 'academy' && activeLesson && activeLesson.playVsEngine))) {
             const isHuman = mode === 'academy' && activeLesson && activeLesson.playVsEngine && chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
             if (!isHuman) {
-                // Delay AI move slightly for realistic feel and readability
-                setTimeout(() => { executeEngineMove(match[1]); }, typeof engineDelay !== 'undefined' ? engineDelay : 1200);
+                // Delay AI move significantly for realistic feel, giving 0.5s for previous animations to finish
+                setTimeout(() => { executeEngineMove(match[1]); }, typeof engineDelay !== 'undefined' ? Math.max(engineDelay, 1500) : 1500);
             }
         }
         if (mode === 'analyze' || (mode === 'academy' && activeLesson && !activeLesson.playVsEngine)) {
@@ -378,10 +378,10 @@ function renderPosition() {
                             pieceEl.style.transition = 'none';
                             pieceEl.style.transform = `translate(${dx}px, ${dy}px)`;
                             
-                            // Force rendering reflow
+                            // Force reflow
                             pieceEl.getBoundingClientRect();
                             
-                            pieceEl.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+                            pieceEl.style.transition = 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)';
                             pieceEl.style.transform = 'translate(0, 0)';
                         } else {
                             pieceEl.style.transition = 'none';
@@ -694,9 +694,14 @@ function updateMovesList() {
     }
     movesListEl.innerHTML = html;
 
-    // Scroll active move into view
+    // Scroll natively within the container itself to avoid scrolling the whole webpage!
     const active = movesListEl.querySelector('.move-btn.active');
-    if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (active) {
+        movesListEl.scrollTo({
+            top: active.offsetTop - movesListEl.offsetTop - (movesListEl.clientHeight / 2) + (active.clientHeight / 2),
+            behavior: 'smooth'
+        });
+    }
 
     // Bind click handlers
     movesListEl.querySelectorAll('.move-btn').forEach(btn => {
@@ -1341,7 +1346,7 @@ function checkAcademyProgress() {
                     activeLessonStep++;
                     checkAcademyProgress();
                 }
-            }, 800);
+            }, 1500);
         }
     } else if (activeLesson.playVsEngine) {
         document.getElementById('academyHintText').textContent = 'Beat Stockfish from this position!';
