@@ -79,6 +79,18 @@ const ACADEMY_DB = {
         { id: 'end8', idx: 'III', title: 'Rook & Bishop vs Rook', fen: '8/8/8/8/8/R1B5/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
         { id: 'end9', idx: 'III', title: 'Queen vs Rook', fen: '8/8/8/8/8/1Q6/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
         { id: 'end10', idx: 'III', title: 'Two Bishops Mate', fen: '8/8/8/8/8/1BB5/8/K1k5 w - - 0 1', expected: null, playVsEngine: true }
+    ],
+    fundamentals: [
+        { id: 'fund1', idx: '0', title: 'Piece Movement: Pawns', desc: 'Pawns move forward 1 square, capture diagonally. First move can be 2 squares.', expected: ['e4','d5','exd5'], isBlack: false },
+        { id: 'fund2', idx: '0', title: 'Piece Movement: Knights', desc: 'Knights move in an L-shape and can jump over pieces.', fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1', expected: ['Nf3','Nc6','Nc3'], isBlack: false },
+        { id: 'fund3', idx: '0', title: 'Piece Movement: Bishops', desc: 'Bishops move diagonally any number of squares.', fen: 'rnbqkbnr/pppp1ppp/4p3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2', expected: ['Bc4'], isBlack: false },
+        { id: 'fund4', idx: '0', title: 'How to Castle', desc: 'Castling moves King 2 squares toward a Rook. King and Rook must not have moved.', fen: 'rnbqk2r/pppp1ppp/4pn2/8/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', expected: ['O-O'], isBlack: false },
+        { id: 'fund5', idx: '0', title: 'En Passant Capture', desc: 'When a pawn moves 2 squares and lands beside your pawn, you can capture it "in passing".', fen: 'rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3', expected: ['exd6'], isBlack: false },
+        { id: 'fund6', idx: '0', title: 'What is Check?', desc: 'Check means the King is under attack. You must escape check.', fen: 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2', expected: ['Qh4+'], isBlack: true },
+        { id: 'fund7', idx: '0', title: "Scholar's Mate", desc: 'The fastest checkmate in 4 moves. Learn to both execute and defend.', expected: ['e4','e5','Bc4','Nc6','Qh5','Nf6','Qxf7#'], isBlack: false },
+        { id: 'fund8', idx: '0', title: 'The Pin Tactic', desc: 'A pin restricts a piece from moving because it would expose a more valuable piece.', fen: 'rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2', expected: ['Bg5'], isBlack: false },
+        { id: 'fund9', idx: '0', title: 'The Fork Tactic', desc: 'A fork attacks two or more pieces simultaneously.', fen: 'r1bqkb1r/pppppppp/2n2n2/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', expected: ['d4'], isBlack: false },
+        { id: 'fund10', idx: '0', title: 'Controlling the Center', desc: 'The center (d4,d5,e4,e5) is the most important area. Control it with pawns and pieces.', expected: ['e4','e5','d4','exd4','Nf3'], isBlack: false },
     ]
 };
 
@@ -856,6 +868,7 @@ document.getElementById('btnNext').onclick  = () => jumpToMove(currentMoveIdx + 
 document.getElementById('btnEnd').onclick   = () => jumpToMove(moveHistory.length - 1);
 
 let autoPlayTimer = null;
+let replaySpeed = 1200;
 const btnAutoPlay = document.getElementById('btnAutoPlay');
 if (btnAutoPlay) {
     btnAutoPlay.onclick = () => {
@@ -873,9 +886,118 @@ if (btnAutoPlay) {
                 } else {
                     jumpToMove(currentMoveIdx + 1);
                 }
-            }, 1000);
+            }, replaySpeed);
         }
     };
+}
+
+// ═══════════════════════════════════════════════════
+// DIFFICULTY LEVEL DESCRIPTIONS
+// ═══════════════════════════════════════════════════
+const DIFF_DESCS = {
+    '1': '🟢 Perfect for absolute beginners. AI makes mistakes and plays slowly.',
+    '5': '🟡 Intermediate level. AI plays reasonable moves with occasional blunders.',
+    '10': '🟠 Club-level strength. Good for improving players (1600-1800 Elo).',
+    '15': '🔴 Expert strength. Tactical and positional play near master level.',
+    '20': '⚫ Full Grandmaster strength. Stockfish at maximum depth — extremely hard.'
+};
+document.getElementById('aiLevel')?.addEventListener('change', (e) => {
+    const desc = document.getElementById('difficultyDesc');
+    if (desc) desc.textContent = DIFF_DESCS[e.target.value] || '';
+});
+
+// ═══════════════════════════════════════════════════
+// PGN FILE UPLOAD
+// ═══════════════════════════════════════════════════
+document.getElementById('pgnFileInput')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+        const pgnText = evt.target.result;
+        document.getElementById('pgnInput').value = pgnText;
+        document.getElementById('loadPgnBtn').click();
+        // Auto start replay from beginning 
+        setTimeout(() => {
+            jumpToMove(-1);
+            setTimeout(() => {
+                startAutoReplay();
+            }, 500);
+        }, 300);
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // Reset so same file can be re-uploaded
+});
+
+// ═══════════════════════════════════════════════════
+// PGN FILE DOWNLOAD
+// ═══════════════════════════════════════════════════
+document.getElementById('downloadPgnBtn')?.addEventListener('click', () => {
+    let pgn = '';
+    for (let i = 0; i < moveHistory.length; i += 2) {
+        const moveNum = Math.floor(i / 2) + 1;
+        pgn += moveNum + '. ' + moveHistory[i].san;
+        if (moveHistory[i + 1]) pgn += ' ' + moveHistory[i + 1].san + ' ';
+        else pgn += ' ';
+    }
+    if (!pgn.trim()) { alert('No moves to download.'); return; }
+    
+    const header = `[Event "Web Chess Game"]\n[Site "chess.quickutils.top"]\n[Date "${new Date().toISOString().split('T')[0]}"]\n[White "Player"]\n[Black "Stockfish AI"]\n[Result "*"]\n\n`;
+    const blob = new Blob([header + pgn.trim()], { type: 'application/x-chess-pgn' });
+    const link = document.createElement('a');
+    link.download = 'chess_game_' + Date.now() + '.pgn';
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+});
+
+// ═══════════════════════════════════════════════════
+// AUTO-REPLAY WITH SMOOTH ANIMATIONS
+// ═══════════════════════════════════════════════════
+function startAutoReplay() {
+    if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+    }
+    const btn = document.getElementById('btnAutoPlay') || document.getElementById('autoReplayBtn');
+    if (btn) btn.classList.add('active');
+    
+    autoPlayTimer = setInterval(() => {
+        if (currentMoveIdx >= moveHistory.length - 1) {
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = null;
+            if (btn) btn.classList.remove('active');
+        } else {
+            jumpToMove(currentMoveIdx + 1);
+        }
+    }, replaySpeed);
+}
+
+document.getElementById('autoReplayBtn')?.addEventListener('click', () => {
+    if (moveHistory.length === 0) return;
+    if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        document.getElementById('autoReplayBtn')?.classList.remove('active');
+    } else {
+        if (currentMoveIdx >= moveHistory.length - 1) jumpToMove(-1);
+        startAutoReplay();
+    }
+});
+
+// Replay speed slider
+const replaySlider = document.getElementById('replaySpeedSlider');
+if (replaySlider) {
+    replaySlider.addEventListener('input', (e) => {
+        replaySpeed = parseInt(e.target.value);
+        const label = document.getElementById('replaySpeedVal');
+        if (label) label.textContent = (replaySpeed / 1000).toFixed(1) + 's';
+        // If auto-replaying, restart with new speed
+        if (autoPlayTimer) {
+            clearInterval(autoPlayTimer);
+            startAutoReplay();
+        }
+    });
 }
 
 // Keyboard shortcuts
@@ -1195,14 +1317,18 @@ function updateAcademyUI() {
     const ops = ACADEMY_DB.openings.length;
     const tacs = ACADEMY_DB.tactics.length;
     const ends = ACADEMY_DB.endgame.length;
+    const funds = ACADEMY_DB.fundamentals.length;
 
     const compOps = academyProgress.completed.filter(id => id.startsWith('op')).length;
     const compTacs = academyProgress.completed.filter(id => id.startsWith('tac')).length;
     const compEnds = academyProgress.completed.filter(id => id.startsWith('end')).length;
+    const compFunds = academyProgress.completed.filter(id => id.startsWith('fund')).length;
 
     document.getElementById('ac-prog-ops').textContent = Math.round((compOps / ops) * 100) + '%';
     document.getElementById('ac-prog-tac').textContent = Math.round((compTacs / tacs) * 100) + '%';
     document.getElementById('ac-prog-end').textContent = Math.round((compEnds / ends) * 100) + '%';
+    const fundEl = document.getElementById('ac-prog-fund');
+    if (fundEl) fundEl.textContent = Math.round((compFunds / funds) * 100) + '%';
 }
 
 function calculateStreak() {
@@ -1415,7 +1541,7 @@ document.getElementById('btnAcademyHint')?.addEventListener('click', () => {
 });
 
 function buildAcademyList() {
-    ['openings', 'tactics', 'endgame'].forEach(cat => {
+    ['fundamentals', 'openings', 'tactics', 'endgame'].forEach(cat => {
         const el = document.getElementById('ac-list-' + cat);
         if (!el) return;
         el.innerHTML = '';
@@ -1424,8 +1550,12 @@ function buildAcademyList() {
             const isComp = academyProgress.completed.includes(item.id);
             div.className = 'ac-item ' + (isComp ? 'completed' : '');
             div.innerHTML = `
-                <div>
-                    <span class="ac-item-title">${item.title}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:0.9rem;">${isComp ? '✅' : '⬜'}</span>
+                    <div>
+                        <span class="ac-item-title">${item.title}</span>
+                        ${item.desc ? `<p style="font-size:0.68rem;color:var(--text-muted);margin:2px 0 0 0;line-height:1.3;">${item.desc}</p>` : ''}
+                    </div>
                 </div>
             `;
             div.onclick = () => loadLesson(item);

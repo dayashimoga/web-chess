@@ -112,14 +112,15 @@
                 
                 <div id="tab-play" class="tab-content">
                     <div class="control-group">
-                        <label>AI Strength</label>
+                        <label>Difficulty Level</label>
                         <select class="input-modern" id="aiLevel">
-                            <option value="1">Level 1 (Easy)</option>
-                            <option value="5">Level 2 (Medium)</option>
-                            <option value="10" selected>Level 3 (Hard)</option>
-                            <option value="15">Level 4 (Harder)</option>
-                            <option value="20">Level 5 (Grandmaster)</option>
+                            <option value="1">🟢 Beginner (800 Elo)</option>
+                            <option value="5">🟡 Intermediate (1200 Elo)</option>
+                            <option value="10" selected>🟠 Advanced (1800 Elo)</option>
+                            <option value="15">🔴 Expert (2200 Elo)</option>
+                            <option value="20">⚫ Grandmaster (2500+ Elo)</option>
                         </select>
+                        <p id="difficultyDesc" style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">AI plays at club-level strength. Good for improving players.</p>
                     </div>
                     <div class="control-group">
                         <label>Play As</label>
@@ -135,9 +136,17 @@
                 <div id="tab-analyze" class="tab-content hidden">
                     <div class="control-group">
                         <label>Paste PGN</label>
-                        <textarea class="textarea-modern" id="pgnInput" rows="4" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."></textarea>
+                        <textarea class="textarea-modern" id="pgnInput" rows="3" placeholder="1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ..."></textarea>
                     </div>
-                    <button class="btn btn-primary w-100 mb-2" id="loadPgnBtn">Load PGN</button>
+                    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+                        <button class="btn btn-primary" style="flex:1;" id="loadPgnBtn">Load PGN</button>
+                        <label class="btn btn-secondary" style="flex:1;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;" for="pgnFileInput">📂 Upload .pgn</label>
+                        <input type="file" id="pgnFileInput" accept=".pgn,.txt" style="display:none;">
+                    </div>
+                    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+                        <button class="btn btn-secondary" style="flex:1;" id="downloadPgnBtn">💾 Download .pgn</button>
+                        <button class="btn btn-secondary" style="flex:1;" id="autoReplayBtn">▶️ Auto-Replay</button>
+                    </div>
                     
                     <div class="control-group mb-2">
                         <label>Famous Games</label>
@@ -154,6 +163,11 @@
                             <option value="zugzwang">Nimzowitsch Zugzwang (1923)</option>
                             <option value="alphazero">AlphaZero vs Stockfish (2017)</option>
                         </select>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                        <label style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;">⏱ Replay Speed</label>
+                        <input type="range" id="replaySpeedSlider" min="300" max="3000" step="100" value="1200" style="flex:1;accent-color:var(--primary-color);">
+                        <span id="replaySpeedVal" style="font-size:0.72rem;color:var(--text-muted);min-width:28px;">1.2s</span>
                     </div>
 
                     <button class="btn btn-secondary w-100" id="resetBoardBtn">Reset Board</button>
@@ -173,6 +187,13 @@
                     </div>
 
                     <div id="academyCategories">
+                        <div class="academy-category mb-2">
+                            <div class="ac-header d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color:#f59e0b; font-size: 1.05rem;">0. Chess Fundamentals</span>
+                                <span class="text-xs text-muted" id="ac-prog-fund">0%</span>
+                            </div>
+                            <div class="ac-list" id="ac-list-fundamentals"></div>
+                        </div>
                         <div class="academy-category mb-2">
                             <div class="ac-header d-flex justify-content-between align-items-center mb-1">
                                 <span class="fw-bold" style="color:#60a5fa; font-size: 1.05rem;">I. Openings</span>
