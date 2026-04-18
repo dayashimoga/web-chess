@@ -187,7 +187,28 @@ function onEngineMessage(event) {
     } else if (typeof line === 'string' && line.includes('score')) {
         parseEvalFromInfo(line);
         const pvMatch = line.match(/pv ([a-h][1-8])([a-h][1-8])[qrbn]?/);
-        if (pvMatch && mode === 'academy' && academyMode === 'theory' && activeLesson && activeLesson.playVsEngine) {
+        
+        // --- Interactive Coach Branch ---
+        if (pvMatch && mode === 'play' && typeof coachModeEnabled !== 'undefined' && coachModeEnabled && chess.turn() !== aiColor) {
+            const hintDiv = document.getElementById('coachHintHud');
+            const hintText = document.getElementById('coachHintText');
+            if (hintDiv) hintDiv.classList.add('active');
+            
+            const evalStr = document.getElementById('evalText') ? document.getElementById('evalText').textContent : '';
+            const evalBadge = `<span style="padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.05); font-family:'JetBrains Mono', monospace; border:1px solid rgba(255,255,255,0.1);">${evalStr}</span>`;
+            
+            const opText = currentOpeningText || "Standard Position";
+            if (hintText) hintText.innerHTML = `<strong>Opening:</strong> ${opText}<br><div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Eval:</strong> ${evalBadge}</div><div style="margin-top:6px;"><strong>Suggestion:</strong> Play <span class="text-neon-blue" style="font-weight:700;">${pvMatch[1]} &rarr; ${pvMatch[2]}</span></div>`;
+            
+            clearTheoryHighlights();
+            const fromEl = document.getElementById(`sq-${pvMatch[1]}`);
+            const toEl = document.getElementById(`sq-${pvMatch[2]}`);
+            if (fromEl) fromEl.classList.add('theory-highlight');
+            if (toEl) toEl.classList.add('theory-highlight');
+            drawTheoryArrow(pvMatch[1], pvMatch[2]);
+        }
+        // --- Academy Theory Branch ---
+        else if (pvMatch && mode === 'academy' && academyMode === 'theory' && activeLesson && activeLesson.playVsEngine) {
             const isHuman = chess.turn() === (activeLesson.isBlack ? 'b' : 'w');
             if (isHuman) {
                 document.getElementById('academyHintText').innerHTML = `Theory Mode Guidance: Play to <strong class="text-neon-blue">${pvMatch[2]}</strong>`;
@@ -247,9 +268,15 @@ function requestEngineAnalysis(depthOverride) {
     engine.postMessage('stop');
     engine.postMessage('position fen ' + chess.fen());
 
-    if (mode === 'play' && chess.turn() === aiColor) {
-        setEngineStatus('thinking', 'AI thinking...');
-        engine.postMessage('go depth ' + aiLevel);
+    if (mode === 'play') {
+        if (chess.turn() === aiColor) {
+            setEngineStatus('thinking', 'AI thinking...');
+            engine.postMessage('go depth ' + aiLevel);
+        } else if (typeof coachModeEnabled !== 'undefined' && coachModeEnabled) {
+            evalContainer.classList.remove('hidden');
+            setEngineStatus('thinking', 'Coach analyzing...');
+            engine.postMessage('go depth 12');
+        }
     } else if (mode === 'analyze') {
         evalContainer.classList.remove('hidden');
         setEngineStatus('thinking', 'Analyzing...');
@@ -1741,6 +1768,29 @@ if (clockSelect) {
             clockIncrement = (inc || 0) * 1000;
         }
         updateClockDisplay();
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// COACH MODE TOGGLE
+// ═══════════════════════════════════════════════════
+let coachModeEnabled = false;
+const coachToggleBtn = document.getElementById('coachToggleBtn');
+if (coachToggleBtn) {
+    coachToggleBtn.addEventListener('change', (e) => {
+        coachModeEnabled = e.target.checked;
+        const hintDiv = document.getElementById('coachHintHud');
+        if (!coachModeEnabled) {
+            if (hintDiv) hintDiv.classList.remove('active');
+            clearTheoryHighlights();
+            engine.postMessage('stop');
+        } else {
+            if (hintDiv) hintDiv.classList.add('active');
+            // Immediately request analysis if it's currently our turn
+            if (mode === 'play' && chess.turn() !== aiColor && !chess.isGameOver()) {
+                requestEngineAnalysis();
+            }
+        }
     });
 }
 

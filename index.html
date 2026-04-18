@@ -155,6 +155,22 @@
                             <option value="30+0">30 min (Classical)</option>
                         </select>
                     </div>
+                    
+                    <div class="coach-toggle-row mb-3">
+                        <div style="display:flex; flex-direction:column; padding-right:10px;">
+                            <span style="font-weight:600; font-size:0.9rem;">Interactive Coach</span>
+                            <span style="font-size:0.7rem; color:var(--text-muted);">Real-time visual hints & engine evaluation</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="coachToggleBtn">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div id="coachHintHud" class="coach-hud mb-3">
+                        <div class="coach-hud-title">🌟 Coach Advice</div>
+                        <div id="coachHintText" style="line-height:1.4; color:#cbd5e1;">Awaiting position analysis...</div>
+                    </div>
+
                     <button class="btn btn-primary w-100" id="newGameBtn">Start New Game</button>
                 </div>
                 
