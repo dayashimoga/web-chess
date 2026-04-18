@@ -57,42 +57,65 @@ const ACADEMY_DB = {
         { id: 'op20', idx: 'I', title: 'Closed Game', expected: ['d4','d5'] }
     ],
     tactics: [
-        { id: 'tac1', idx: 'II', title: 'Mate in 2', fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4', expected: ['Nxe4', 'Qh5#'], isBlack: true },
-        { id: 'tac2', idx: 'II', title: 'Classic Fork', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], isBlack: false },
-        { id: 'tac3', idx: 'II', title: 'Back Rank Mate', fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', expected: ['Re8#'], isBlack: false },
-        { id: 'tac4', idx: 'II', title: 'Discovered Attack', fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w kq - 4 6', expected: ['Nxe5', 'Nxe5', 'd4'], isBlack: false },
-        { id: 'tac5', idx: 'II', title: 'Pin to Win', fen: '2r3k1/5ppp/p7/1p6/4Q3/P6P/1q3PP1/4R1K1 w - - 0 25', expected: ['Qe8+', 'Rxe8', 'Rxe8#'], isBlack: false },
-        { id: 'tac6', idx: 'II', title: "Morphy's Opera Sac", fen: '1n2kb1r/p4ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 w k - 1 17', expected: ['Rd8#'], isBlack: false },
-        { id: 'tac7', idx: 'II', title: "The Greek Gift", fen: 'r1bq1rk1/ppp1nppp/2n5/3pP3/1bB5/2N2N2/PP3PPP/R1BQR1K1 w - - 0 10', expected: ['Bxh7+', 'Kxh7', 'Ng5+'], isBlack: false },
-        { id: 'tac8', idx: 'II', title: "Smothered Sequence", fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2N/4P3/8/PPPP1PPP/RNBQK2R b KQkq - 0 5', expected: ['Nxh5', 'Qxh5', 'g6'], isBlack: true },
-        { id: 'tac9', idx: 'II', title: "Légal Trap", fen: 'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPPBPPP/RNBQ1RK1 w kq - 0 6', expected: ['Nxe5', 'Bxd1', 'Bxf7+', 'Ke7', 'Nd5#'], isBlack: false },
-        { id: 'tac10', idx: 'II', title: "Fischer's Century", fen: 'rnbq1rk1/pp2ppbp/3p1np1/8/2PN4/2N3P1/PP2PPBP/R1BQK2R w KQ - 1 8', expected: ['Na5', 'Bg5', 'Nxc3'], isBlack: true }
+        { id: 'tac1', idx: 'II', title: 'Mate in 2', desc: 'Find the forcing sequence to checkmate.', fen: 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4', expected: ['Nxe4', 'Qh5#'], isBlack: true },
+        { id: 'tac2', idx: 'II', title: 'Classic Fork', desc: 'Attack two pieces at once with your knight.', fen: 'rnbqkbnr/ppp2ppp/8/3pp3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3', expected: ['Nxe5', 'dxe4', 'Qe2'], isBlack: false },
+        { id: 'tac3', idx: 'II', title: 'Back Rank Mate', desc: 'Exploit the weakness of an unprotected back rank.', fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', expected: ['Re8#'], isBlack: false },
+        { id: 'tac4', idx: 'II', title: 'Discovered Attack', desc: 'Move one piece to reveal an attack from another.', fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w kq - 4 6', expected: ['Nxe5', 'Nxe5', 'd4'], isBlack: false },
+        { id: 'tac5', idx: 'II', title: 'Pin to Win', desc: 'Pin a piece against the king to win material.', fen: '2r3k1/5ppp/p7/1p6/4Q3/P6P/1q3PP1/4R1K1 w - - 0 25', expected: ['Qe8+', 'Rxe8', 'Rxe8#'], isBlack: false },
+        { id: 'tac6', idx: 'II', title: "Morphy's Opera Sac", desc: 'A brilliant sacrifice from the famous Opera Game.', fen: '1n2kb1r/p4ppp/4q3/4p1B1/4P3/8/PPP2PPP/2KR4 w k - 1 17', expected: ['Rd8#'], isBlack: false },
+        { id: 'tac7', idx: 'II', title: "The Greek Gift", desc: 'The classic bishop sacrifice on h7.', fen: 'r1bq1rk1/ppp1nppp/2n5/3pP3/1bB5/2N2N2/PP3PPP/R1BQR1K1 w - - 0 10', expected: ['Bxh7+', 'Kxh7', 'Ng5+'], isBlack: false },
+        { id: 'tac8', idx: 'II', title: "Smothered Mate", desc: 'Use a knight to deliver mate to a trapped king.', fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p2N/4P3/8/PPPP1PPP/RNBQK2R b KQkq - 0 5', expected: ['Nxh5', 'Qxh5', 'g6'], isBlack: true },
+        { id: 'tac9', idx: 'II', title: "Légal Trap", desc: 'A famous opening trap that punishes greedy play.', fen: 'r1bqkb1r/ppp2ppp/2n2n2/3pp3/4P3/5N2/PPPPBPPP/RNBQ1RK1 w kq - 0 6', expected: ['Nxe5', 'Bxd1', 'Bxf7+', 'Ke7', 'Nd5#'], isBlack: false },
+        { id: 'tac10', idx: 'II', title: "Double Attack", desc: 'Attack two targets at once, forcing material gain.', fen: 'r1bqkbnr/pppppppp/2n5/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', expected: ['d4'], isBlack: false },
+        { id: 'tac11', idx: 'II', title: "Deflection", desc: 'Force a defending piece away from its duty.', fen: '6k1/5p1p/6p1/8/8/8/r4PPP/3R2K1 w - - 0 1', expected: ['Rd8+'], isBlack: false },
+        { id: 'tac12', idx: 'II', title: "Zwischenzug", desc: 'An in-between move that changes everything.', fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 3', expected: ['Ng5'], isBlack: false },
+        { id: 'tac13', idx: 'II', title: "Overloaded Piece", desc: 'Exploit a piece with too many defensive tasks.', fen: '3r2k1/5ppp/8/8/8/8/5PPP/3RR1K1 w - - 0 1', expected: ['Re8+', 'Rxe8', 'Rxe8#'], isBlack: false },
+        { id: 'tac14', idx: 'II', title: "X-Ray Attack", desc: 'Attack through one piece to hit a target behind.', fen: '4r1k1/5ppp/8/8/8/8/5PPP/R3R1K1 w - - 0 1', expected: ['Re8+','Rxe8','Rxe8#'], isBlack: false },
+        { id: 'tac15', idx: 'II', title: "Skewer Tactic", desc: 'Attack a valuable piece, revealing a target behind.', fen: '8/8/8/8/8/1B6/1k6/1K5r w - - 0 1', expected: ['Ba4+'], isBlack: false }
     ],
     endgame: [
-        { id: 'end1', idx: 'III', title: 'Lucena Position', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end2', idx: 'III', title: 'Philidor Position', fen: '8/8/8/8/8/4k3/4p3/4K3 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end3', idx: 'III', title: 'King & Pawn vs King', fen: '8/8/8/8/3K4/3P4/8/3k4 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end4', idx: 'III', title: 'King & Rook vs King', fen: '8/8/8/8/8/8/3R4/K1k5 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end5', idx: 'III', title: 'Queen vs Pawn (7th)', fen: '8/8/8/8/8/8/p7/K1Q5 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end6', idx: 'III', title: 'Vancura Position', fen: '8/8/8/8/8/p1K5/7R/k7 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end7', idx: 'III', title: 'Pawn Square Rule', fen: '8/8/8/8/6p1/8/8/K1k5 w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end8', idx: 'III', title: 'Rook & Bishop vs Rook', fen: '8/8/8/8/8/R1B5/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end9', idx: 'III', title: 'Queen vs Rook', fen: '8/8/8/8/8/1Q6/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
-        { id: 'end10', idx: 'III', title: 'Two Bishops Mate', fen: '8/8/8/8/8/1BB5/8/K1k5 w - - 0 1', expected: null, playVsEngine: true }
+        { id: 'end1', idx: 'III', title: 'Lucena Position', desc: 'The most important rook endgame position.', fen: '1K6/P7/8/8/8/8/1r6/k7 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end2', idx: 'III', title: 'Philidor Position', desc: 'Defensive drawing technique in rook endgames.', fen: '8/8/8/8/8/4k3/4p3/4K3 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end3', idx: 'III', title: 'King & Pawn vs King', desc: 'Learn the key squares and opposition.', fen: '8/8/8/8/3K4/3P4/8/3k4 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end4', idx: 'III', title: 'King & Rook vs King', desc: 'Systematic technique to deliver checkmate.', fen: '8/8/8/8/8/8/3R4/K1k5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end5', idx: 'III', title: 'Queen vs Pawn (7th)', desc: 'Technique to stop a pawn and deliver mate.', fen: '8/8/8/8/8/8/p7/K1Q5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end6', idx: 'III', title: 'Vancura Position', desc: 'A rook vs passed pawn drawing technique.', fen: '8/8/8/8/8/p1K5/7R/k7 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end7', idx: 'III', title: 'Pawn Square Rule', desc: 'Can your king catch a passed pawn?', fen: '8/8/8/8/6p1/8/8/K1k5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end8', idx: 'III', title: 'Rook & Bishop vs Rook', desc: 'A complex theoretical endgame.', fen: '8/8/8/8/8/R1B5/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end9', idx: 'III', title: 'Queen vs Rook', desc: 'Convert the queen advantage to victory.', fen: '8/8/8/8/8/1Q6/8/K1k4r w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end10', idx: 'III', title: 'Two Bishops Mate', desc: 'Coordinate two bishops to checkmate.', fen: '8/8/8/8/8/1BB5/8/K1k5 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end11', idx: 'III', title: 'Opposition', desc: 'The key concept in king and pawn endgames.', fen: '8/8/4k3/8/4K3/4P3/8/8 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end12', idx: 'III', title: 'Fortress Draw', desc: 'Set up an impregnable defensive position.', fen: '8/8/8/8/8/1k6/1p6/1K1R4 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end13', idx: 'III', title: 'Stalemate Trick', desc: 'Escape a lost position with a stalemate trap.', fen: '5k2/5P2/5K2/8/8/8/8/8 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end14', idx: 'III', title: 'Active Rook Endgame', desc: 'Activity wins in rook endgames.', fen: '8/8/8/R7/1k6/1p6/1K6/8 w - - 0 1', expected: null, playVsEngine: true },
+        { id: 'end15', idx: 'III', title: 'Bishop vs Knight', desc: 'When bishops dominate and when knights shine.', fen: '8/8/8/3B4/8/1k6/2n5/1K6 w - - 0 1', expected: null, playVsEngine: true }
+    ],
+    strategy: [
+        { id: 'str1', idx: 'IV', title: 'Pawn Structure', desc: 'Doubled, isolated, and backward pawns — weaknesses to exploit.', expected: ['e4','e5','d4','exd4','Nf3','Nc6','Nxd4'], isBlack: false },
+        { id: 'str2', idx: 'IV', title: 'Piece Activity', desc: 'Active pieces win games. Develop with tempo!', expected: ['e4','e5','Nf3','Nc6','Bc4','Nf6','d3'], isBlack: false },
+        { id: 'str3', idx: 'IV', title: 'The Outpost', desc: 'Place a knight on a square that cannot be attacked by pawns.', fen: 'r1bqkb1r/ppp2ppp/2np1n2/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5', expected: ['d4', 'exd4', 'Nd5'], isBlack: false },
+        { id: 'str4', idx: 'IV', title: 'Weak Squares', desc: 'Target squares your opponent cannot protect with pawns.', expected: ['e4','d6','d4','Nf6','Nc3','g6','f4'], isBlack: false },
+        { id: 'str5', idx: 'IV', title: 'The Bishop Pair', desc: 'Two bishops working together are a powerful weapon.', expected: ['e4','e5','Nf3','Nc6','Bc4','Bc5','d3','d6','Bg5'], isBlack: false },
+        { id: 'str6', idx: 'IV', title: 'Rook on the 7th Rank', desc: 'A rook on the 7th attacks pawns and restricts the king.', fen: '3r2k1/pp3ppp/8/8/8/8/PP3PPP/3R2K1 w - - 0 1', expected: ['Rd7'], isBlack: false },
+        { id: 'str7', idx: 'IV', title: 'Doubled Rooks', desc: 'Stack rooks on an open file for maximum pressure.', fen: '8/pp3ppp/8/8/8/8/PP3PPP/R2R2K1 w - - 0 1', expected: ['Rac1'], isBlack: false },
+        { id: 'str8', idx: 'IV', title: 'Minority Attack', desc: 'Use fewer pawns to attack the opponent pawn structure.', expected: ['d4','d5','c4','e6','Nc3','Nf6','Bg5','Be7','e3'], isBlack: false },
+        { id: 'str9', idx: 'IV', title: 'Prophylactic Thinking', desc: 'Prevent what your opponent wants to do.', expected: ['e4','c5','Nf3','d6','d4','cxd4','Nxd4','Nf6','Nc3','a6','Be2'], isBlack: false },
+        { id: 'str10', idx: 'IV', title: 'Space Advantage', desc: 'Control more squares and restrict opponent pieces.', expected: ['e4','e6','d4','d5','e5'], isBlack: false }
     ],
     fundamentals: [
         { id: 'fund1', idx: '0', title: 'Piece Movement: Pawns', desc: 'Pawns move forward 1 square, capture diagonally. First move can be 2 squares.', expected: ['e4','d5','exd5'], isBlack: false },
         { id: 'fund2', idx: '0', title: 'Piece Movement: Knights', desc: 'Knights move in an L-shape and can jump over pieces.', fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1', expected: ['Nf3','Nc6','Nc3'], isBlack: false },
         { id: 'fund3', idx: '0', title: 'Piece Movement: Bishops', desc: 'Bishops move diagonally any number of squares.', fen: 'rnbqkbnr/pppp1ppp/4p3/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2', expected: ['Bc4'], isBlack: false },
         { id: 'fund4', idx: '0', title: 'How to Castle', desc: 'Castling moves King 2 squares toward a Rook. King and Rook must not have moved.', fen: 'rnbqk2r/pppp1ppp/4pn2/8/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', expected: ['O-O'], isBlack: false },
-        { id: 'fund5', idx: '0', title: 'En Passant Capture', desc: 'When a pawn moves 2 squares and lands beside your pawn, you can capture it "in passing".', fen: 'rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3', expected: ['exd6'], isBlack: false },
-        { id: 'fund6', idx: '0', title: 'What is Check?', desc: 'Check means the King is under attack. You must escape check.', fen: 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2', expected: ['Qh4+'], isBlack: true },
-        { id: 'fund7', idx: '0', title: "Scholar's Mate", desc: 'The fastest checkmate in 4 moves. Learn to both execute and defend.', expected: ['e4','e5','Bc4','Nc6','Qh5','Nf6','Qxf7#'], isBlack: false },
-        { id: 'fund8', idx: '0', title: 'The Pin Tactic', desc: 'A pin restricts a piece from moving because it would expose a more valuable piece.', fen: 'rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2', expected: ['Bg5'], isBlack: false },
+        { id: 'fund5', idx: '0', title: 'En Passant Capture', desc: 'When a pawn moves 2 squares beside your pawn, capture it "in passing".', fen: 'rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3', expected: ['exd6'], isBlack: false },
+        { id: 'fund6', idx: '0', title: 'What is Check?', desc: 'Check means the King is under attack. You must escape.', fen: 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2', expected: ['Qh4+'], isBlack: true },
+        { id: 'fund7', idx: '0', title: "Scholar's Mate", desc: 'The fastest checkmate in 4 moves.', expected: ['e4','e5','Bc4','Nc6','Qh5','Nf6','Qxf7#'], isBlack: false },
+        { id: 'fund8', idx: '0', title: 'The Pin Tactic', desc: 'A pin restricts a piece from moving — it would expose a valuable piece.', fen: 'rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2', expected: ['Bg5'], isBlack: false },
         { id: 'fund9', idx: '0', title: 'The Fork Tactic', desc: 'A fork attacks two or more pieces simultaneously.', fen: 'r1bqkb1r/pppppppp/2n2n2/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', expected: ['d4'], isBlack: false },
-        { id: 'fund10', idx: '0', title: 'Controlling the Center', desc: 'The center (d4,d5,e4,e5) is the most important area. Control it with pawns and pieces.', expected: ['e4','e5','d4','exd4','Nf3'], isBlack: false },
+        { id: 'fund10', idx: '0', title: 'Controlling the Center', desc: 'The center (d4,d5,e4,e5) is the most important area.', expected: ['e4','e5','d4','exd4','Nf3'], isBlack: false },
     ]
-};
+
+
 
 let academyProgress = JSON.parse(localStorage.getItem('chessAcademyXP') || '{"xp":0,"completed":[]}');
 let activeLesson = null;
@@ -413,6 +436,7 @@ function renderPosition() {
     }
 
     // Remove captured pieces (anything still marked stale)
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
@@ -1318,17 +1342,21 @@ function updateAcademyUI() {
     const tacs = ACADEMY_DB.tactics.length;
     const ends = ACADEMY_DB.endgame.length;
     const funds = ACADEMY_DB.fundamentals.length;
+    const strs = ACADEMY_DB.strategy.length;
 
     const compOps = academyProgress.completed.filter(id => id.startsWith('op')).length;
     const compTacs = academyProgress.completed.filter(id => id.startsWith('tac')).length;
     const compEnds = academyProgress.completed.filter(id => id.startsWith('end')).length;
     const compFunds = academyProgress.completed.filter(id => id.startsWith('fund')).length;
+    const compStrs = academyProgress.completed.filter(id => id.startsWith('str')).length;
 
     document.getElementById('ac-prog-ops').textContent = Math.round((compOps / ops) * 100) + '%';
     document.getElementById('ac-prog-tac').textContent = Math.round((compTacs / tacs) * 100) + '%';
     document.getElementById('ac-prog-end').textContent = Math.round((compEnds / ends) * 100) + '%';
     const fundEl = document.getElementById('ac-prog-fund');
     if (fundEl) fundEl.textContent = Math.round((compFunds / funds) * 100) + '%';
+    const strEl = document.getElementById('ac-prog-str');
+    if (strEl) strEl.textContent = Math.round((compStrs / strs) * 100) + '%';
 }
 
 function calculateStreak() {
@@ -1541,7 +1569,7 @@ document.getElementById('btnAcademyHint')?.addEventListener('click', () => {
 });
 
 function buildAcademyList() {
-    ['fundamentals', 'openings', 'tactics', 'endgame'].forEach(cat => {
+    ['fundamentals', 'openings', 'tactics', 'endgame', 'strategy'].forEach(cat => {
         const el = document.getElementById('ac-list-' + cat);
         if (!el) return;
         el.innerHTML = '';

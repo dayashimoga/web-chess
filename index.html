@@ -51,9 +51,9 @@
 </nav>
 
 <main class="container">
-    <section class="hero text-center" style="padding-top: 5rem; padding-bottom: 2rem;">
+    <section class="hero text-center">
         <h1><span class="gradient-text">Web Chess Pro</span></h1>
-        <p class="hero-sub">Play against Stockfish AI or Analyze PGNs with evaluation metrics.</p>
+        <p class="hero-sub">Play • Learn • Master — Powered by Stockfish AI</p>
     </section>
 
     <div class="chess-layout">
@@ -99,9 +99,7 @@
                 <div class="flex-spread mb-3">
                     <h3 class="card-title m-0">Game Mode</h3>
                     <div class="engine-status" id="engineStatus"><span class="status-dot"></span> Engine Loading...</div>
-                    <div class="academy-progress hidden" id="academyProgress">
-                        <span class="text-neon-green" style="font-size:0.8rem; font-weight:bold;">XP: <span id="academyXp">0</span></span>
-                    </div>
+
                 </div>
                 
                 <div class="tabs mb-3">
@@ -217,7 +215,14 @@
                             </div>
                             <div class="ac-list" id="ac-list-endgame"></div>
                         </div>
-                    </div>
+
+                        <div class="academy-category mb-2 mt-3">
+                            <div class="ac-header d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" style="color:#f472b6; font-size: 1.05rem;">IV. Strategy & Positional Play</span>
+                                <span class="text-xs text-muted" id="ac-prog-str">0%</span>
+                            </div>
+                            <div class="ac-list" id="ac-list-strategy"></div>
+                        </div>
                     
                     <div id="academyActiveLesson" class="hidden">
                         <button class="btn btn-secondary btn-sm mb-3 w-100" id="btnBackToAcademy">← Back to Curriculum</button>
@@ -231,6 +236,7 @@
                         
                         <div class="academy-instructions mt-2 p-3 glass-card" style="border-left: 3px solid var(--primary-color);">
                             <p class="text-xs m-0" id="academyHintText">Loading lesson...</p>
+                            <button class="btn btn-secondary btn-sm mt-2 hidden" id="btnAcademyHint">💡 Show Hint (-5 XP)</button>
                         </div>
                     </div>
                 </div>
@@ -282,6 +288,7 @@
 </footer>
 
 <script type="module" src="script.js"></script>
+
 
 <!-- QuickUtils Network Promo -->
 <div id="qu-promo-ribbon" style="margin-top:4rem; padding:2rem 1rem; background:rgba(0,0,0,0.05); border-top:1px solid rgba(128,128,128,0.2); text-align:center; font-family:sans-serif;">
@@ -386,6 +393,7 @@
    </div>
 </div>
 <!-- /QuickUtils Network Promo -->
+
 
 </body>
 </html>
