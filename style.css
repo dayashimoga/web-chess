@@ -122,7 +122,7 @@ body {
 .board-column {
     flex: 0 0 auto; display: flex; gap: 6px; align-items: stretch;
     position: sticky; top: 60px;
-    width: min(58vh, 520px);
+    width: min(72vh, 670px);
 }
 
 .board-stack {
@@ -581,3 +581,18 @@ body {
 .board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
 .piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
 .animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
+
+/* Fullscreen mode support */
+.board-wrapper:fullscreen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-color, #0f172a);
+    padding: 2rem;
+}
+.board-wrapper:fullscreen .chess-board {
+    height: min(90vh, 90vw) !important;
+    width: min(90vh, 90vw) !important;
+    max-width: none;
+}
