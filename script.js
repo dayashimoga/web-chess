@@ -114,7 +114,7 @@ const ACADEMY_DB = {
         { id: 'fund9', idx: '0', title: 'The Fork Tactic', desc: 'A fork attacks two or more pieces simultaneously.', fen: 'r1bqkb1r/pppppppp/2n2n2/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', expected: ['d4'], isBlack: false },
         { id: 'fund10', idx: '0', title: 'Controlling the Center', desc: 'The center (d4,d5,e4,e5) is the most important area.', expected: ['e4','e5','d4','exd4','Nf3'], isBlack: false },
     ]
-
+};
 
 
 let academyProgress = JSON.parse(localStorage.getItem('chessAcademyXP') || '{"xp":0,"completed":[]}');
