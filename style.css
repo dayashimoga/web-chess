@@ -500,10 +500,82 @@ body {
     .board-column { max-width: 100%; }
 }
 
-/* Patched CSS */
-.board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
-.piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
+/* ─── Sound & Fullscreen Toggle ─── */
+.toolbar-btn {
+    width: 34px; height: 34px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px; font-size: 0.95rem;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+    color: var(--text); cursor: pointer; transition: all 0.2s;
+}
+.toolbar-btn:hover { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.3); }
+.toolbar-btn.muted { color: #ef4444; opacity: 0.7; }
+
+/* ─── Opening Name Badge ─── */
+.opening-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15));
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    transition: all 0.3s;
+    min-height: 22px;
+}
+.opening-badge:empty { display: none; }
+
+/* ─── Game Clock ─── */
+.game-clock {
+    display: flex; gap: 6px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+}
+.clock-side {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--glass-border);
+    font-weight: 700;
+    min-width: 60px;
+    text-align: center;
+    transition: all 0.3s;
+}
+.clock-side.active-clock {
+    background: rgba(99,102,241,0.2);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+.clock-side.low-time {
+    background: rgba(239,68,68,0.2);
+    border-color: #ef4444;
+    color: #fca5a5;
+    animation: clock-pulse 0.5s infinite alternate;
+}
+@keyframes clock-pulse {
+    0% { box-shadow: 0 0 4px rgba(239,68,68,0.3); }
+    100% { box-shadow: 0 0 12px rgba(239,68,68,0.6); }
+}
+
+/* ─── Move Annotation Badges ─── */
+.move-annotation {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    border-radius: 3px;
+    padding: 0 3px;
+    margin-left: 2px;
+    vertical-align: middle;
+}
+.annot-brilliant { color: #1cb5a2; }
+.annot-great { color: #81b64c; }
+.annot-interesting { color: #fccc4b; }
+.annot-dubious { color: #f7a030; }
+.annot-mistake { color: #fa3c28; }
+.annot-blunder { color: #fa3c28; font-size: 0.7rem; }
 
 /* Patched CSS */
 .board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }

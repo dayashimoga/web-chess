@@ -438,8 +438,6 @@ function renderPosition() {
     // Remove captured pieces (anything still marked stale)
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
     updateMovesList();
     checkGameEnd();
@@ -1595,9 +1593,162 @@ function buildAcademyList() {
 }
 
 // ═══════════════════════════════════════════════════
+// SOUND TOGGLE
+// ═══════════════════════════════════════════════════
+let soundMuted = localStorage.getItem('chess_muted') === 'true';
+
+const btnSoundToggle = document.getElementById('btnSoundToggle');
+if (btnSoundToggle) {
+    if (soundMuted) btnSoundToggle.classList.add('muted');
+    btnSoundToggle.textContent = soundMuted ? '🔇' : '🔊';
+    btnSoundToggle.addEventListener('click', () => {
+        soundMuted = !soundMuted;
+        localStorage.setItem('chess_muted', soundMuted);
+        btnSoundToggle.textContent = soundMuted ? '🔇' : '🔊';
+        btnSoundToggle.classList.toggle('muted', soundMuted);
+    });
+}
+
+// Override playSound to respect mute
+const _originalPlaySound = playSound;
+playSound = function(move) {
+    if (soundMuted) return;
+    _originalPlaySound(move);
+};
+
+// ═══════════════════════════════════════════════════
+// FULLSCREEN MODE
+// ═══════════════════════════════════════════════════
+const btnFullscreen = document.getElementById('btnFullscreen');
+if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => {
+        const boardWrap = document.querySelector('.board-wrapper');
+        if (!document.fullscreenElement) {
+            (boardWrap || document.documentElement).requestFullscreen?.().catch(() => {});
+            btnFullscreen.textContent = '⛶';
+        } else {
+            document.exitFullscreen?.();
+            btnFullscreen.textContent = '⛶';
+        }
+    });
+    document.addEventListener('fullscreenchange', () => {
+        btnFullscreen.textContent = document.fullscreenElement ? '✕' : '⛶';
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// GAME CLOCK (Fischer increment)
+// ═══════════════════════════════════════════════════
+let clockEnabled = false;
+let clockWhite = 600000;   // 10 minutes in ms
+let clockBlack = 600000;
+let clockIncrement = 0;    // ms
+let clockInterval = null;
+let clockLastTick = 0;
+
+const clockWhiteEl = document.getElementById('clockWhite');
+const clockBlackEl = document.getElementById('clockBlack');
+
+function formatClock(ms) {
+    if (ms <= 0) return '0:00';
+    const totalSec = Math.ceil(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
+function updateClockDisplay() {
+    if (!clockWhiteEl || !clockBlackEl) return;
+    clockWhiteEl.textContent = formatClock(clockWhite);
+    clockBlackEl.textContent = formatClock(clockBlack);
+    
+    // Active side highlight
+    clockWhiteEl.classList.toggle('active-clock', chess.turn() === 'w' && !chess.isGameOver());
+    clockBlackEl.classList.toggle('active-clock', chess.turn() === 'b' && !chess.isGameOver());
+    
+    // Low time warning
+    clockWhiteEl.classList.toggle('low-time', clockWhite < 30000 && clockWhite > 0);
+    clockBlackEl.classList.toggle('low-time', clockBlack < 30000 && clockBlack > 0);
+}
+
+function tickClock() {
+    if (!clockEnabled || chess.isGameOver()) {
+        stopClock();
+        return;
+    }
+    const now = performance.now();
+    const dt = now - clockLastTick;
+    clockLastTick = now;
+    
+    if (chess.turn() === 'w') {
+        clockWhite -= dt;
+        if (clockWhite <= 0) {
+            clockWhite = 0;
+            gameResultEl.textContent = 'White lost on time! Black wins.';
+            gameResultEl.classList.remove('hidden');
+            stopClock();
+        }
+    } else {
+        clockBlack -= dt;
+        if (clockBlack <= 0) {
+            clockBlack = 0;
+            gameResultEl.textContent = 'Black lost on time! White wins.';
+            gameResultEl.classList.remove('hidden');
+            stopClock();
+        }
+    }
+    updateClockDisplay();
+}
+
+function startClock() {
+    if (clockInterval) clearInterval(clockInterval);
+    clockLastTick = performance.now();
+    clockInterval = setInterval(tickClock, 100);
+}
+
+function stopClock() {
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+}
+
+// Hook into commitMove for clock increment
+const _origCommitMove = commitMove;
+commitMove = function(move) {
+    if (clockEnabled && mode === 'play') {
+        // Add increment for the side that just moved
+        const movingSide = move.color;
+        if (movingSide === 'w') clockWhite += clockIncrement;
+        else clockBlack += clockIncrement;
+        updateClockDisplay();
+    }
+    _origCommitMove(move);
+    // Also detect opening after each move
+    detectOpening();
+};
+
+// Clock control selector
+const clockSelect = document.getElementById('clockSelect');
+if (clockSelect) {
+    clockSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val === 'none') {
+            clockEnabled = false;
+            stopClock();
+        } else {
+            clockEnabled = true;
+            const [baseMin, inc] = val.split('+').map(Number);
+            clockWhite = baseMin * 60000;
+            clockBlack = baseMin * 60000;
+            clockIncrement = (inc || 0) * 1000;
+        }
+        updateClockDisplay();
+    });
+}
+
+// ═══════════════════════════════════════════════════
 // BOOTSTRAP
 // ═══════════════════════════════════════════════════
 initEngine();
 buildBoard();
 buildAcademyList();
+updateClockDisplay();
 
