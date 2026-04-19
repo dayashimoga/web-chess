@@ -1156,6 +1156,8 @@ const OPENINGS = [
     { moves: 'd4 d5', name: 'Closed Game' },
 ];
 
+let currentOpeningText = '';
+
 function detectOpening() {
     const history = chess.history();
     const movesStr = history.join(' ');
@@ -1165,8 +1167,9 @@ function detectOpening() {
             bestMatch = op;
         }
     }
+    currentOpeningText = bestMatch ? bestMatch.name : '';
     const el = document.getElementById('openingName');
-    if (el) el.textContent = bestMatch ? bestMatch.name : '';
+    if (el) el.textContent = currentOpeningText;
 }
 
 // ═══════════════════════════════════════════════════
@@ -1940,8 +1943,9 @@ function finishBatchAnalysis() {
     
     if(analysisProgressBar) analysisProgressBar.style.width = '100%';
     
-    let blunders = 0, mistakes = 0, inaccuracies = 0;
+    let blunders = 0, mistakes = 0, inaccuracies = 0, goodMoves = 0, bestMoves = 0;
     let reportHtml = '';
+    window.reviewMistakesList = [];
     
     for (let i = 1; i < batchAnalysisResults.length; i++) {
         const prev = batchAnalysisResults[i - 1]; 
@@ -1964,37 +1968,67 @@ function finishBatchAnalysis() {
             errorDrop = 0; 
         }
         
+        const bestMv = prev.bestMoveEngine || '?';
+        const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
+        
+        // Generate human-readable reasoning
+        const reason = generateMoveReasoning(moveData, bestMv, errorDrop, valBefore, valAfter, colorMoved, prev, i);
+        
         let flag = null;
         let colorBox = '';
-        if (errorDrop > 250) { flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.2)'; }
-        else if (errorDrop > 120) { flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.2)'; }
-        else if (errorDrop > 70) { flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.2)'; }
+        let emoji = '';
+        if (errorDrop > 250) { flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.15)'; emoji = '❌'; }
+        else if (errorDrop > 120) { flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.15)'; emoji = '⚠️'; }
+        else if (errorDrop > 70) { flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.15)'; emoji = '❓'; }
+        else if (errorDrop < -20) { bestMoves++; }
+        else { goodMoves++; }
         
         if (flag) {
-            const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
-            const bestMv = prev.bestMoveEngine || '?';
-            
-            // COACH: Inject into reviewMistakesList
+            // COACH: Inject into reviewMistakesList with reasoning
             if (flag === 'Blunder' || flag === 'Mistake') {
-                if(!window.reviewMistakesList) window.reviewMistakesList = [];
                 window.reviewMistakesList.push({
                     histIdx: i - 1,
                     bestMoveUci: bestMv,
                     flag: flag,
                     badMoveSan: moveData.san,
-                    fenBefore: prev.fen
+                    fenBefore: prev.fen,
+                    reason: reason,
+                    evalBefore: valBefore,
+                    evalAfter: valAfter,
+                    errorDrop: errorDrop
                 });
             }
 
             reportHtml += `
-                <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox};" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
-                    <div>
-                        <span class="ac-item-title">${moveNumStr} ${moveData.san} (${flag})</span>
-                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
-                            Engine preferred: <strong style="color:var(--text);">${bestMv}</strong>
+                <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox}; cursor:pointer; border-radius:8px; padding:0.6rem;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:4px;">
+                                <span style="font-size:1rem;">${emoji}</span>
+                                <span class="ac-item-title" style="font-weight:700;">${moveNumStr} ${moveData.san}</span>
+                                <span style="font-size:0.7rem; padding:1px 6px; border-radius:4px; background:${colorBox}; font-weight:600;">${flag}</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">(${errorDrop > 0 ? '-' : '+'}${(Math.abs(errorDrop)/100).toFixed(1)})</span>
+                            </div>
+                            <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:4px; line-height:1.4;">
+                                ${reason.whyBad}
+                            </div>
+                            <div style="font-size:0.78rem; color:#86efac; line-height:1.4;">
+                                <strong>Better:</strong> <span style="color:#4ade80; font-weight:600;">${bestMv !== '?' ? bestMv : 'N/A'}</span>
+                                ${reason.whyBetter ? ' — ' + reason.whyBetter : ''}
+                            </div>
                         </div>
                     </div>
-                    <span style="font-size:1.2rem;">${flag === 'Blunder'?'❌':flag === 'Mistake'?'⚠️':'❓'}</span>
+                </div>
+            `;
+        } else if (errorDrop < -20) {
+            reportHtml += `
+                <div class="ac-item mb-1" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.12); border-radius:8px; padding:0.5rem; cursor:pointer;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span style="font-size:0.9rem;">⭐</span>
+                        <span style="font-weight:600; font-size:0.85rem;">${moveNumStr} ${moveData.san}</span>
+                        <span style="font-size:0.68rem; padding:1px 6px; border-radius:4px; background:rgba(34,197,94,0.15); color:#4ade80; font-weight:600;">Best Move</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#86efac; margin-top:3px;">${reason.whyGood || 'Engine agrees — this was the optimal play.'}</div>
                 </div>
             `;
         }
@@ -2004,15 +2038,103 @@ function finishBatchAnalysis() {
     document.getElementById('ar-mistakes').textContent = mistakes;
     document.getElementById('ar-inaccuracies').textContent = inaccuracies;
     
+    // Calculate and show accuracy
+    const totalClassified = blunders + mistakes + inaccuracies + goodMoves + bestMoves;
+    const accuracy = totalClassified > 0 ? Math.round(((goodMoves + bestMoves) / totalClassified) * 100) : 100;
+    const accEl = document.getElementById('analysisAccuracy');
+    const accValEl = document.getElementById('ar-accuracy');
+    if (accEl && accValEl) {
+        accValEl.textContent = accuracy + '%';
+        accValEl.style.color = accuracy >= 80 ? '#4ade80' : accuracy >= 60 ? '#fbbf24' : accuracy >= 40 ? '#f97316' : '#ef4444';
+        accEl.style.display = 'block';
+    }
+    
     const btnCoach = document.getElementById('btnStartCoach');
     if (window.reviewMistakesList && window.reviewMistakesList.length > 0) {
         if(btnCoach) btnCoach.style.display = 'block';
     } else {
         if(btnCoach) btnCoach.style.display = 'none';
-        reportHtml = '<div class="text-center text-neon-green" style="padding:1rem;">Perfect game! No significant mistakes detected.</div>';
+    }
+    
+    if (!reportHtml) {
+        reportHtml = '<div class="text-center text-neon-green" style="padding:1rem;">🏆 Perfect game! No significant mistakes detected.</div>';
     }
 
     document.getElementById('analysisReportList').innerHTML = reportHtml;
+}
+
+// ═══════════════════════════════════════════════════
+// MOVE REASONING ENGINE
+// ═══════════════════════════════════════════════════
+function generateMoveReasoning(moveData, bestMoveUci, errorDrop, evalBefore, evalAfter, colorMoved, prevAnalysis, moveIdx) {
+    const san = moveData.san;
+    const from = moveData.from;
+    const to = moveData.to;
+    
+    let whyBad = '';
+    let whyBetter = '';
+    let whyGood = '';
+    
+    const pieceChar = san.charAt(0);
+    const isPawnMove = pieceChar === pieceChar.toLowerCase() && !san.startsWith('O');
+    const isKingMove = san.startsWith('K');
+    const isQueenMove = san.startsWith('Q');
+    const isCastle = san.startsWith('O');
+    const isCapture = san.includes('x');
+    const isCheck = san.includes('+');
+    const isMate = san.includes('#');
+    
+    const cpLoss = Math.abs(errorDrop);
+    const losesMinor = cpLoss >= 280 && cpLoss < 450;
+    const losesRook = cpLoss >= 450 && cpLoss < 800;
+    const losesQueen = cpLoss >= 800;
+    
+    // === WHY BAD ===
+    if (errorDrop > 250) {
+        if (losesQueen) {
+            whyBad = `Loses major material — approximately a Queen's worth of advantage (${(cpLoss/100).toFixed(1)} pawns). `;
+        } else if (losesRook) {
+            whyBad = `Drops roughly a Rook's worth of material (${(cpLoss/100).toFixed(1)} pawns). `;
+        } else if (losesMinor) {
+            whyBad = `Loses the equivalent of a minor piece (${(cpLoss/100).toFixed(1)} pawns). `;
+        } else {
+            whyBad = `Significant position weakening (${(cpLoss/100).toFixed(1)} pawn disadvantage). `;
+        }
+        if (isKingMove && !isCastle) whyBad += 'Moving the King exposes it to threats.';
+        else if (isQueenMove && moveIdx < 12) whyBad += 'Early Queen development allows opponent to gain tempo.';
+        else if (isCapture) whyBad += 'This capture walks into a tactical refutation.';
+        else whyBad += 'This move overlooks an important tactical detail.';
+    } else if (errorDrop > 120) {
+        whyBad = `Weakens position by ${(cpLoss/100).toFixed(1)} pawns. `;
+        if (isPawnMove) whyBad += 'This pawn move creates structural weaknesses.';
+        else whyBad += 'A more active option was available.';
+    } else if (errorDrop > 70) {
+        whyBad = `Slightly inaccurate (${(cpLoss/100).toFixed(1)} pawn slip). The position becomes marginally worse.`;
+    }
+    
+    // === WHY BETTER ===
+    if (bestMoveUci && bestMoveUci !== '?' && bestMoveUci.length >= 4) {
+        const bestTo = bestMoveUci.substring(2, 4);
+        const isCentral = 'cdef'.includes(bestTo[0]) && '3456'.includes(bestTo[1]);
+        if (errorDrop > 250) {
+            whyBetter = isCentral ? 'Controls key central squares and maintains coordination.' : 'Maintains tactical advantage and keeps the position secure.';
+        } else if (errorDrop > 120) {
+            whyBetter = 'Improves piece activity while maintaining solid structure.';
+        } else {
+            whyBetter = 'Slightly more precise — optimizes piece placement.';
+        }
+    }
+    
+    // === WHY GOOD ===
+    if (errorDrop < -20) {
+        if (isCapture) whyGood = 'Wins material cleanly with proper tactical execution.';
+        else if (isCastle) whyGood = 'Excellent timing — secures King safety and activates the Rook.';
+        else if (isCheck) whyGood = 'Forcing check creates tempo and improves position.';
+        else if (isMate) whyGood = 'Checkmate! Game over.';
+        else whyGood = 'Strong positional move — engine agrees this was optimal.';
+    }
+    
+    return { whyBad, whyBetter, whyGood };
 }
 
 window.jumpToAnalysis = function(histIdx, bestMoveUci) {
@@ -2057,34 +2179,24 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     svg.appendChild(line);
 }
 
-
-// redeploy
-
 // ═══════════════════════════════════════════════════
-// NEW INTERACTIVE COACH ENGINE
+// INTERACTIVE COACH ENGINE (Enhanced with Reasoning)
 // ═══════════════════════════════════════════════════
 window.currentReviewIdx = -1;
 
 window.startInteractiveCoach = function() {
     if (!window.reviewMistakesList || window.reviewMistakesList.length === 0) return;
-    
-    // Switch to Play Tab so board is big
     document.querySelector('.tab-btn[data-tab="play"]').click();
-    
     window.currentReviewIdx = 0;
-    
-    // Hide controls, show HUD
     document.getElementById('controlsBox').style.display = 'none';
     document.getElementById('interactiveCoachHud').classList.remove('hidden');
-    
     loadReviewMistake();
 };
 
 window.coachExitReview = function() {
     document.getElementById('controlsBox').style.display = 'block';
     document.getElementById('interactiveCoachHud').classList.add('hidden');
-    
-    // Go back to end of game
+    window.isReviewMode = false;
     jumpToMove(moveHistory.length - 1);
     clearTheoryHighlights();
 };
@@ -2092,8 +2204,13 @@ window.coachExitReview = function() {
 window.coachSkipMistake = function() {
     window.currentReviewIdx++;
     if (window.currentReviewIdx >= window.reviewMistakesList.length) {
-        alert("You have reviewed all your mistakes! Good job!");
-        coachExitReview();
+        const hud = document.getElementById('coachHudText');
+        const reasonBox = document.getElementById('coachReasonText');
+        const progress = document.getElementById('coachProgress');
+        if (hud) hud.innerHTML = '<strong style="color:#4ade80;">🏆 All mistakes reviewed!</strong><br>Great job analyzing your game. Keep practicing!';
+        if (reasonBox) reasonBox.style.display = 'none';
+        if (progress) progress.textContent = 'Done!';
+        setTimeout(() => coachExitReview(), 3000);
         return;
     }
     loadReviewMistake();
@@ -2104,22 +2221,39 @@ window.coachShowHint = function() {
     if (mistake.bestMoveUci && mistake.bestMoveUci !== '?') {
         const fm = mistake.bestMoveUci.substring(0, 2);
         const tm = mistake.bestMoveUci.substring(2, 4);
+        clearTheoryHighlights();
         drawArrowRaw(fm, tm, 'rgba(34,197,94,0.85)', 'arrowhead-green');
+        const fromEl = document.getElementById(`sq-${fm}`);
+        const toEl = document.getElementById(`sq-${tm}`);
+        if (fromEl) fromEl.classList.add('theory-highlight');
+        if (toEl) toEl.classList.add('theory-highlight');
+    }
+    const reasonBox = document.getElementById('coachReasonText');
+    if (reasonBox && mistake.reason) {
+        reasonBox.innerHTML = `<div style="margin-bottom:4px;"><strong style="color:#f97316;">Why your move was bad:</strong> ${mistake.reason.whyBad}</div>` +
+            `<div><strong style="color:#4ade80;">Why ${mistake.bestMoveUci} is better:</strong> ${mistake.reason.whyBetter || 'Maintains better evaluation.'}</div>`;
+        reasonBox.style.display = 'block';
     }
 };
 
 window.loadReviewMistake = function() {
     const mistake = window.reviewMistakesList[window.currentReviewIdx];
-    
-    // Sync the internal chess engine to the history index BEFORE the bad move
+    const total = window.reviewMistakesList.length;
     jumpToMove(mistake.histIdx - 1);
-    
-    // Ensure it's human turn on the board for the human player's color at that move
-    // actually user can just drag a piece in jumpToMove state.
-    // wait, we need to bypass normal 'play' logic
     window.isReviewMode = true;
     
+    const progress = document.getElementById('coachProgress');
+    if (progress) progress.textContent = `${window.currentReviewIdx + 1}/${total}`;
+    
     const uiText = document.getElementById('coachHudText');
-    uiText.innerHTML = `Move ${Math.ceil(mistake.histIdx/2)}: You played <strong style="color:#ef4444">${mistake.badMoveSan}</strong> (${mistake.flag}). Can you find the engine's suggested move?`;
+    const evalChange = mistake.errorDrop ? ` (${(mistake.errorDrop/100).toFixed(1)} pawns lost)` : '';
+    uiText.innerHTML = `<strong>Move ${Math.ceil((mistake.histIdx+1)/2)}:</strong> You played <strong style="color:#ef4444">${mistake.badMoveSan}</strong> — a <span style="color:${mistake.flag === 'Blunder' ? '#ef4444' : '#f97316'}; font-weight:700;">${mistake.flag}</span>${evalChange}.<br><span style="color:#94a3b8;">Can you find the engine's recommended move?</span>`;
+    
+    const reasonBox = document.getElementById('coachReasonText');
+    if (reasonBox && mistake.reason) {
+        reasonBox.innerHTML = `<strong style="color:#f97316;">💭 Why was this bad?</strong> ${mistake.reason.whyBad}`;
+        reasonBox.style.display = 'block';
+    }
     clearTheoryHighlights();
 };
+
