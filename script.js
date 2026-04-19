@@ -558,23 +558,38 @@ function onSquareClick(e) {
                 showPromotionPicker(targetMove.from, targetMove.to);
             } else {
                 if (window.isReviewMode) {
-                    const testMove = chess.move({ from: targetMove.from, to: targetMove.to });
+                    const testMove = chess.move({ from: targetMove.from, to: targetMove.to, promotion: targetMove.promotion || 'q' });
                     if (testMove) {
-                        const expectedUci = window.reviewMistakesList[window.currentReviewIdx].bestMoveUci;
+                        const mistakeObj = window.reviewMistakesList[window.currentReviewIdx];
+                        const expectedUci = mistakeObj.bestMoveUci;
                         const userUci = testMove.from + testMove.to + (testMove.promotion || '');
                         if (userUci === expectedUci) {
                             document.getElementById('snd-success')?.play().catch(()=>{});
-                            const uT = document.getElementById('coachHudText');
-                            uT.innerHTML = '<strong style="color:#22c55e">Excellent!</strong> You found the best move.';
-                            if (window.reviewMistakesList[window.currentReviewIdx].bestMoveUci.length >= 4) {
-                                const fm = expectedUci.substring(0, 2);
-                                const tm = expectedUci.substring(2, 4);
-                                drawArrowRaw(fm, tm, 'rgba(34,197,94,0.85)', 'arrowhead-green');
+                            
+                            // Visual update for board!
+                            buildBoard();
+                            
+                            let continuationHtml = '';
+                            if (mistakeObj.pv) {
+                                // Just show the first 3-4 moves of PV for readability
+                                const pvMoves = mistakeObj.pv.split(' ').slice(1, 4).join(' ');
+                                continuationHtml = `<div style="font-size:0.75rem; color:#94a3b8; margin-top:6px; background:rgba(0,0,0,0.2); padding:6px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);"><strong>Continuation:</strong> ${pvMoves}...</div>`;
                             }
+                            
+                            const uT = document.getElementById('coachHudText');
+                            uT.innerHTML = `<strong style="color:#22c55e; font-size:1.1rem;">Excellent!</strong><br><span style="color:#e8ecf4;">You found the best move.</span> ${continuationHtml}`;
+                            
+                            const reasonBox = document.getElementById('coachReasonText');
+                            if (reasonBox && mistakeObj.reason && mistakeObj.reason.whyBetter) {
+                                reasonBox.innerHTML = `<strong>Why it's good:</strong> ${mistakeObj.reason.whyBetter}`;
+                                reasonBox.style.display = 'block';
+                            }
+                            
+                            // Wait for reading, then proceed
                             setTimeout(() => {
                                 chess.undo();
                                 window.coachSkipMistake();
-                            }, 1500);
+                            }, 3500);
                         } else {
                             chess.undo();
                             document.getElementById('snd-error')?.play().catch(()=>{});
@@ -1903,6 +1918,7 @@ if (btnAnalyzeGame) {
         }
         
         let pendingEval = null;
+        let pendingPv = '';
         let resolveMove = null;
         
         // Now set the eval-tracking handler
@@ -1915,15 +1931,19 @@ if (btnAnalyzeGame) {
                 if (mateMatch) score = parseInt(mateMatch[1]) > 0 ? 9999 : -9999;
                 else if (cpMatch) score = parseInt(cpMatch[1]);
                 pendingEval = score;
+                
+                const pvMatch = line.match(/pv\s+(.*)/);
+                if (pvMatch) pendingPv = pvMatch[1];
             } else if (typeof line === 'string' && line.startsWith('bestmove')) {
                 const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
-                if (resolveMove) resolveMove({ bestMove: match ? match[1] : null, evalScore: pendingEval || 0 });
+                if (resolveMove) resolveMove({ bestMove: match ? match[1] : null, evalScore: pendingEval || 0, pv: pendingPv });
             }
         };
 
         const evaluateFen = (fen) => {
             return new Promise(resolve => {
                 pendingEval = null;
+                pendingPv = '';
                 resolveMove = resolve;
                 analysisEngine.postMessage('position fen ' + fen);
                 analysisEngine.postMessage('go depth 12');
@@ -1943,6 +1963,7 @@ if (btnAnalyzeGame) {
                 idx: i,
                 score: res.evalScore,
                 bestMoveEngine: res.bestMove,
+                pv: res.pv,
                 isBlackTurn: (i % 2 === 1)
             });
         }
@@ -2018,6 +2039,7 @@ function finishBatchAnalysis() {
                 window.reviewMistakesList.push({
                     histIdx: i - 1,
                     bestMoveUci: bestMv,
+                    pv: prev.pv,
                     flag: flag,
                     badMoveSan: moveData.san,
                     fenBefore: prev.fen,
