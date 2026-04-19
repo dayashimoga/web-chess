@@ -2009,3 +2009,5 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     line.setAttribute('marker-end', `url(#${markerId})`);
     svg.appendChild(line);
 }
+ 
+ 
