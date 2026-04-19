@@ -1944,17 +1944,17 @@ function finishBatchAnalysis() {
         if (flag) {
             const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
             const bestMv = prev.bestMoveEngine || '?';
-            reportHtml += \`
-                <div class="ac-item mb-1" style="background:\${colorBox}; border:1px solid \${colorBox};" onclick="jumpToAnalysis(\${i - 1}, '\${bestMv}')">
+            reportHtml += `
+                <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox};" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
                     <div>
-                        <span class="ac-item-title">\${moveNumStr} \${moveData.san} (\${flag})</span>
+                        <span class="ac-item-title">${moveNumStr} ${moveData.san} (${flag})</span>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
-                            Engine preferred: <strong style="color:var(--text);">\${bestMv}</strong>
+                            Engine preferred: <strong style="color:var(--text);">${bestMv}</strong>
                         </div>
                     </div>
-                    <span style="font-size:1.2rem;">\${flag === 'Blunder'?'❌':flag === 'Mistake'?'⚠️':'❓'}</span>
+                    <span style="font-size:1.2rem;">${flag === 'Blunder'?'❌':flag === 'Mistake'?'⚠️':'❓'}</span>
                 </div>
-            \`;
+            `;
         }
     }
     
@@ -1977,7 +1977,7 @@ window.jumpToAnalysis = function(histIdx, bestMoveUci) {
         if (bestMoveUci && bestMoveUci.length >= 4 && bestMoveUci !== '?') {
             drawArrowRaw(bestMoveUci.substring(0, 2), bestMoveUci.substring(2, 4), 'rgba(34,197,94,0.85)', 'arrowhead-green');
         }
-        const pieceEl = document.querySelector(\`#sq-\${badMove.from} .piece\`) || document.querySelector(\`#sq-\${badMove.to} .piece\`);
+        const pieceEl = document.querySelector(`#sq-${badMove.from} .piece`) || document.querySelector(`#sq-${badMove.to} .piece`);
         if (pieceEl) {
             pieceEl.classList.add('shake-error');
             setTimeout(()=> pieceEl.classList.remove('shake-error'), 500);
@@ -2006,6 +2006,6 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     line.setAttribute('stroke', colorStr);
     line.setAttribute('stroke-width', '6');
     line.setAttribute('stroke-linecap', 'round');
-    line.setAttribute('marker-end', \`url(#\${markerId})\`);
+    line.setAttribute('marker-end', `url(#${markerId})`);
     svg.appendChild(line);
 }
