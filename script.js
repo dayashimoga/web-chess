@@ -557,7 +557,36 @@ function onSquareClick(e) {
                 // Pawn promotion
                 showPromotionPicker(targetMove.from, targetMove.to);
             } else {
-                if (mode === 'academy' && activeLesson && activeLesson.expected) {
+                if (window.isReviewMode) {
+                    const testMove = chess.move({ from: targetMove.from, to: targetMove.to });
+                    if (testMove) {
+                        const expectedUci = window.reviewMistakesList[window.currentReviewIdx].bestMoveUci;
+                        const userUci = testMove.from + testMove.to + (testMove.promotion || '');
+                        if (userUci === expectedUci) {
+                            document.getElementById('snd-success')?.play().catch(()=>{});
+                            const uT = document.getElementById('coachHudText');
+                            uT.innerHTML = '<strong style="color:#22c55e">Excellent!</strong> You found the best move.';
+                            if (window.reviewMistakesList[window.currentReviewIdx].bestMoveUci.length >= 4) {
+                                const fm = expectedUci.substring(0, 2);
+                                const tm = expectedUci.substring(2, 4);
+                                drawArrowRaw(fm, tm, 'rgba(34,197,94,0.85)', 'arrowhead-green');
+                            }
+                            setTimeout(() => {
+                                chess.undo();
+                                window.coachSkipMistake();
+                            }, 1500);
+                        } else {
+                            chess.undo();
+                            document.getElementById('snd-error')?.play().catch(()=>{});
+                            const pEl = document.querySelector(`#sq-${targetMove.from} .piece`);
+                            if(pEl) {
+                                pEl.classList.remove('shake-error');
+                                void pEl.offsetWidth; // Trigger reflow
+                                pEl.classList.add('shake-error');
+                            }
+                        }
+                    }
+                } else if (mode === 'academy' && activeLesson && activeLesson.expected) {
                     const testMove = chess.move({ from: targetMove.from, to: targetMove.to });
                     if (testMove) {
                         if (testMove.san === activeLesson.expected[activeLessonStep]) {
@@ -1944,6 +1973,19 @@ function finishBatchAnalysis() {
         if (flag) {
             const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
             const bestMv = prev.bestMoveEngine || '?';
+            
+            // COACH: Inject into reviewMistakesList
+            if (flag === 'Blunder' || flag === 'Mistake') {
+                if(!window.reviewMistakesList) window.reviewMistakesList = [];
+                window.reviewMistakesList.push({
+                    histIdx: i - 1,
+                    bestMoveUci: bestMv,
+                    flag: flag,
+                    badMoveSan: moveData.san,
+                    fenBefore: prev.fen
+                });
+            }
+
             reportHtml += `
                 <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox};" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
                     <div>
@@ -1962,9 +2004,14 @@ function finishBatchAnalysis() {
     document.getElementById('ar-mistakes').textContent = mistakes;
     document.getElementById('ar-inaccuracies').textContent = inaccuracies;
     
-    if (reportHtml === '') {
+    const btnCoach = document.getElementById('btnStartCoach');
+    if (window.reviewMistakesList && window.reviewMistakesList.length > 0) {
+        if(btnCoach) btnCoach.style.display = 'block';
+    } else {
+        if(btnCoach) btnCoach.style.display = 'none';
         reportHtml = '<div class="text-center text-neon-green" style="padding:1rem;">Perfect game! No significant mistakes detected.</div>';
     }
+
     document.getElementById('analysisReportList').innerHTML = reportHtml;
 }
 
@@ -2012,3 +2059,67 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
 
 
 // redeploy
+
+// ═══════════════════════════════════════════════════
+// NEW INTERACTIVE COACH ENGINE
+// ═══════════════════════════════════════════════════
+window.currentReviewIdx = -1;
+
+window.startInteractiveCoach = function() {
+    if (!window.reviewMistakesList || window.reviewMistakesList.length === 0) return;
+    
+    // Switch to Play Tab so board is big
+    document.querySelector('.tab-btn[data-tab="play"]').click();
+    
+    window.currentReviewIdx = 0;
+    
+    // Hide controls, show HUD
+    document.getElementById('controlsBox').style.display = 'none';
+    document.getElementById('interactiveCoachHud').classList.remove('hidden');
+    
+    loadReviewMistake();
+};
+
+window.coachExitReview = function() {
+    document.getElementById('controlsBox').style.display = 'block';
+    document.getElementById('interactiveCoachHud').classList.add('hidden');
+    
+    // Go back to end of game
+    jumpToMove(moveHistory.length - 1);
+    clearTheoryHighlights();
+};
+
+window.coachSkipMistake = function() {
+    window.currentReviewIdx++;
+    if (window.currentReviewIdx >= window.reviewMistakesList.length) {
+        alert("You have reviewed all your mistakes! Good job!");
+        coachExitReview();
+        return;
+    }
+    loadReviewMistake();
+};
+
+window.coachShowHint = function() {
+    const mistake = window.reviewMistakesList[window.currentReviewIdx];
+    if (mistake.bestMoveUci && mistake.bestMoveUci !== '?') {
+        const fm = mistake.bestMoveUci.substring(0, 2);
+        const tm = mistake.bestMoveUci.substring(2, 4);
+        drawArrowRaw(fm, tm, 'rgba(34,197,94,0.85)', 'arrowhead-green');
+    }
+};
+
+window.loadReviewMistake = function() {
+    const mistake = window.reviewMistakesList[window.currentReviewIdx];
+    
+    // Sync the internal chess engine to the history index BEFORE the bad move
+    jumpToMove(mistake.histIdx - 1);
+    
+    // Ensure it's human turn on the board for the human player's color at that move
+    // actually user can just drag a piece in jumpToMove state.
+    // wait, we need to bypass normal 'play' logic
+    window.isReviewMode = true;
+    
+    const uiText = document.getElementById('coachHudText');
+    uiText.innerHTML = `Move ${Math.ceil(mistake.histIdx/2)}: You played <strong style="color:#ef4444">${mistake.badMoveSan}</strong> (${mistake.flag}). Can you find the engine's suggested move?`;
+    clearTheoryHighlights();
+};

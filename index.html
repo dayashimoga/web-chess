@@ -101,6 +101,16 @@
                 <div class="captured-pieces" id="capturedWhite" style="display:flex; gap:2px; height:1.5rem; overflow:hidden;"></div>
             </div>
             
+            <div id="interactiveCoachHud" class="glass-card hidden" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:50; width:90%; padding:1rem; border:2px solid var(--glow-purple); background:rgba(15,23,42,0.9); text-align:center; box-shadow:0 0 20px rgba(139,92,246,0.3);">
+                <h4 style="color:var(--glow-purple); margin-top:0; margin-bottom:0.5rem;" id="coachHudTitle">Coach Review Mode</h4>
+                <p id="coachHudText" style="margin-bottom:1rem; font-size:0.95rem;">You blundered. Find the best move!</p>
+                <div style="display:flex; justify-content:center; gap:0.5rem;">
+                    <button class="btn btn-outline" id="coachBtnHint" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachShowHint()">Show Hint</button>
+                    <button class="btn btn-outline" id="coachBtnSkip" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachSkipMistake()">Skip Move</button>
+                    <button class="btn btn-primary" id="coachBtnExit" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachExitReview()">Exit Coach</button>
+                </div>
+            </div>
+            
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
                 <div class="opening-badge" id="openingName"></div>
                 <div style="display:flex; gap:0.5rem; margin-left:auto;">
@@ -360,6 +370,7 @@
                             <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Inaccuracies</div>
                         </div>
                     </div>
+                    <button class="btn btn-primary w-100 mb-2" id="btnStartCoach" style="display:none;" onclick="startInteractiveCoach()">🎯 Start Interactive Coach</button>
                     <div style="flex-grow:1; max-height:150px; overflow-y:auto; padding-right:4px;" id="analysisReportList" class="custom-scrollbar">
                         <div class="text-center text-muted" style="font-size:0.8rem; padding: 1rem 0;">Awaiting analysis request...</div>
                     </div>
