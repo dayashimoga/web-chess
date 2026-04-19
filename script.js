@@ -2286,3 +2286,272 @@ window.loadReviewMistake = function() {
     clearTheoryHighlights();
 };
 
+// ═══════════════════════════════════════════════════
+// GAME STATISTICS TRACKER (Persistent)
+// ═══════════════════════════════════════════════════
+const gameStats = JSON.parse(localStorage.getItem('chess_game_stats') || '{"wins":0,"losses":0,"draws":0,"totalGames":0,"bestStreak":0,"currentStreak":0,"accuracyHistory":[],"gamesLog":[]}');
+
+function saveGameStats() {
+    // Keep only last 50 games in log
+    if (gameStats.gamesLog.length > 50) gameStats.gamesLog = gameStats.gamesLog.slice(-50);
+    if (gameStats.accuracyHistory.length > 50) gameStats.accuracyHistory = gameStats.accuracyHistory.slice(-50);
+    localStorage.setItem('chess_game_stats', JSON.stringify(gameStats));
+    updateStatsDisplay();
+}
+
+function recordGameResult(result, aiLvl) {
+    gameStats.totalGames++;
+    if (result === 'win') {
+        gameStats.wins++;
+        gameStats.currentStreak++;
+        if (gameStats.currentStreak > gameStats.bestStreak) gameStats.bestStreak = gameStats.currentStreak;
+    } else if (result === 'loss') {
+        gameStats.losses++;
+        gameStats.currentStreak = 0;
+    } else {
+        gameStats.draws++;
+    }
+    gameStats.gamesLog.push({
+        date: new Date().toISOString().split('T')[0],
+        result,
+        aiLevel: aiLvl,
+        moves: moveHistory.length,
+        timestamp: Date.now()
+    });
+    saveGameStats();
+}
+
+function updateStatsDisplay() {
+    const el = document.getElementById('statsDisplay');
+    if (!el) return;
+    const winRate = gameStats.totalGames > 0 ? Math.round((gameStats.wins / gameStats.totalGames) * 100) : 0;
+    el.innerHTML = `
+        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;font-size:0.72rem;">
+            <span style="color:#4ade80;">W: <strong>${gameStats.wins}</strong></span>
+            <span style="color:#ef4444;">L: <strong>${gameStats.losses}</strong></span>
+            <span style="color:#94a3b8;">D: <strong>${gameStats.draws}</strong></span>
+            <span style="color:var(--accent);">Win: <strong>${winRate}%</strong></span>
+            <span style="color:#fbbf24;">🔥 ${gameStats.currentStreak}</span>
+        </div>`;
+}
+
+// Hook game end to track result
+const _origGameResult = gameResultEl;
+if (gameResultEl) {
+    const observer = new MutationObserver(() => {
+        const text = gameResultEl.textContent.toLowerCase();
+        if (gameResultEl.classList.contains('hidden') || !text) return;
+        if (text.includes('checkmate')) {
+            const sideWon = text.includes('white wins') ? 'w' : 'b';
+            recordGameResult(sideWon !== aiColor ? 'win' : 'loss', aiLevel);
+        } else if (text.includes('draw') || text.includes('stalemate') || text.includes('repetition') || text.includes('insufficient')) {
+            recordGameResult('draw', aiLevel);
+        } else if (text.includes('lost on time')) {
+            const sideWon = text.includes('white wins') ? 'w' : 'b';
+            recordGameResult(sideWon !== aiColor ? 'win' : 'loss', aiLevel);
+        }
+    });
+    observer.observe(gameResultEl, { childList: true, characterData: true, subtree: true });
+}
+
+// ═══════════════════════════════════════════════════
+// DAILY PUZZLE OF THE DAY
+// ═══════════════════════════════════════════════════
+const DAILY_PUZZLES = [
+    { fen: 'r2qkb1r/pp2nppp/3p4/2pNN1B1/2BnP3/3P4/PPP2PPP/R2bK2R w KQkq - 0 1', solution: ['Nf6+', 'gxf6', 'Bxf7#'], title: 'Smothered Discovery', difficulty: '⭐⭐⭐' },
+    { fen: '6k1/pp4p1/2p5/2bp4/8/P5Pb/1P3rrP/2BRRK2 b - - 0 1', solution: ['Rf1+'], title: 'Heavy Piece Tactics', difficulty: '⭐⭐' },
+    { fen: 'r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq - 0 1', solution: ['Bc5+', 'Kxe5', 'Qf4#'], title: 'King Hunt', difficulty: '⭐⭐⭐' },
+    { fen: 'r3k2r/ppp2Npp/1b5n/4P2b/2B1P3/8/PPP2PPP/RNB1K2R b KQkq - 0 1', solution: ['Kd7'], title: 'Defensive Resource', difficulty: '⭐⭐' },
+    { fen: '6k1/5ppp/8/8/8/8/r4PPP/3R2K1 w - - 0 1', solution: ['Rd8+', 'Kh7'], title: 'Back Rank Pressure', difficulty: '⭐' },
+    { fen: 'r1bqkbnr/pppppppp/2n5/1B6/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 2', solution: ['a6', 'Ba4', 'Nf6'], title: 'Morphy Defense', difficulty: '⭐' },
+    { fen: '2kr3r/p1ppqpb1/bn2Pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQ - 0 1', solution: ['Qxe6'], title: 'Complex Tactics', difficulty: '⭐⭐⭐' },
+    { fen: '1rb4r/pkPp3p/1b1P3n/1Q6/N3Pp2/8/P1P3PP/7K w - - 0 1', solution: ['Qd5+', 'Ka6', 'cxb8=N#'], title: 'Underpromotion Mate', difficulty: '⭐⭐⭐⭐' },
+    { fen: 'r3r1k1/pppb1ppp/8/3pN3/3Pn1q1/2PB4/PP4PP/R1BQ1RK1 w - - 0 1', solution: ['Nxf7'], title: 'Discovered Attack', difficulty: '⭐⭐' },
+    { fen: '4rrk1/pppb4/7p/3P2pq/3Q4/2P5/PP3RPP/R5K1 w - - 0 1', solution: ['Qxg7#'], title: 'Queen Sacrifice', difficulty: '⭐' },
+    { fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', solution: ['c3', 'd6', 'd4'], title: 'Italian Opening Theory', difficulty: '⭐' },
+    { fen: 'r2qr1k1/ppp2ppp/2np1n2/2b1p1B1/2B1P1b1/2NP1N2/PPP2PPP/R2QR1K1 w - - 0 1', solution: ['Nd5'], title: 'Central Knight Domination', difficulty: '⭐⭐' },
+    { fen: '8/8/p1p5/1p5p/1P5k/8/PPP2K1P/8 w - - 0 1', solution: ['a4'], title: 'Pawn Breakthrough', difficulty: '⭐⭐' },
+    { fen: '5rk1/1p3ppp/pq3b2/8/8/1P1Q1N2/P4PPP/3R2K1 w - - 0 1', solution: ['Qd6'], title: 'Queen Trade Advantage', difficulty: '⭐⭐' },
+    { fen: 'r4rk1/pp3ppp/2p2n2/3p4/3P4/2PB1N2/PP3PPP/R4RK1 w - - 0 1', solution: ['Bxh7+', 'Nxh7', 'Ng5'], title: 'Classic Greek Gift', difficulty: '⭐⭐⭐' },
+    { fen: 'r1bq1rk1/pppnn1pp/4p3/3pPp2/1b1P4/2NB3N/PPP2PPP/R1BQK2R w KQ - 0 1', solution: ['Bxf5'], title: 'Pawn Storm Preparation', difficulty: '⭐⭐' },
+    { fen: '8/5pk1/6p1/8/p3P3/8/1r3PPP/4R1K1 w - - 0 1', solution: ['e5'], title: 'Passed Pawn Push', difficulty: '⭐' },
+    { fen: 'r1bqkb1r/pp3ppp/2n1pn2/2pp4/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 5', solution: ['cxd5', 'exd5', 'Bg5'], title: 'QGD Exchange Variation', difficulty: '⭐⭐' },
+    { fen: '8/8/8/2K5/8/1Q6/1k6/8 w - - 0 1', solution: ['Qb4+'], title: 'King & Queen Technique', difficulty: '⭐' },
+    { fen: 'r2q1rk1/pp2ppbp/2p2np1/6B1/3PP1b1/2N2N2/PPQ2PPP/R3KB1R w KQ - 0 1', solution: ['e5', 'Nd5', 'Qd2'], title: 'Central Pawn Advance', difficulty: '⭐⭐' },
+];
+
+function getDailyPuzzle() {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    return DAILY_PUZZLES[dayOfYear % DAILY_PUZZLES.length];
+}
+
+function loadDailyPuzzle() {
+    const puzzle = getDailyPuzzle();
+    chess = new Chess(puzzle.fen);
+    moveHistory = [];
+    currentMoveIdx = -1;
+    buildBoard();
+    updateMovesUI();
+    
+    const hud = document.getElementById('coachHintHud');
+    const hintText = document.getElementById('coachHintText');
+    if (hud) hud.classList.add('active');
+    if (hintText) {
+        hintText.innerHTML = `<div style="margin-bottom:4px;"><strong style="color:#fbbf24;">🧩 Daily Puzzle: ${puzzle.title}</strong> <span style="font-size:0.7rem;">${puzzle.difficulty}</span></div>
+            <div style="font-size:0.8rem;color:#94a3b8;">Find the best continuation. ${chess.turn() === 'w' ? 'White' : 'Black'} to move.</div>`;
+    }
+    
+    // Track if user solves it
+    window._dailyPuzzleSolution = puzzle.solution;
+    window._dailyPuzzleStep = 0;
+    window._dailyPuzzleActive = true;
+}
+
+// Inject daily puzzle button into the Play tab
+const newGameBtn = document.getElementById('newGameBtn');
+if (newGameBtn) {
+    const puzzleBtn = document.createElement('button');
+    puzzleBtn.className = 'btn btn-secondary w-100';
+    puzzleBtn.style.cssText = 'margin-top:0.4rem;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;';
+    puzzleBtn.innerHTML = '🧩 Daily Puzzle';
+    puzzleBtn.addEventListener('click', loadDailyPuzzle);
+    newGameBtn.parentNode.insertBefore(puzzleBtn, newGameBtn.nextSibling);
+}
+
+// ═══════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+    // Don't fire shortcuts when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    
+    switch(e.key) {
+        case 'ArrowLeft':
+            e.preventDefault();
+            document.getElementById('btnPrev')?.click();
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            document.getElementById('btnNext')?.click();
+            break;
+        case 'Home':
+            e.preventDefault();
+            document.getElementById('btnStart')?.click();
+            break;
+        case 'End':
+            e.preventDefault();
+            document.getElementById('btnEnd')?.click();
+            break;
+        case 'f':
+        case 'F':
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                document.getElementById('flipBoard')?.click();
+            }
+            break;
+        case 'n':
+        case 'N':
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                document.getElementById('newGameBtn')?.click();
+            }
+            break;
+        case 'a':
+        case 'A':
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                document.getElementById('btnAnalyzeGame')?.click();
+            }
+            break;
+        case 'Escape':
+            if (window.isReviewMode) {
+                window.coachExitReview?.();
+            }
+            break;
+        case '?':
+            showShortcutsHelp();
+            break;
+    }
+});
+
+function showShortcutsHelp() {
+    const existing = document.getElementById('shortcutsOverlay');
+    if (existing) { existing.remove(); return; }
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'shortcutsOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `
+        <div style="background:var(--glass-bg,#1e1e28);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:1.5rem;max-width:380px;width:90%;color:var(--text,#e8ecf4);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 style="margin:0;font-size:1rem;">⌨️ Keyboard Shortcuts</h3>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;">✕</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:0.82rem;">
+                ${[
+                    ['← →', 'Navigate moves'],
+                    ['Home / End', 'First / Last move'],
+                    ['F', 'Flip board'],
+                    ['N', 'New game'],
+                    ['A', 'Analyze game'],
+                    ['Esc', 'Exit coach mode'],
+                    ['?', 'Toggle this help'],
+                ].map(([key,desc]) => `<div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">${desc}</span><kbd style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:1px 8px;border-radius:4px;font-size:0.75rem;font-family:monospace;">${key}</kbd></div>`).join('')}
+            </div>
+        </div>`;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+}
+
+// ═══════════════════════════════════════════════════
+// STATS DISPLAY — Inject below New Game button
+// ═══════════════════════════════════════════════════
+if (newGameBtn) {
+    const statsDiv = document.createElement('div');
+    statsDiv.id = 'statsDisplay';
+    statsDiv.style.cssText = 'margin-top:0.5rem;padding:6px;background:rgba(0,0,0,0.15);border-radius:8px;border:1px solid rgba(255,255,255,0.04);';
+    newGameBtn.parentNode.insertBefore(statsDiv, newGameBtn.nextSibling.nextSibling);
+    updateStatsDisplay();
+}
+
+// ═══════════════════════════════════════════════════
+// MATERIAL BALANCE BAR
+// ═══════════════════════════════════════════════════
+function calculateMaterialBalance() {
+    const values = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+    const board = chess.board();
+    let white = 0, black = 0;
+    for (const row of board) {
+        for (const sq of row) {
+            if (!sq) continue;
+            const val = values[sq.type] || 0;
+            if (sq.color === 'w') white += val;
+            else black += val;
+        }
+    }
+    return { white, black, advantage: white - black };
+}
+
+// Update captured pieces to show material advantage
+const _origBuildBoard = buildBoard;
+buildBoard = function() {
+    _origBuildBoard();
+    const bal = calculateMaterialBalance();
+    const advEl = document.getElementById('materialAdvantage');
+    if (!advEl) {
+        const label = document.createElement('span');
+        label.id = 'materialAdvantage';
+        label.style.cssText = 'font-size:0.7rem;font-weight:700;margin-left:4px;';
+        const whiteCapt = document.getElementById('capturedWhite');
+        if (whiteCapt) whiteCapt.parentElement?.appendChild(label);
+    }
+    const mEl = document.getElementById('materialAdvantage');
+    if (mEl) {
+        if (bal.advantage > 0) mEl.textContent = `+${bal.advantage}`;
+        else if (bal.advantage < 0) mEl.textContent = `${bal.advantage}`;
+        else mEl.textContent = '=';
+        mEl.style.color = bal.advantage > 0 ? '#4ade80' : bal.advantage < 0 ? '#ef4444' : '#94a3b8';
+    }
+};
+
+
