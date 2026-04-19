@@ -464,8 +464,6 @@ function renderPosition() {
 
     // Remove captured pieces (anything still marked stale)
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
     updateMovesList();
     checkGameEnd();
@@ -661,6 +659,10 @@ function showPromotionPicker(from, to) {
 // MOVE COMMIT & HISTORY
 // ═══════════════════════════════════════════════════
 function commitMove(move) {
+    if (typeof window !== 'undefined' && window.clearTheoryHighlights) {
+        window.clearTheoryHighlights(); // using window reference to avoid undefined if order matters
+    }
+
     lastMoveSquares = [move.from, move.to];
 
     // Truncate future history if we're branching
@@ -717,6 +719,9 @@ function playSound(move) {
 }
 
 function jumpToMove(idx) {
+    if (typeof window !== 'undefined' && window.clearTheoryHighlights) {
+        window.clearTheoryHighlights();
+    }
     if (idx < -1 || idx >= moveHistory.length) return;
     currentMoveIdx = idx;
 
@@ -1476,7 +1481,10 @@ function clearTheoryArrow() {
 
 function clearTheoryHighlights() {
     document.querySelectorAll('.theory-highlight').forEach(el => el.classList.remove('theory-highlight'));
-    clearTheoryArrow();
+    clearTheoryArrow(); // clear old system
+    // also clear SVG overlay arrows
+    const svgOvl = document.getElementById('arrowOverlay');
+    if (svgOvl) svgOvl.querySelectorAll('line').forEach(l => l.remove());
 }
 
 function checkAcademyProgress() {
@@ -1807,33 +1815,80 @@ updateClockDisplay();
 // POST-GAME INTERACTIVE ANALYSIS (Engine Batch Mode)
 // ═══════════════════════════════════════════════════
 let isBatchAnalyzing = false;
-let batchAnalysisIndex = 0;
 let batchAnalysisResults = [];
-let pendingEval = null;
 
 const btnAnalyzeGame = document.getElementById('btnAnalyzeGame');
 const analysisReportContainer = document.getElementById('analysisReportContainer');
 const btnCloseAnalysis = document.getElementById('btnCloseAnalysis');
 const analysisProgressBar = document.getElementById('analysisProgressBar');
 
+let analysisEngine = null;
+
 if (btnAnalyzeGame) {
-    btnAnalyzeGame.addEventListener('click', () => {
+    btnAnalyzeGame.addEventListener('click', async () => {
         if (moveHistory.length < 2) return;
         
         btnAnalyzeGame.disabled = true;
         btnAnalyzeGame.textContent = '⏳ Analyzing...';
         analysisReportContainer.classList.remove('hidden');
-        
         document.getElementById('analysisReportList').innerHTML = '<div class="text-center text-muted" style="padding:1rem;">Stockfish is evaluating your game...</div>';
         
-        // Reset state
         isBatchAnalyzing = true;
-        batchAnalysisIndex = 0;
         batchAnalysisResults = [];
-        pendingEval = null;
         
-        // Prepare to analyze the very first state (index 0 before move 1)
-        analyzeNextBatchPosition();
+        if (!analysisEngine) {
+            const workerCode = `importScripts("${STOCKFISH_CDN}");`;
+            analysisEngine = new Worker(URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' })));
+            analysisEngine.postMessage('uci');
+        }
+        
+        let pendingEval = null;
+        let resolveMove = null;
+        
+        analysisEngine.onmessage = (e) => {
+            const line = e.data;
+            if (typeof line === 'string' && line.includes('score')) {
+                const cpMatch = line.match(/score cp (-?\d+)/);
+                const mateMatch = line.match(/score mate (-?\d+)/);
+                let score = 0;
+                if (mateMatch) score = parseInt(mateMatch[1]) > 0 ? 9999 : -9999;
+                else if (cpMatch) score = parseInt(cpMatch[1]);
+                pendingEval = score;
+            } else if (typeof line === 'string' && line.startsWith('bestmove')) {
+                const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
+                if (resolveMove) resolveMove({ bestMove: match ? match[1] : null, evalScore: pendingEval || 0 });
+            }
+        };
+
+        const evaluateFen = (fen) => {
+            return new Promise(resolve => {
+                pendingEval = null;
+                resolveMove = resolve;
+                analysisEngine.postMessage('position fen ' + fen);
+                analysisEngine.postMessage('go depth 12');
+            });
+        };
+        
+        for (let i = 0; i <= moveHistory.length; i++) {
+            if (!isBatchAnalyzing) break;
+            
+            const pct = Math.round((i / Math.max(1, moveHistory.length)) * 100);
+            if(analysisProgressBar) analysisProgressBar.style.width = pct + '%';
+            
+            let fen = (i === 0) ? new Chess().fen() : moveHistory[i - 1].fen;
+            const res = await evaluateFen(fen);
+            
+            batchAnalysisResults.push({
+                idx: i,
+                score: res.evalScore,
+                bestMoveEngine: res.bestMove,
+                isBlackTurn: (i % 2 === 1)
+            });
+        }
+        
+        if (isBatchAnalyzing) {
+            finishBatchAnalysis();
+        }
     });
 }
 
@@ -1842,52 +1897,11 @@ if (btnCloseAnalysis) {
         analysisReportContainer.classList.add('hidden');
         if (isBatchAnalyzing) {
             isBatchAnalyzing = false;
-            engine.postMessage('stop');
+            if(analysisEngine) analysisEngine.postMessage('stop');
             btnAnalyzeGame.disabled = false;
             btnAnalyzeGame.textContent = '🔍 Request Analysis';
         }
     });
-}
-
-function analyzeNextBatchPosition() {
-    if (!isBatchAnalyzing) return;
-    if (!engine || !engineReady) return;
-    
-    // We analyze the board state BEFORE move `batchAnalysisIndex` is made
-    if (batchAnalysisIndex > moveHistory.length) {
-        finishBatchAnalysis();
-        return;
-    }
-    
-    // Update progress
-    const pct = Math.round((batchAnalysisIndex / Math.max(1, moveHistory.length)) * 100);
-    if(analysisProgressBar) analysisProgressBar.style.width = pct + '%';
-    
-    let fenToAnalyze = '';
-    // if index == 0, it's the starting position
-    if (batchAnalysisIndex === 0) {
-        const tmp = new Chess();
-        fenToAnalyze = tmp.fen();
-    } else {
-        fenToAnalyze = moveHistory[batchAnalysisIndex - 1].fen;
-    }
-    
-    engine.postMessage('stop');
-    engine.postMessage('position fen ' + fenToAnalyze);
-    engine.postMessage('go depth 12');
-}
-
-function handleBatchAnalysisEvalResult(bestMoveSan, currentEval) {
-    if (!isBatchAnalyzing) return;
-
-    batchAnalysisResults.push({
-        idx: batchAnalysisIndex,
-        evalObj: currentEval,
-        bestMoveEngine: bestMoveSan
-    });
-    
-    batchAnalysisIndex++;
-    analyzeNextBatchPosition();
 }
 
 function finishBatchAnalysis() {
@@ -1897,28 +1911,26 @@ function finishBatchAnalysis() {
     
     if(analysisProgressBar) analysisProgressBar.style.width = '100%';
     
-    // Process results into blunders/mistakes
     let blunders = 0, mistakes = 0, inaccuracies = 0;
     let reportHtml = '';
     
     for (let i = 1; i < batchAnalysisResults.length; i++) {
-        const prev = batchAnalysisResults[i - 1]; // State before move
-        const curr = batchAnalysisResults[i];     // State after move
+        const prev = batchAnalysisResults[i - 1]; 
+        const curr = batchAnalysisResults[i];     
         
         const moveData = moveHistory[i - 1];
         if (!moveData) continue;
         
         const colorMoved = i % 2 === 1 ? 'w' : 'b';
         
-        let valBefore = prev.evalObj.score; 
-        if (prev.evalObj.isBlackTurn) valBefore = -valBefore; 
+        let valBefore = prev.score; 
+        if (prev.isBlackTurn) valBefore = -valBefore; 
         
-        let valAfter = curr.evalObj.score;
-        if (curr.evalObj.isBlackTurn) valAfter = -valAfter; 
+        let valAfter = curr.score;
+        if (curr.isBlackTurn) valAfter = -valAfter; 
         
         let errorDrop = colorMoved === 'w' ? (valBefore - valAfter) : (valAfter - valBefore);
         
-        // Handle mate scores simply
         if (Math.abs(valBefore) > 9000 || Math.abs(valAfter) > 9000) {
             errorDrop = 0; 
         }
@@ -1931,18 +1943,18 @@ function finishBatchAnalysis() {
         
         if (flag) {
             const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
-            
-            reportHtml += `
-                <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox};" onclick="jumpToAnalysis(${i - 1}, '${prev.bestMoveEngine}')">
+            const bestMv = prev.bestMoveEngine || '?';
+            reportHtml += \`
+                <div class="ac-item mb-1" style="background:\${colorBox}; border:1px solid \${colorBox};" onclick="jumpToAnalysis(\${i - 1}, '\${bestMv}')">
                     <div>
-                        <span class="ac-item-title">${moveNumStr} ${moveData.san} (${flag})</span>
+                        <span class="ac-item-title">\${moveNumStr} \${moveData.san} (\${flag})</span>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
-                            Engine preferred: <strong style="color:var(--text);">${prev.bestMoveEngine || '?'}</strong>
+                            Engine preferred: <strong style="color:var(--text);">\${bestMv}</strong>
                         </div>
                     </div>
-                    <span style="font-size:1.2rem;">${flag === 'Blunder'?'❌':flag === 'Mistake'?'⚠️':'❓'}</span>
+                    <span style="font-size:1.2rem;">\${flag === 'Blunder'?'❌':flag === 'Mistake'?'⚠️':'❓'}</span>
                 </div>
-            `;
+            \`;
         }
     }
     
@@ -1958,20 +1970,14 @@ function finishBatchAnalysis() {
 
 window.jumpToAnalysis = function(histIdx, bestMoveUci) {
     jumpToMove(histIdx - 1);
-    
     const badMove = moveHistory[histIdx];
-    
     setTimeout(() => {
         clearTheoryHighlights();
         drawArrowRaw(badMove.from, badMove.to, 'rgba(239,68,68,0.85)', 'arrowhead-red');
-        
-        if (bestMoveUci && bestMoveUci.length >= 4) {
-            const bcFrom = bestMoveUci.substring(0, 2);
-            const bcTo = bestMoveUci.substring(2, 4);
-            drawArrowRaw(bcFrom, bcTo, 'rgba(34,197,94,0.85)', 'arrowhead-green');
+        if (bestMoveUci && bestMoveUci.length >= 4 && bestMoveUci !== '?') {
+            drawArrowRaw(bestMoveUci.substring(0, 2), bestMoveUci.substring(2, 4), 'rgba(34,197,94,0.85)', 'arrowhead-green');
         }
-        
-        const pieceEl = document.querySelector(`#sq-${badMove.from} .piece`) || document.querySelector(`#sq-${badMove.to} .piece`);
+        const pieceEl = document.querySelector(\`#sq-\${badMove.from} .piece\`) || document.querySelector(\`#sq-\${badMove.to} .piece\`);
         if (pieceEl) {
             pieceEl.classList.add('shake-error');
             setTimeout(()=> pieceEl.classList.remove('shake-error'), 500);
@@ -1982,20 +1988,16 @@ window.jumpToAnalysis = function(histIdx, bestMoveUci) {
 function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     const svg = document.getElementById('arrowOverlay');
     if(!svg) return;
-    
     const fEl = document.getElementById('sq-' + fromSq);
     const tEl = document.getElementById('sq-' + toSq);
     if (!fEl || !tEl) return;
-    
     const boardRect = boardEl.getBoundingClientRect();
     const sfRect = fEl.getBoundingClientRect();
     const stRect = tEl.getBoundingClientRect();
-    
     const x1 = sfRect.left + sfRect.width / 2 - boardRect.left;
     const y1 = sfRect.top + sfRect.height / 2 - boardRect.top;
     const x2 = stRect.left + stRect.width / 2 - boardRect.left;
     const y2 = stRect.top + stRect.height / 2 - boardRect.top;
-    
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', x1);
     line.setAttribute('y1', y1);
@@ -2004,60 +2006,6 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     line.setAttribute('stroke', colorStr);
     line.setAttribute('stroke-width', '6');
     line.setAttribute('stroke-linecap', 'round');
-    line.setAttribute('marker-end', `url(#${markerId})`);
-    
+    line.setAttribute('marker-end', \`url(#\${markerId})\`);
     svg.appendChild(line);
 }
-
-function clearTheoryHighlights() {
-    document.querySelectorAll('.theory-highlight').forEach(el => el.classList.remove('theory-highlight'));
-    const svg = document.getElementById('arrowOverlay');
-    if (svg) {
-        const lines = svg.querySelectorAll('line');
-        lines.forEach(l => l.remove());
-    }
-}
-
-window.drawTheoryArrow = function(fromSq, toSq) {
-    drawArrowRaw(fromSq, toSq, 'rgba(99,102,241,0.85)', 'arrowhead-green');
-}
-
-const _origOnEngineMessage = onEngineMessage;
-onEngineMessage = function(event) {
-    const line = event.data;
-    
-    if (isBatchAnalyzing) {
-        if (typeof line === 'string' && line.includes('score')) {
-            const cpMatch = line.match(/score cp (-?\d+)/);
-            const mateMatch = line.match(/score mate (-?\d+)/);
-            let score = 0;
-            if (mateMatch) score = parseInt(mateMatch[1]) > 0 ? 9999 : -9999;
-            else if (cpMatch) score = parseInt(cpMatch[1]);
-            
-            const isBlackTurn = (batchAnalysisIndex % 2 === 1);
-            pendingEval = { score: score, isBlackTurn: isBlackTurn };
-        }
-        else if (typeof line === 'string' && line.startsWith('bestmove')) {
-            const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
-            if (match && pendingEval) {
-                handleBatchAnalysisEvalResult(match[1], pendingEval);
-            } else {
-                handleBatchAnalysisEvalResult(null, { score: 0, isBlackTurn: false });
-            }
-        }
-        return;
-    }
-    
-    _origOnEngineMessage(event);
-};
-
-const _origJumpToMove = jumpToMove;
-jumpToMove = function(idx) {
-    clearTheoryHighlights();
-    _origJumpToMove(idx);
-};
-const _origCommitMove2 = commitMove;
-commitMove = function(move) {
-    clearTheoryHighlights();
-    _origCommitMove2(move);
-};
