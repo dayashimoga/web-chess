@@ -64,7 +64,7 @@
                 <div class="eval-text" id="evalText">0.0</div>
             </div>
             
-            <div class="board-stack" style="display:flex; flex-direction:column; flex-grow:1; width:calc(100% - 36px);">
+            <div class="board-stack">
             <div class="player-info p-black mb-2" style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span class="player-name">Black</span>
@@ -313,7 +313,7 @@
                 </div>
             </div>
 
-            <div class="glass-card flex-grow" id="movesPanelBox" style="display:flex; flex-direction:column;">
+            <div class="glass-card flex-grow" id="movesPanelBox" style="display:flex; flex-direction:column; overflow-y:auto;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
                     <h3 class="card-title m-0">Moves</h3>
                     <button class="btn btn-secondary btn-sm" id="btnAnalyzeGame" style="padding: 4px 10px; font-size:0.8rem; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80;">🔍 Request Analysis</button>
@@ -328,25 +328,22 @@
                 <div class="moves-list" id="movesList"></div>
                 <div class="game-result hidden" id="gameResult"></div>
                 <div class="opening-name" id="openingName" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);font-style:italic;"></div>
-                <div class="utility-buttons" style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+                <div class="utility-buttons" style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">
                     <button class="btn btn-secondary btn-sm" id="exportPgn" title="Export PGN">&#x1F4CB; Export PGN</button>
                     <button class="btn btn-secondary btn-sm" id="copyFen" title="Copy FEN">&#x1F4C4; Copy FEN</button>
                     <button class="btn btn-secondary btn-sm" id="flipBoard" title="Flip Board">&#x1F504; Flip</button>
                 </div>
-                <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border-color);">
-                    <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
-                        <label style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">&#x1F3A8; Theme</label>
-                        <select id="boardTheme" class="btn btn-secondary btn-sm" style="flex:1;padding:4px 8px;font-size:0.8rem;">
-                            <option value="classic">Classic Wood</option>
-                            <option value="emerald">Emerald</option>
-                            <option value="midnight">Midnight Blue</option>
-                            <option value="marble">Marble</option>
-                        </select>
-                    </div>
-                    <div style="display:flex;gap:0.5rem;align-items:center;">
-                        <label style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">&#x23F1; AI Delay</label>
-                        <input type="range" id="moveTimingSlider" min="200" max="3000" step="100" value="1200" style="flex:1;accent-color:var(--primary-color);">
-                        <span id="moveTimingVal" style="font-size:0.75rem;color:var(--text-muted);min-width:32px;">1.2s</span>
+                <div style="margin-top:0.35rem;padding-top:0.35rem;border-top:1px solid var(--border-color);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                    <select id="boardTheme" class="btn btn-secondary btn-sm" style="padding:3px 6px;font-size:0.72rem;">
+                        <option value="classic">🎨 Classic</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="midnight">Midnight</option>
+                        <option value="marble">Marble</option>
+                    </select>
+                    <div style="display:flex;gap:0.3rem;align-items:center;flex:1;min-width:120px;">
+                        <span style="font-size:0.68rem;color:var(--text-muted);">⏱</span>
+                        <input type="range" id="moveTimingSlider" min="200" max="3000" step="100" value="1200" style="flex:1;accent-color:var(--primary-color);height:4px;">
+                        <span id="moveTimingVal" style="font-size:0.68rem;color:var(--text-muted);min-width:24px;">1.2s</span>
                     </div>
                 </div>
 
@@ -380,7 +377,7 @@
                         <span style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Overall Accuracy</span>
                         <div style="font-size:1.6rem; font-weight:bold; color:#4ade80;" id="ar-accuracy">100%</div>
                     </div>
-                    <div style="flex-grow:1; max-height:350px; overflow-y:auto; padding-right:4px;" id="analysisReportList" class="custom-scrollbar">
+                    <div style="flex-grow:1; max-height:200px; overflow-y:auto; padding-right:4px;" id="analysisReportList" class="custom-scrollbar">
                         <div class="text-center text-muted" style="font-size:0.8rem; padding: 1rem 0;">Awaiting analysis request...</div>
                     </div>
                 </div>

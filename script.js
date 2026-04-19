@@ -1855,6 +1855,7 @@ const btnCloseAnalysis = document.getElementById('btnCloseAnalysis');
 const analysisProgressBar = document.getElementById('analysisProgressBar');
 
 let analysisEngine = null;
+let analysisEngineReady = false;
 
 if (btnAnalyzeGame) {
     btnAnalyzeGame.addEventListener('click', async () => {
@@ -1868,15 +1869,43 @@ if (btnAnalyzeGame) {
         isBatchAnalyzing = true;
         batchAnalysisResults = [];
         
+        // Initialize analysis engine with proper UCI handshake
         if (!analysisEngine) {
             const workerCode = `importScripts("${STOCKFISH_CDN}");`;
             analysisEngine = new Worker(URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' })));
-            analysisEngine.postMessage('uci');
+            
+            // Wait for full UCI handshake before proceeding
+            await new Promise((resolve) => {
+                analysisEngine.onmessage = (e) => {
+                    const line = e.data;
+                    if (line === 'uciok') {
+                        analysisEngine.postMessage('isready');
+                    } else if (line === 'readyok') {
+                        analysisEngineReady = true;
+                        resolve();
+                    }
+                };
+                analysisEngine.postMessage('uci');
+            });
+        } else {
+            // Engine exists — still confirm it's ready for a new batch
+            await new Promise((resolve) => {
+                analysisEngine.postMessage('stop');
+                const readyHandler = (e) => {
+                    if (e.data === 'readyok') {
+                        analysisEngine.removeEventListener('message', readyHandler);
+                        resolve();
+                    }
+                };
+                analysisEngine.addEventListener('message', readyHandler);
+                analysisEngine.postMessage('isready');
+            });
         }
         
         let pendingEval = null;
         let resolveMove = null;
         
+        // Now set the eval-tracking handler
         analysisEngine.onmessage = (e) => {
             const line = e.data;
             if (typeof line === 'string' && line.includes('score')) {
