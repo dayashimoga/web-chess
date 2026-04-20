@@ -101,20 +101,7 @@
                 <div class="captured-pieces" id="capturedWhite" style="display:flex; gap:2px; height:1.5rem; overflow:hidden;"></div>
             </div>
             
-            <div id="interactiveCoachHud" class="glass-card hidden" style="position:relative; z-index:10; width:100%; padding:1rem 1.25rem; margin-top:0.75rem; border:2px solid var(--glow-purple); background:rgba(15,23,42,0.95); text-align:center; box-shadow:0 0 20px rgba(139,92,246,0.3); border-radius:12px;">
-                <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:0.5rem;">
-                    <span style="font-size:1.3rem;">🎯</span>
-                    <h4 style="color:var(--glow-purple); margin:0; font-size:1rem;" id="coachHudTitle">Coach Review Mode</h4>
-                    <span style="font-size:0.75rem; background:rgba(139,92,246,0.2); padding:2px 8px; border-radius:10px; color:#c084fc;" id="coachProgress">1/1</span>
-                </div>
-                <p id="coachHudText" style="margin-bottom:0.75rem; font-size:0.9rem; line-height:1.5;">You blundered. Find the best move!</p>
-                <div id="coachReasonText" style="margin-bottom:0.75rem; font-size:0.8rem; color:#94a3b8; line-height:1.4; padding:0.5rem; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.06); display:none;"></div>
-                <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;">
-                    <button class="btn btn-outline" id="coachBtnHint" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachShowHint()">💡 Show Hint</button>
-                    <button class="btn btn-outline" id="coachBtnSkip" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachSkipMistake()">⏭ Skip Move</button>
-                    <button class="btn btn-primary" id="coachBtnExit" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachExitReview()">Exit Coach</button>
-                </div>
-            </div>
+
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
                 <div class="opening-badge" id="openingName"></div>
@@ -137,6 +124,21 @@
         <!-- RIGHT: Controls & PGN -->
         <div class="controls-column">
             
+            <div id="interactiveCoachHud" class="glass-card hidden" style="position:relative; z-index:10; width:100%; padding:1rem 1.25rem; margin-bottom:1rem; border:2px solid var(--glow-purple); background:rgba(15,23,42,0.95); text-align:center; box-shadow:0 0 20px rgba(139,92,246,0.3); border-radius:12px;">
+                <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:0.5rem;">
+                    <span style="font-size:1.3rem;">🎯</span>
+                    <h4 style="color:var(--glow-purple); margin:0; font-size:1rem;" id="coachHudTitle">Coach Review Mode</h4>
+                    <span style="font-size:0.75rem; background:rgba(139,92,246,0.2); padding:2px 8px; border-radius:10px; color:#c084fc;" id="coachProgress">1/1</span>
+                </div>
+                <p id="coachHudText" style="margin-bottom:0.75rem; font-size:0.9rem; line-height:1.5;">You blundered. Find the best move!</p>
+                <div id="coachReasonText" style="margin-bottom:0.75rem; font-size:0.8rem; color:#94a3b8; line-height:1.4; padding:0.5rem; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.06); display:none;"></div>
+                <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;">
+                    <button class="btn btn-outline" id="coachBtnHint" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachShowHint()">💡 Show Hint</button>
+                    <button class="btn btn-outline" id="coachBtnSkip" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachSkipMistake()">⏭ Skip Move</button>
+                    <button class="btn btn-primary" id="coachBtnExit" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="coachExitReview()">Exit Coach</button>
+                </div>
+            </div>
+
             <div class="glass-card mb-4" id="controlsBox">
                 <div class="flex-spread mb-3">
                     <h3 class="card-title m-0">Game Mode</h3>
