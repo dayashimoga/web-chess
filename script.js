@@ -1886,8 +1886,15 @@ if (btnAnalyzeGame) {
         
         // Initialize analysis engine with proper UCI handshake
         if (!analysisEngine) {
-            const workerCode = `importScripts("${STOCKFISH_CDN}");`;
-            analysisEngine = new Worker(URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' })));
+            try {
+                const response = await fetch(STOCKFISH_CDN);
+                const code = await response.text();
+                analysisEngine = new Worker(URL.createObjectURL(new Blob([code], { type: 'application/javascript' })));
+            } catch(e) {
+                console.warn('analysisEngine fetch failed, trying importScripts', e);
+                const workerCode = `importScripts("${STOCKFISH_CDN}");`;
+                analysisEngine = new Worker(URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' })));
+            }
             
             // Wait for full UCI handshake before proceeding
             await new Promise((resolve) => {
@@ -1901,6 +1908,7 @@ if (btnAnalyzeGame) {
                     }
                 };
                 analysisEngine.postMessage('uci');
+                setTimeout(() => resolve(), 3000); // Failsafe timeout
             });
         } else {
             // Engine exists — still confirm it's ready for a new batch
@@ -1914,6 +1922,7 @@ if (btnAnalyzeGame) {
                 };
                 analysisEngine.addEventListener('message', readyHandler);
                 analysisEngine.postMessage('isready');
+                setTimeout(() => resolve(), 2000); // Failsafe timeout
             });
         }
         
@@ -1947,6 +1956,7 @@ if (btnAnalyzeGame) {
                 resolveMove = resolve;
                 analysisEngine.postMessage('position fen ' + fen);
                 analysisEngine.postMessage('go depth 12');
+                setTimeout(() => resolve({bestMove: null, evalScore: pendingEval || 0, pv: pendingPv}), 8000);
             });
         };
         
@@ -1964,7 +1974,8 @@ if (btnAnalyzeGame) {
                 score: res.evalScore,
                 bestMoveEngine: res.bestMove,
                 pv: res.pv,
-                isBlackTurn: (i % 2 === 1)
+                isBlackTurn: (i % 2 === 1),
+                fen: fen
             });
         }
         
