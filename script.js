@@ -1804,8 +1804,7 @@ commitMove = function(move) {
         updateClockDisplay();
     }
     _origCommitMove(move);
-    // Also detect opening after each move
-    detectOpening();
+    // Note: detectOpening() is already called via the first monkey-patch (line ~1371)
 };
 
 // Clock control selector
@@ -2005,8 +2004,32 @@ function finishBatchAnalysis() {
     if(analysisProgressBar) analysisProgressBar.style.width = '100%';
     
     let blunders = 0, mistakes = 0, inaccuracies = 0, goodMoves = 0, bestMoves = 0;
+    let brilliantMoves = 0;
     let reportHtml = '';
     window.reviewMistakesList = [];
+    
+    // CAPS (Computer Accuracy Percentage Score) — weighted accuracy
+    let capsScoreSum = 0;
+    let capsMovesCount = 0;
+    
+    // Move classification tracking for badges
+    const moveClassifications = [];
+    
+    // Pattern tracking for post-game improvement tips
+    const patternTracker = {
+        earlyQueenMoves: 0,
+        kingSafetyIssues: 0,
+        missedTactics: 0,
+        endgameErrors: 0,
+        openingPhaseErrors: 0, // moves 1-10
+        middlegameErrors: 0,   // moves 11-30
+        pawnStructureWeaknesses: 0,
+        missedCaptures: 0,
+        uncastled: true,
+        totalErrorDrop: 0,
+        worstMove: null,
+        worstDrop: 0
+    };
     
     // Determine which color's mistakes we actually care about so we don't coach the enemy!
     let humanColor = 'w';
@@ -2053,18 +2076,57 @@ function finishBatchAnalysis() {
         let flag = null;
         let colorBox = '';
         let emoji = '';
+        let badge = '✅';
         
         // Only classify and count blunders for the HUMAN player to avoiding guiding them on the engine's behalf
         if (colorMoved === humanColor) {
-            if (errorDrop > 250) { flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.15)'; emoji = '❌'; }
-            else if (errorDrop > 120) { flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.15)'; emoji = '⚠️'; }
-            else if (errorDrop > 70) { flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.15)'; emoji = '❓'; }
-            else if (errorDrop < -20) { bestMoves++; }
-            else { goodMoves++; }
+            // CAPS: Convert centipawn loss to a 0-100 accuracy score per move
+            // Formula: accuracy = max(0, 100 - (cpLoss^1.5 / 10))
+            const cpLoss = Math.max(0, errorDrop);
+            const moveAccuracy = Math.max(0, Math.min(100, 100 - (Math.pow(cpLoss, 1.5) / 10)));
+            capsScoreSum += moveAccuracy;
+            capsMovesCount++;
+            
+            if (errorDrop > 250) { 
+                flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.15)'; emoji = '❌'; badge = '❌';
+                patternTracker.totalErrorDrop += errorDrop;
+                if (errorDrop > patternTracker.worstDrop) {
+                    patternTracker.worstDrop = errorDrop;
+                    patternTracker.worstMove = { san: moveData.san, moveNum: moveNumStr, drop: errorDrop };
+                }
+            }
+            else if (errorDrop > 120) { 
+                flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.15)'; emoji = '⚠️'; badge = '⚠️';
+                patternTracker.totalErrorDrop += errorDrop;
+            }
+            else if (errorDrop > 70) { 
+                flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.15)'; emoji = '❓'; badge = '❓';
+            }
+            else if (errorDrop < -50) { 
+                brilliantMoves++; badge = '💡'; bestMoves++; 
+            }
+            else if (errorDrop < -20) { bestMoves++; badge = '⭐'; }
+            else { goodMoves++; badge = '✅'; }
+            
+            // Track patterns for improvement tips
+            const san = moveData.san;
+            const movePhase = Math.ceil(i / 2);
+            if (flag && movePhase <= 10) patternTracker.openingPhaseErrors++;
+            if (flag && movePhase > 10 && movePhase <= 30) patternTracker.middlegameErrors++;
+            if (flag && movePhase > 30) patternTracker.endgameErrors++;
+            if (san.startsWith('Q') && movePhase <= 6) patternTracker.earlyQueenMoves++;
+            if (san.startsWith('K') && !san.startsWith('O')) patternTracker.kingSafetyIssues++;
+            if (san.startsWith('O')) patternTracker.uncastled = false;
+            if (flag && san.includes('x')) patternTracker.missedCaptures++;
+            if (flag && bestSan && bestSan.includes('x')) patternTracker.missedTactics++;
+            if (san.match(/^[a-h]/) && flag) patternTracker.pawnStructureWeaknesses++;
         } else {
              // For the opponent, just note best moves optionally but don't flag as mistakes for the user.
-            if (errorDrop < -20) { bestMoves++; } else { goodMoves++; }
+            if (errorDrop < -20) { bestMoves++; badge = '⭐'; } else { goodMoves++; badge = '✅'; }
         }
+        
+        // Store classification for move list badges
+        moveClassifications.push({ idx: i - 1, badge, flag, colorMoved });
         
         if (flag) {
             // COACH: Inject into reviewMistakesList with reasoning
@@ -2105,6 +2167,18 @@ function finishBatchAnalysis() {
                     </div>
                 </div>
             `;
+        } else if (errorDrop < -50 && colorMoved === humanColor) {
+            // Brilliant move
+            reportHtml += `
+                <div class="ac-item mb-1" style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.15); border-radius:8px; padding:0.5rem; cursor:pointer;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
+                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                        <span style="font-size:0.9rem;">💡</span>
+                        <span style="font-weight:600; font-size:0.85rem;">${moveNumStr} ${moveData.san}</span>
+                        <span style="font-size:0.68rem; padding:1px 6px; border-radius:4px; background:rgba(168,85,247,0.15); color:#c084fc; font-weight:600;">Brilliant</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#c4b5fd; margin-top:3px;">${reason.whyGood || 'Exceptional move — better than the engine\'s top choice!'}</div>
+                </div>
+            `;
         } else if (errorDrop < -20 && colorMoved === humanColor) {
             reportHtml += `
                 <div class="ac-item mb-1" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.12); border-radius:8px; padding:0.5rem; cursor:pointer;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
@@ -2123,16 +2197,31 @@ function finishBatchAnalysis() {
     document.getElementById('ar-mistakes').textContent = mistakes;
     document.getElementById('ar-inaccuracies').textContent = inaccuracies;
     
-    // Calculate and show accuracy (only for human player)
+    // Calculate CAPS (Computer Accuracy Percentage Score) — weighted accuracy
+    const capsAccuracy = capsMovesCount > 0 ? Math.round(capsScoreSum / capsMovesCount) : 100;
+    // Also keep simple accuracy for reference
     const totalClassified = blunders + mistakes + inaccuracies + goodMoves + bestMoves;
-    const accuracy = totalClassified > 0 ? Math.round(((goodMoves + bestMoves) / totalClassified) * 100) : 100;
+    const simpleAccuracy = totalClassified > 0 ? Math.round(((goodMoves + bestMoves) / totalClassified) * 100) : 100;
+    
     const accEl = document.getElementById('analysisAccuracy');
     const accValEl = document.getElementById('ar-accuracy');
     if (accEl && accValEl) {
-        accValEl.textContent = accuracy + '%';
-        accValEl.style.color = accuracy >= 80 ? '#4ade80' : accuracy >= 60 ? '#fbbf24' : accuracy >= 40 ? '#f97316' : '#ef4444';
+        accValEl.textContent = capsAccuracy + '%';
+        accValEl.style.color = capsAccuracy >= 80 ? '#4ade80' : capsAccuracy >= 60 ? '#fbbf24' : capsAccuracy >= 40 ? '#f97316' : '#ef4444';
         accEl.style.display = 'block';
+        // Show accuracy label clarification
+        const accLabelEl = document.getElementById('ar-accuracy-label');
+        if (accLabelEl) accLabelEl.textContent = 'CAPS Accuracy';
     }
+    
+    // Save accuracy to game stats history
+    if (gameStats) {
+        gameStats.accuracyHistory.push(capsAccuracy);
+        saveGameStats();
+    }
+    
+    // Apply move classification badges to the move list UI
+    applyMoveBadges(moveClassifications);
     
     const btnCoach = document.getElementById('btnStartCoach');
     if (window.reviewMistakesList && window.reviewMistakesList.length > 0) {
@@ -2141,11 +2230,168 @@ function finishBatchAnalysis() {
         if(btnCoach) btnCoach.style.display = 'none';
     }
     
+    // Generate structured improvement tips
+    const improvementTips = generateImprovementTips(patternTracker, blunders, mistakes, inaccuracies, bestMoves, brilliantMoves, capsAccuracy);
+    
+    // Build summary header with stats breakdown
+    let summaryHtml = `
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; justify-content:center;">
+            ${brilliantMoves > 0 ? `<span style="font-size:0.72rem; padding:2px 8px; border-radius:12px; background:rgba(168,85,247,0.15); color:#c084fc; font-weight:600;">💡 ${brilliantMoves} Brilliant</span>` : ''}
+            <span style="font-size:0.72rem; padding:2px 8px; border-radius:12px; background:rgba(34,197,94,0.1); color:#4ade80; font-weight:600;">⭐ ${bestMoves} Best</span>
+            <span style="font-size:0.72rem; padding:2px 8px; border-radius:12px; background:rgba(148,163,184,0.1); color:#94a3b8; font-weight:600;">✅ ${goodMoves} Good</span>
+        </div>
+    `;
+    
     if (!reportHtml) {
         reportHtml = '<div class="text-center text-neon-green" style="padding:1rem;">🏆 Perfect game! No significant mistakes detected.</div>';
     }
+    
+    // Append improvement tips section
+    if (improvementTips.length > 0) {
+        reportHtml += `
+            <div style="margin-top:12px; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.15); border-radius:10px; padding:10px;">
+                <div style="font-size:0.78rem; font-weight:700; color:var(--accent); margin-bottom:8px; display:flex; align-items:center; gap:4px;">🎯 Improvement Tips</div>
+                ${improvementTips.map(tip => `
+                    <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:0.76rem; line-height:1.45;">
+                        <span style="flex-shrink:0; font-size:0.85rem;">${tip.icon}</span>
+                        <div>
+                            <strong style="color:${tip.color};">${tip.title}:</strong>
+                            <span style="color:#94a3b8;">${tip.detail}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
 
-    document.getElementById('analysisReportList').innerHTML = reportHtml;
+    document.getElementById('analysisReportList').innerHTML = summaryHtml + reportHtml;
+}
+
+// ═══════════════════════════════════════════════════
+// MOVE BADGE OVERLAY (Post-Analysis)
+// ═══════════════════════════════════════════════════
+function applyMoveBadges(classifications) {
+    const buttons = document.querySelectorAll('.move-btn');
+    classifications.forEach(c => {
+        if (c.flag && buttons[c.idx]) {
+            const btn = buttons[c.idx];
+            // Remove any existing badge
+            const existing = btn.querySelector('.move-badge');
+            if (existing) existing.remove();
+            
+            const badgeEl = document.createElement('span');
+            badgeEl.className = 'move-badge';
+            badgeEl.textContent = c.badge;
+            badgeEl.style.cssText = 'font-size:0.6rem; margin-left:2px; vertical-align:super;';
+            btn.appendChild(badgeEl);
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// POST-GAME IMPROVEMENT TIPS ENGINE
+// ═══════════════════════════════════════════════════
+function generateImprovementTips(tracker, blunders, mistakes, inaccuracies, bestMoves, brilliantMoves, accuracy) {
+    const tips = [];
+    
+    // Opening phase issues
+    if (tracker.openingPhaseErrors >= 2) {
+        tips.push({
+            icon: '📖',
+            title: 'Opening Theory',
+            detail: `You made ${tracker.openingPhaseErrors} errors in the opening (moves 1-10). Study the Academy\'s fundamentals and opening lessons to build a stronger foundation.`,
+            color: '#fbbf24'
+        });
+    }
+    
+    // Early queen development
+    if (tracker.earlyQueenMoves >= 2) {
+        tips.push({
+            icon: '👑',
+            title: 'Avoid Early Queen Moves',
+            detail: 'Moving your Queen too early wastes tempo and allows the opponent to develop with threats. Develop minor pieces (Knights, Bishops) first.',
+            color: '#f97316'
+        });
+    }
+    
+    // Castling check
+    if (tracker.uncastled && moveHistory.length > 20) {
+        tips.push({
+            icon: '🏰',
+            title: 'Castle Earlier',
+            detail: 'You didn\'t castle this game. Castling protects your King and connects your Rooks. Aim to castle within the first 10 moves.',
+            color: '#ef4444'
+        });
+    }
+    
+    // Missed tactics
+    if (tracker.missedTactics >= 2) {
+        tips.push({
+            icon: '⚔️',
+            title: 'Tactical Vision',
+            detail: `You missed ${tracker.missedTactics} tactical opportunities (captures/forks/pins). Practice puzzles in the Academy\'s Tactics section to sharpen your pattern recognition.`,
+            color: '#60a5fa'
+        });
+    }
+    
+    // Middlegame issues
+    if (tracker.middlegameErrors >= 3) {
+        tips.push({
+            icon: '♟️',
+            title: 'Middlegame Strategy',
+            detail: `${tracker.middlegameErrors} errors in the middlegame. Focus on piece coordination, controlling the center, and looking for tactical patterns before each move.`,
+            color: '#a78bfa'
+        });
+    }
+    
+    // Endgame issues
+    if (tracker.endgameErrors >= 2) {
+        tips.push({
+            icon: '🎯',
+            title: 'Endgame Technique',
+            detail: `${tracker.endgameErrors} errors in the endgame. Study King + Pawn endings and basic checkmate patterns in the Academy\'s Endgame section.`,
+            color: '#f472b6'
+        });
+    }
+    
+    // Pawn structure weaknesses
+    if (tracker.pawnStructureWeaknesses >= 3) {
+        tips.push({
+            icon: '🧱',
+            title: 'Pawn Structure',
+            detail: 'Several inaccurate pawn moves. Avoid creating isolated or doubled pawns. Each pawn move is permanent — think carefully before advancing.',
+            color: '#fbbf24'
+        });
+    }
+    
+    // Worst move callout
+    if (tracker.worstMove && tracker.worstDrop > 300) {
+        tips.push({
+            icon: '🔍',
+            title: 'Critical Moment',
+            detail: `Your worst move was ${tracker.worstMove.moveNum} ${tracker.worstMove.san} (lost ${(tracker.worstDrop/100).toFixed(1)} pawns). Click it in the analysis to see the better alternative and understand why.`,
+            color: '#ef4444'
+        });
+    }
+    
+    // Positive reinforcement
+    if (accuracy >= 85 && blunders === 0) {
+        tips.push({
+            icon: '🌟',
+            title: 'Excellent Play',
+            detail: 'Outstanding accuracy! You avoided blunders and made strong decisions. Challenge a harder AI level to keep improving.',
+            color: '#4ade80'
+        });
+    } else if (brilliantMoves > 0) {
+        tips.push({
+            icon: '💡',
+            title: 'Brilliant Finds',
+            detail: `You found ${brilliantMoves} brilliant move${brilliantMoves > 1 ? 's' : ''} that exceeded the engine\'s expectations. Great tactical instinct!`,
+            color: '#c084fc'
+        });
+    }
+    
+    return tips;
 }
 
 // ═══════════════════════════════════════════════════
