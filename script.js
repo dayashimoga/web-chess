@@ -1997,6 +1997,12 @@ function finishBatchAnalysis() {
     let reportHtml = '';
     window.reviewMistakesList = [];
     
+    // Determine which color's mistakes we actually care about so we don't coach the enemy!
+    let humanColor = 'w';
+    if (typeof mode !== 'undefined' && mode === 'play' && typeof aiColor !== 'undefined') {
+        humanColor = (aiColor === 'w') ? 'b' : 'w';
+    }
+    
     for (let i = 1; i < batchAnalysisResults.length; i++) {
         const prev = batchAnalysisResults[i - 1]; 
         const curr = batchAnalysisResults[i];     
@@ -2021,17 +2027,33 @@ function finishBatchAnalysis() {
         const bestMv = prev.bestMoveEngine || '?';
         const moveNumStr = Math.ceil(i / 2) + (colorMoved === 'w' ? '.' : '...');
         
+        let bestSan = bestMv;
+        if (bestMv !== '?') {
+            try {
+                const tempChess = new Chess(prev.fen);
+                const tm = tempChess.move({ from: bestMv.substring(0,2), to: bestMv.substring(2,4), promotion: bestMv.substring(4) || 'q' });
+                if (tm) bestSan = tm.san;
+            } catch(e) {}
+        }
+        
         // Generate human-readable reasoning
-        const reason = generateMoveReasoning(moveData, bestMv, errorDrop, valBefore, valAfter, colorMoved, prev, i);
+        const reason = generateMoveReasoning(moveData, bestSan, errorDrop, valBefore, valAfter, colorMoved, prev, i);
         
         let flag = null;
         let colorBox = '';
         let emoji = '';
-        if (errorDrop > 250) { flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.15)'; emoji = '❌'; }
-        else if (errorDrop > 120) { flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.15)'; emoji = '⚠️'; }
-        else if (errorDrop > 70) { flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.15)'; emoji = '❓'; }
-        else if (errorDrop < -20) { bestMoves++; }
-        else { goodMoves++; }
+        
+        // Only classify and count blunders for the HUMAN player to avoiding guiding them on the engine's behalf
+        if (colorMoved === humanColor) {
+            if (errorDrop > 250) { flag = 'Blunder'; blunders++; colorBox = 'rgba(239,68,68,0.15)'; emoji = '❌'; }
+            else if (errorDrop > 120) { flag = 'Mistake'; mistakes++; colorBox = 'rgba(249,115,22,0.15)'; emoji = '⚠️'; }
+            else if (errorDrop > 70) { flag = 'Inaccuracy'; inaccuracies++; colorBox = 'rgba(234,179,8,0.15)'; emoji = '❓'; }
+            else if (errorDrop < -20) { bestMoves++; }
+            else { goodMoves++; }
+        } else {
+             // For the opponent, just note best moves optionally but don't flag as mistakes for the user.
+            if (errorDrop < -20) { bestMoves++; } else { goodMoves++; }
+        }
         
         if (flag) {
             // COACH: Inject into reviewMistakesList with reasoning
@@ -2039,6 +2061,7 @@ function finishBatchAnalysis() {
                 window.reviewMistakesList.push({
                     histIdx: i - 1,
                     bestMoveUci: bestMv,
+                    bestMoveSan: bestSan,
                     pv: prev.pv,
                     flag: flag,
                     badMoveSan: moveData.san,
@@ -2064,14 +2087,14 @@ function finishBatchAnalysis() {
                                 ${reason.whyBad}
                             </div>
                             <div style="font-size:0.78rem; color:#86efac; line-height:1.4;">
-                                <strong>Better:</strong> <span style="color:#4ade80; font-weight:600;">${bestMv !== '?' ? bestMv : 'N/A'}</span>
+                                <strong>Better:</strong> <span style="color:#4ade80; font-weight:600;">${bestSan !== '?' ? bestSan : 'N/A'}</span>
                                 ${reason.whyBetter ? ' — ' + reason.whyBetter : ''}
                             </div>
                         </div>
                     </div>
                 </div>
             `;
-        } else if (errorDrop < -20) {
+        } else if (errorDrop < -20 && colorMoved === humanColor) {
             reportHtml += `
                 <div class="ac-item mb-1" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.12); border-radius:8px; padding:0.5rem; cursor:pointer;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
                     <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -2089,7 +2112,7 @@ function finishBatchAnalysis() {
     document.getElementById('ar-mistakes').textContent = mistakes;
     document.getElementById('ar-inaccuracies').textContent = inaccuracies;
     
-    // Calculate and show accuracy
+    // Calculate and show accuracy (only for human player)
     const totalClassified = blunders + mistakes + inaccuracies + goodMoves + bestMoves;
     const accuracy = totalClassified > 0 ? Math.round(((goodMoves + bestMoves) / totalClassified) * 100) : 100;
     const accEl = document.getElementById('analysisAccuracy');
@@ -2282,7 +2305,7 @@ window.coachShowHint = function() {
     const reasonBox = document.getElementById('coachReasonText');
     if (reasonBox && mistake.reason) {
         reasonBox.innerHTML = `<div style="margin-bottom:4px;"><strong style="color:#f97316;">Why your move was bad:</strong> ${mistake.reason.whyBad}</div>` +
-            `<div><strong style="color:#4ade80;">Why ${mistake.bestMoveUci} is better:</strong> ${mistake.reason.whyBetter || 'Maintains better evaluation.'}</div>`;
+            `<div><strong style="color:#4ade80;">Why ${mistake.bestMoveSan || mistake.bestMoveUci} is better:</strong> ${mistake.reason.whyBetter || 'Maintains better evaluation.'}</div>`;
         reasonBox.style.display = 'block';
     }
 };
