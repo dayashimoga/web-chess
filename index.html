@@ -35,6 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="quickutils-core.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <meta name="theme-color" content="#ffffff">
 </head>
 <body>
@@ -148,7 +149,8 @@
                 
                 <div class="tabs mb-3">
                     <button class="tab-btn active" data-tab="play">Play AI</button>
-                    <button class="tab-btn" data-tab="analyze">Analyze PGN</button>
+                    <button class="tab-btn" data-tab="multiplayer">👥 Friend</button>
+                    <button class="tab-btn" data-tab="analyze">Analyze</button>
                     <button class="tab-btn" data-tab="academy"><span style="color:#facc15;">★</span> Academy</button>
                 </div>
                 
@@ -202,6 +204,38 @@
                     </div>
 
                     <button class="btn btn-primary w-100" id="newGameBtn">Start New Game</button>
+                </div>
+
+                <div id="tab-multiplayer" class="tab-content hidden">
+                    <p class="text-xs text-muted mb-3" style="text-align: center; color: var(--text-muted);">Play directly with a friend via Peer-to-Peer WebRTC. No servers!</p>
+                    <div class="control-group">
+                        <label>Your ID (Send to friend)</label>
+                        <div style="display:flex;gap:0.5rem;">
+                            <input type="text" id="myPeerId" class="input-modern" readonly placeholder="Connecting to PeerJS...">
+                            <button class="btn btn-secondary" id="btnCopyPeerId" title="Copy ID">📋 Copy</button>
+                        </div>
+                    </div>
+                    <div style="text-align:center; color:var(--text-muted); margin:0.5rem 0; font-size:0.8rem;">OR</div>
+                    <div class="control-group">
+                        <label>Connect to Friend's ID</label>
+                        <div style="display:flex;gap:0.5rem;">
+                            <input type="text" id="friendPeerId" class="input-modern" placeholder="Paste ID here">
+                            <button class="btn btn-primary" id="btnConnectFriend">Connect</button>
+                        </div>
+                    </div>
+                    <div id="multiplayerStatus" class="engine-status mt-2 mb-2"><span class="status-dot"></span> <span id="mpStatusText">Offline</span></div>
+                    
+                    <div id="multiplayerControls" class="hidden">
+                        <div class="control-group mt-3">
+                            <label>Play As</label>
+                            <select class="input-modern" id="mpPlayerColor">
+                                <option value="w">White</option>
+                                <option value="b">Black</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100" id="btnMpStart" style="background:linear-gradient(135deg, #10b981, #059669);">Start Multiplayer Game</button>
+                    </div>
                 </div>
                 
                 <div id="tab-analyze" class="tab-content hidden">

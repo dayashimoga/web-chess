@@ -19,12 +19,18 @@ Object.values(PIECE_URLS).forEach(url => { const img = new Image(); img.src = ur
 // ═══════════════════════════════════════════════════
 let chess = new Chess();
 let flipped = false;
-let mode = 'play';      // 'play' | 'analyze'
+let mode = 'play';      // 'play' | 'analyze' | 'academy' | 'multiplayer'
 let aiColor = 'b';
 let aiLevel = 5;
 let selectedSquare = null;
 let validMovesForSelected = [];
 let lastMoveSquares = [];
+
+// Multiplayer State
+let peer = null;
+let peerConnection = null;
+let mpColor = null; // 'w' or 'b'
+let isHost = false;
 
 // Move history tracking
 let moveHistory = [];    // [{san, from, to, fen}, ...]
@@ -532,6 +538,9 @@ function onSquareClick(e) {
     // In play mode, block clicks when it's AI's turn
     if (mode === 'play' && chess.turn() === aiColor && !chess.isGameOver()) return;
     
+    // In multiplayer mode, block clicks if it's not our turn
+    if (mode === 'multiplayer' && mpColor && chess.turn() !== mpColor && !chess.isGameOver()) return;
+    
     // In academy mode, block clicks if it's the AI's expected turn
     if (mode === 'academy') {
         if (activeLesson && activeLesson.expected) {
@@ -737,6 +746,14 @@ function commitMove(move) {
     }
 
     renderPosition();
+
+    // Broadcast move if in multiplayer mode
+    if (mode === 'multiplayer' && peerConnection && peerConnection.open) {
+        // Since we just moved, chess.turn() is now the opponent's color
+        if (chess.turn() !== mpColor) {
+            peerConnection.send({ type: 'move', fen: chess.fen(), moveHistory: moveHistory });
+        }
+    }
 
     // Request engine analysis or AI move
     if (!chess.isGameOver()) {
@@ -1854,6 +1871,166 @@ if (coachToggleBtn) {
 // ═══════════════════════════════════════════════════
 initEngine();
 buildBoard();
+
+// ═══════════════════════════════════════════════════
+// WEBRTC MULTIPLAYER (PEERJS)
+// ═══════════════════════════════════════════════════
+function initMultiplayer() {
+    if (peer) return; // Already initialized
+    
+    const myPeerIdEl = document.getElementById('myPeerId');
+    const mpStatusText = document.getElementById('mpStatusText');
+    const statusDot = document.querySelector('#multiplayerStatus .status-dot');
+    
+    // Initialize PeerJS
+    peer = new Peer();
+    
+    peer.on('open', (id) => {
+        myPeerIdEl.value = id;
+        mpStatusText.textContent = 'Ready (Waiting for connection...)';
+        statusDot.className = 'status-dot thinking'; // Orange waiting state
+    });
+    
+    // Handle incoming connections (We are the host)
+    peer.on('connection', (conn) => {
+        if (peerConnection) return; // Only allow one connection
+        peerConnection = conn;
+        isHost = true;
+        setupPeerConnection();
+    });
+    
+    peer.on('error', (err) => {
+        console.error('PeerJS Error:', err);
+        mpStatusText.textContent = 'Connection Error';
+        statusDot.className = 'status-dot error';
+    });
+}
+
+function setupPeerConnection() {
+    const mpStatusText = document.getElementById('mpStatusText');
+    const statusDot = document.querySelector('#multiplayerStatus .status-dot');
+    const controls = document.getElementById('multiplayerControls');
+    
+    peerConnection.on('open', () => {
+        mpStatusText.textContent = 'Connected!';
+        statusDot.className = 'status-dot ready'; // Green
+        if (isHost) {
+            controls.classList.remove('hidden'); // Host can start the game
+        } else {
+            controls.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:0.9rem;">Connected. Waiting for host to start game...</div>';
+            controls.classList.remove('hidden');
+        }
+    });
+    
+    peerConnection.on('data', (data) => {
+        if (data.type === 'start') {
+            // Host started the game
+            mpColor = data.color === 'w' ? 'b' : 'w';
+            flipped = (mpColor === 'b');
+            chess = new Chess();
+            moveHistory = [];
+            currentMoveIdx = -1;
+            lastMoveSquares = [];
+            evalContainer.classList.remove('hidden');
+            gameResultEl.classList.add('hidden');
+            buildBoard();
+            requestEngineAnalysis(); // First analysis
+            document.getElementById('snd-move')?.play().catch(()=>{});
+        } 
+        else if (data.type === 'move') {
+            // Receive opponent's move
+            chess.load(data.fen);
+            moveHistory = data.moveHistory;
+            currentMoveIdx = moveHistory.length - 1;
+            if (currentMoveIdx >= 0) {
+                lastMoveSquares = [moveHistory[currentMoveIdx].from, moveHistory[currentMoveIdx].to];
+            }
+            renderPosition();
+            playSound(moveHistory[currentMoveIdx]);
+            
+            if (moveHistory[currentMoveIdx].flags.includes('c') || moveHistory[currentMoveIdx].flags.includes('e')) {
+                 const sqEl = document.getElementById('sq-' + moveHistory[currentMoveIdx].to);
+                 if (sqEl) {
+                     const ripple = document.createElement('div');
+                     ripple.className = 'capture-ripple';
+                     sqEl.appendChild(ripple);
+                     setTimeout(() => { if (ripple.parentNode) ripple.remove(); }, 600);
+                 }
+            }
+            
+            if (!chess.isGameOver()) {
+                requestEngineAnalysis();
+            }
+        }
+    });
+    
+    peerConnection.on('close', () => {
+        mpStatusText.textContent = 'Disconnected';
+        statusDot.className = 'status-dot error';
+        peerConnection = null;
+        controls.classList.add('hidden');
+    });
+}
+
+// Connect as Guest
+document.getElementById('btnConnectFriend')?.addEventListener('click', () => {
+    const friendId = document.getElementById('friendPeerId').value.trim();
+    if (!friendId) return;
+    if (!peer) initMultiplayer();
+    
+    const mpStatusText = document.getElementById('mpStatusText');
+    const statusDot = document.querySelector('#multiplayerStatus .status-dot');
+    mpStatusText.textContent = 'Connecting...';
+    statusDot.className = 'status-dot thinking';
+    
+    peerConnection = peer.connect(friendId);
+    isHost = false;
+    setupPeerConnection();
+});
+
+// Host starts game
+document.getElementById('btnMpStart')?.addEventListener('click', () => {
+    if (!peerConnection || !peerConnection.open) return;
+    
+    const colorSel = document.getElementById('mpPlayerColor').value;
+    if (colorSel === 'random') {
+        mpColor = Math.random() > 0.5 ? 'w' : 'b';
+    } else {
+        mpColor = colorSel;
+    }
+    
+    // Broadcast start game
+    peerConnection.send({ type: 'start', color: mpColor });
+    
+    flipped = (mpColor === 'b');
+    chess = new Chess();
+    moveHistory = [];
+    currentMoveIdx = -1;
+    lastMoveSquares = [];
+    evalContainer.classList.remove('hidden');
+    gameResultEl.classList.add('hidden');
+    buildBoard();
+    requestEngineAnalysis();
+});
+
+document.getElementById('btnCopyPeerId')?.addEventListener('click', () => {
+    const input = document.getElementById('myPeerId');
+    if (input.value) {
+        navigator.clipboard.writeText(input.value);
+        const btn = document.getElementById('btnCopyPeerId');
+        btn.textContent = '✅ Copied';
+        setTimeout(() => btn.textContent = '📋 Copy', 2000);
+    }
+});
+
+// Initialize PeerJS when switching to multiplayer tab
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.dataset.tab === 'multiplayer') {
+            initMultiplayer();
+        }
+    });
+});
 buildAcademyList();
 updateClockDisplay();
 
