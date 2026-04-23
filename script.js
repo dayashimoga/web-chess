@@ -470,6 +470,9 @@ function renderPosition() {
 
     // Remove captured pieces (anything still marked stale)
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
+    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
     updateMovesList();
     checkGameEnd();
