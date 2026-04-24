@@ -36,6 +36,15 @@ let isHost = false;
 let moveHistory = [];    // [{san, from, to, fen}, ...]
 let currentMoveIdx = -1; // -1 = starting position
 
+// Timer State
+let timerInterval = null;
+let whiteTimeMs = 0;
+let blackTimeMs = 0;
+let timeIncrementMs = 0;
+let isClockActive = false;
+let lastTimerUpdate = 0;
+let isTimeOut = false;
+
 // ═══════════════════════════════════════════════════
 // ACADEMY DATABASE & STATE
 // ═══════════════════════════════════════════════════
@@ -268,6 +277,217 @@ function parseEvalFromInfo(line) {
     pct = Math.max(3, Math.min(97, pct));
     evalBar.style.height = pct + '%';
 }
+
+// ═══════════════════════════════════════════════════
+// GAME CLOCK TIMERS
+// ═══════════════════════════════════════════════════
+function formatTime(ms) {
+    if (ms <= 0) return "0:00.0";
+    const totalSecs = Math.max(0, ms / 1000);
+    const m = Math.floor(totalSecs / 60);
+    const s = Math.floor(totalSecs % 60);
+    if (totalSecs < 20) {
+        const ms_rem = Math.floor((totalSecs - (m * 60) - s) * 10);
+        return `${m}:${s.toString().padStart(2, '0')}.${ms_rem}`;
+    }
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function updateClockUI() {
+    const cw = document.getElementById('clockWhite');
+    const cb = document.getElementById('clockBlack');
+    if (cw) cw.textContent = formatTime(whiteTimeMs);
+    if (cb) cb.textContent = formatTime(blackTimeMs);
+    
+    if (chess.turn() === 'w') {
+        cw?.classList.add('active-clock');
+        cb?.classList.remove('active-clock');
+    } else {
+        cb?.classList.add('active-clock');
+        cw?.classList.remove('active-clock');
+    }
+}
+
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    if (!isClockActive) return;
+    
+    lastTimerUpdate = performance.now();
+    timerInterval = setInterval(() => {
+        if (chess.isGameOver() || mode === 'analyze' || mode === 'academy') {
+            clearInterval(timerInterval);
+            return;
+        }
+        
+        const now = performance.now();
+        const delta = now - lastTimerUpdate;
+        lastTimerUpdate = now;
+        
+        if (chess.turn() === 'w') {
+            whiteTimeMs -= delta;
+            if (whiteTimeMs <= 0) handleTimeOut('w');
+        } else {
+            blackTimeMs -= delta;
+            if (blackTimeMs <= 0) handleTimeOut('b');
+        }
+        updateClockUI();
+    }, 50); // 50ms for smooth tenths of a second update
+}
+
+function handleTimeOut(colorLost) {
+    clearInterval(timerInterval);
+    isClockActive = false;
+    isTimeOut = true;
+    whiteTimeMs = Math.max(0, whiteTimeMs);
+    blackTimeMs = Math.max(0, blackTimeMs);
+    updateClockUI();
+    const resultDiv = document.getElementById('gameResult');
+    if (resultDiv) {
+        resultDiv.textContent = colorLost === 'w' ? 'Black wins on time.' : 'White wins on time.';
+        resultDiv.classList.remove('hidden');
+    }
+    document.getElementById('snd-end')?.play().catch(()=>{});
+}
+
+function parseTimeControl(val) {
+    if (val === 'none') {
+        isClockActive = false;
+        whiteTimeMs = 0; blackTimeMs = 0; timeIncrementMs = 0;
+        return;
+    }
+    const parts = val.split('+');
+    isClockActive = true;
+    whiteTimeMs = parseInt(parts[0]) * 60000;
+    blackTimeMs = whiteTimeMs;
+    timeIncrementMs = parts.length > 1 ? parseInt(parts[1]) * 1000 : 0;
+}
+
+// ═══════════════════════════════════════════════════
+// MULTIPLAYER (PEERJS)
+// ═══════════════════════════════════════════════════
+function initMultiplayer() {
+    if (peer) return;
+    peer = new Peer();
+    
+    peer.on('open', (id) => {
+        const myPeerIdInput = document.getElementById('myPeerId');
+        if (myPeerIdInput) myPeerIdInput.value = id;
+        document.getElementById('mpStatusText').textContent = 'Online & Ready';
+        document.getElementById('multiplayerStatus').classList.remove('error');
+        document.getElementById('multiplayerStatus').classList.add('ready');
+    });
+
+    peer.on('connection', (conn) => {
+        // Someone connected to us
+        isHost = true;
+        peerConnection = conn;
+        setupPeerConnection();
+    });
+}
+
+function setupPeerConnection() {
+    document.getElementById('mpStatusText').textContent = 'Connected to Friend!';
+    document.getElementById('multiplayerControls').classList.remove('hidden');
+    
+    let pingInterval;
+    
+    peerConnection.on('data', (data) => {
+        if (data.type === 'start') {
+            mpColor = data.color;
+            chess = new Chess();
+            moveHistory = [];
+            currentMoveIdx = -1;
+            lastMoveSquares = [];
+            flipped = mpColor === 'b';
+            isTimeOut = false;
+            buildBoard();
+            document.getElementById('multiplayerControls').classList.add('hidden');
+        } else if (data.type === 'move') {
+            chess.load(data.fen);
+            moveHistory = data.moveHistory;
+            currentMoveIdx = moveHistory.length - 1;
+            if (moveHistory.length > 0) {
+                const lastMove = moveHistory[currentMoveIdx];
+                lastMoveSquares = [lastMove.from, lastMove.to];
+                playSound({ flags: lastMove.flags });
+            }
+            buildBoard();
+        } else if (data.type === 'ping') {
+            peerConnection.send({ type: 'pong', t: data.t });
+        } else if (data.type === 'pong') {
+            const rtt = Date.now() - data.t;
+            const pingEl = document.getElementById('mpPing');
+            if (pingEl) {
+                pingEl.style.display = 'block';
+                const span = pingEl.querySelector('span');
+                if (span) {
+                    span.textContent = `${rtt} ms`;
+                    span.style.color = rtt < 100 ? '#4ade80' : (rtt < 300 ? '#fbbf24' : '#ef4444');
+                }
+            }
+        }
+    });
+
+    peerConnection.on('close', () => {
+        clearInterval(pingInterval);
+        document.getElementById('mpStatusText').textContent = 'Friend Disconnected';
+        document.getElementById('multiplayerStatus').classList.add('error');
+        document.getElementById('mpPing').style.display = 'none';
+        peerConnection = null;
+    });
+    
+    // Start pinging every 2 seconds
+    pingInterval = setInterval(() => {
+        if (peerConnection && peerConnection.open) {
+            peerConnection.send({ type: 'ping', t: Date.now() });
+        } else {
+            clearInterval(pingInterval);
+        }
+    }, 2000);
+}
+
+document.getElementById('btnCopyPeerId')?.addEventListener('click', () => {
+    const myId = document.getElementById('myPeerId').value;
+    if (myId) {
+        navigator.clipboard.writeText(myId);
+        const btn = document.getElementById('btnCopyPeerId');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '📋 Copy', 2000);
+    }
+});
+
+document.getElementById('btnConnectFriend')?.addEventListener('click', () => {
+    const friendId = document.getElementById('friendPeerId').value.trim();
+    if (!friendId) return;
+    
+    document.getElementById('mpStatusText').textContent = 'Connecting...';
+    peerConnection = peer.connect(friendId);
+    isHost = false;
+    setupPeerConnection();
+});
+
+document.getElementById('btnMpStart')?.addEventListener('click', () => {
+    if (!peerConnection || !peerConnection.open) return;
+    
+    let colorChoice = document.getElementById('mpPlayerColor').value;
+    if (colorChoice === 'random') {
+        colorChoice = Math.random() > 0.5 ? 'w' : 'b';
+    }
+    
+    mpColor = colorChoice;
+    const friendColor = mpColor === 'w' ? 'b' : 'w';
+    
+    chess = new Chess();
+    moveHistory = [];
+    currentMoveIdx = -1;
+    lastMoveSquares = [];
+    flipped = mpColor === 'b';
+    isTimeOut = false;
+    buildBoard();
+    document.getElementById('multiplayerControls').classList.add('hidden');
+    
+    peerConnection.send({ type: 'start', color: friendColor });
+});
 
 function requestEngineAnalysis(depthOverride) {
     if (!engineReady || !engine) return;
@@ -535,8 +755,8 @@ function updateCapturedPieces() {
 // CLICK-TO-MOVE INTERACTION
 // ═══════════════════════════════════════════════════
 function onSquareClick(e) {
-    // Block interaction during promotion
-    if (!promotionModal.classList.contains('hidden')) return;
+    // Block interaction during promotion or if time is out
+    if (!promotionModal.classList.contains('hidden') || isTimeOut) return;
 
     // In play mode, block clicks when it's AI's turn
     if (mode === 'play' && chess.turn() === aiColor && !chess.isGameOver()) return;
@@ -758,6 +978,78 @@ function commitMove(move) {
         }
     }
 
+    // Time increment and restart timer
+    if (isClockActive && !chess.isGameOver()) {
+        if (chess.turn() === 'b') { // White just moved (turn is now black)
+            whiteTimeMs += timeIncrementMs;
+        } else {
+            blackTimeMs += timeIncrementMs;
+        }
+        updateClockUI();
+        startTimer();
+    } else if (chess.isGameOver()) {
+        clearInterval(timerInterval);
+    }
+
+    // Check Puzzle Mode Logic
+    if (window._dailyPuzzleActive && move.san) {
+        const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+        
+        if (move.san === expectedSan) {
+            window._dailyPuzzleStep++;
+            showToast("✅ Great move!", "success");
+            
+            if (window._dailyPuzzleStep >= window._dailyPuzzleSolution.length) {
+                // Solved!
+                window._dailyPuzzleActive = false;
+                document.getElementById('snd-end')?.play().catch(()=>{});
+                
+                if (puzzleRushActive) {
+                    puzzleRushScore++;
+                    showToast(`⭐ Score: ${puzzleRushScore}`, "success");
+                    updateRushUI();
+                    setTimeout(loadNextRushPuzzle, 600);
+                } else {
+                    showToast("🎉 Puzzle Solved!", "success", 4000);
+                    const hintText = document.getElementById('coachHintText');
+                    if (hintText) hintText.innerHTML = `<strong style="color:#4ade80;">🎉 Brilliant! Puzzle Solved!</strong>`;
+                    // Add XP
+                    const xpEl = document.getElementById('academyXp');
+                    if (xpEl) xpEl.textContent = parseInt(xpEl.textContent) + 50;
+                }
+            } else {
+                // Engine makes the next move automatically
+                setTimeout(() => {
+                    const engineSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+                    const emove = chess.move(engineSan);
+                    if (emove) {
+                        commitMove(emove);
+                    }
+                    window._dailyPuzzleStep++;
+                }, 500);
+            }
+        } else {
+            // Wrong move
+            chess.undo();
+            moveHistory.pop();
+            currentMoveIdx--;
+            renderPosition();
+            document.getElementById('snd-error')?.play().catch(()=>{});
+            
+            if (puzzleRushActive) {
+                puzzleRushStrikes++;
+                showToast("❌ Incorrect!", "error");
+                updateRushUI();
+                if (puzzleRushStrikes >= 3) {
+                    setTimeout(() => endPuzzleRush("3 Strikes! Game Over"), 500);
+                }
+            } else {
+                showToast("❌ Incorrect move. Try again!", "error");
+            }
+        }
+        return; // Don't trigger standard AI response during puzzle
+    }
+
     // Request engine analysis or AI move
     if (!chess.isGameOver()) {
         requestEngineAnalysis();
@@ -877,6 +1169,10 @@ document.getElementById('newGameBtn').addEventListener('click', () => {
     moveHistory = [];
     currentMoveIdx = -1;
     lastMoveSquares = [];
+    
+    // Timer logic
+    const clockSelect = document.getElementById('clockSelect');
+    if (clockSelect) parseTimeControl(clockSelect.value);
 
     aiLevel = parseInt(document.getElementById('aiLevel').value);
     const colorSel = document.getElementById('playerColor').value;
@@ -890,6 +1186,8 @@ document.getElementById('newGameBtn').addEventListener('click', () => {
     evalContainer.classList.add('hidden');
     gameResultEl.classList.add('hidden');
     buildBoard();
+    updateClockUI();
+    if (isClockActive) startTimer();
 
     if (aiColor === 'w') {
         requestEngineAnalysis(); // AI moves first
@@ -1131,17 +1429,23 @@ document.addEventListener('keydown', e => {
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        // Ignore inner academy tabs
+        if (btn.dataset.atab) return;
+        
+        document.querySelectorAll('.tab-btn:not([data-atab])').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content:not(#academyTabContent .tab-content)').forEach(c => c.classList.add('hidden'));
 
         btn.classList.add('active');
         const tab = btn.dataset.tab;
         mode = tab;
-        document.getElementById('tab-' + tab).classList.remove('hidden');
+        const target = document.getElementById('tab-' + tab);
+        if (target) target.classList.remove('hidden');
 
         if (mode === 'analyze') {
             evalContainer.classList.remove('hidden');
             if (!chess.isGameOver()) requestEngineAnalysis();
+        } else if (mode === 'multiplayer') {
+            initMultiplayer();
         } else {
             evalContainer.classList.add('hidden');
             if (engine) engine.postMessage('stop');
@@ -1261,6 +1565,19 @@ document.getElementById('flipBoard').addEventListener('click', () => {
         buildBoard();
     }
 });
+
+const toggle3dBtn = document.getElementById('toggle3dBoard');
+if (toggle3dBtn) {
+    toggle3dBtn.addEventListener('click', () => {
+        const wrap = document.querySelector('.board-wrapper');
+        if (wrap) {
+            wrap.classList.toggle('mode-3d');
+            const is3D = wrap.classList.contains('mode-3d');
+            toggle3dBtn.classList.toggle('active', is3D);
+            toggle3dBtn.innerHTML = is3D ? '🧊 2D' : '🧊 3D';
+        }
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // DRAG-AND-DROP PIECE MOVEMENT
@@ -2837,38 +3154,38 @@ if (gameResultEl) {
 }
 
 // ═══════════════════════════════════════════════════
-// DAILY PUZZLE OF THE DAY
+// PUZZLE SYSTEM & PUZZLE RUSH
 // ═══════════════════════════════════════════════════
-const DAILY_PUZZLES = [
-    { fen: 'r2qkb1r/pp2nppp/3p4/2pNN1B1/2BnP3/3P4/PPP2PPP/R2bK2R w KQkq - 0 1', solution: ['Nf6+', 'gxf6', 'Bxf7#'], title: 'Smothered Discovery', difficulty: '⭐⭐⭐' },
-    { fen: '6k1/pp4p1/2p5/2bp4/8/P5Pb/1P3rrP/2BRRK2 b - - 0 1', solution: ['Rf1+'], title: 'Heavy Piece Tactics', difficulty: '⭐⭐' },
-    { fen: 'r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq - 0 1', solution: ['Bc5+', 'Kxe5', 'Qf4#'], title: 'King Hunt', difficulty: '⭐⭐⭐' },
-    { fen: 'r3k2r/ppp2Npp/1b5n/4P2b/2B1P3/8/PPP2PPP/RNB1K2R b KQkq - 0 1', solution: ['Kd7'], title: 'Defensive Resource', difficulty: '⭐⭐' },
-    { fen: '6k1/5ppp/8/8/8/8/r4PPP/3R2K1 w - - 0 1', solution: ['Rd8+', 'Kh7'], title: 'Back Rank Pressure', difficulty: '⭐' },
-    { fen: 'r1bqkbnr/pppppppp/2n5/1B6/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 2', solution: ['a6', 'Ba4', 'Nf6'], title: 'Morphy Defense', difficulty: '⭐' },
-    { fen: '2kr3r/p1ppqpb1/bn2Pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQ - 0 1', solution: ['Qxe6'], title: 'Complex Tactics', difficulty: '⭐⭐⭐' },
-    { fen: '1rb4r/pkPp3p/1b1P3n/1Q6/N3Pp2/8/P1P3PP/7K w - - 0 1', solution: ['Qd5+', 'Ka6', 'cxb8=N#'], title: 'Underpromotion Mate', difficulty: '⭐⭐⭐⭐' },
-    { fen: 'r3r1k1/pppb1ppp/8/3pN3/3Pn1q1/2PB4/PP4PP/R1BQ1RK1 w - - 0 1', solution: ['Nxf7'], title: 'Discovered Attack', difficulty: '⭐⭐' },
-    { fen: '4rrk1/pppb4/7p/3P2pq/3Q4/2P5/PP3RPP/R5K1 w - - 0 1', solution: ['Qxg7#'], title: 'Queen Sacrifice', difficulty: '⭐' },
-    { fen: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4', solution: ['c3', 'd6', 'd4'], title: 'Italian Opening Theory', difficulty: '⭐' },
-    { fen: 'r2qr1k1/ppp2ppp/2np1n2/2b1p1B1/2B1P1b1/2NP1N2/PPP2PPP/R2QR1K1 w - - 0 1', solution: ['Nd5'], title: 'Central Knight Domination', difficulty: '⭐⭐' },
-    { fen: '8/8/p1p5/1p5p/1P5k/8/PPP2K1P/8 w - - 0 1', solution: ['a4'], title: 'Pawn Breakthrough', difficulty: '⭐⭐' },
-    { fen: '5rk1/1p3ppp/pq3b2/8/8/1P1Q1N2/P4PPP/3R2K1 w - - 0 1', solution: ['Qd6'], title: 'Queen Trade Advantage', difficulty: '⭐⭐' },
-    { fen: 'r4rk1/pp3ppp/2p2n2/3p4/3P4/2PB1N2/PP3PPP/R4RK1 w - - 0 1', solution: ['Bxh7+', 'Nxh7', 'Ng5'], title: 'Classic Greek Gift', difficulty: '⭐⭐⭐' },
-    { fen: 'r1bq1rk1/pppnn1pp/4p3/3pPp2/1b1P4/2NB3N/PPP2PPP/R1BQK2R w KQ - 0 1', solution: ['Bxf5'], title: 'Pawn Storm Preparation', difficulty: '⭐⭐' },
-    { fen: '8/5pk1/6p1/8/p3P3/8/1r3PPP/4R1K1 w - - 0 1', solution: ['e5'], title: 'Passed Pawn Push', difficulty: '⭐' },
-    { fen: 'r1bqkb1r/pp3ppp/2n1pn2/2pp4/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 5', solution: ['cxd5', 'exd5', 'Bg5'], title: 'QGD Exchange Variation', difficulty: '⭐⭐' },
-    { fen: '8/8/8/2K5/8/1Q6/1k6/8 w - - 0 1', solution: ['Qb4+'], title: 'King & Queen Technique', difficulty: '⭐' },
-    { fen: 'r2q1rk1/pp2ppbp/2p2np1/6B1/3PP1b1/2N2N2/PPQ2PPP/R3KB1R w KQ - 0 1', solution: ['e5', 'Nd5', 'Qd2'], title: 'Central Pawn Advance', difficulty: '⭐⭐' },
-];
+let ALL_PUZZLES = [];
+
+// Fetch the large puzzle database
+fetch('data/puzzles.json')
+    .then(r => r.json())
+    .then(data => {
+        ALL_PUZZLES = data;
+        console.log(`Loaded ${ALL_PUZZLES.length} puzzles.`);
+    })
+    .catch(e => console.error("Failed to load puzzles:", e));
 
 function getDailyPuzzle() {
+    if (!ALL_PUZZLES.length) return null;
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-    return DAILY_PUZZLES[dayOfYear % DAILY_PUZZLES.length];
+    return ALL_PUZZLES[dayOfYear % ALL_PUZZLES.length];
 }
+
+let puzzleRushActive = false;
+let puzzleRushScore = 0;
+let puzzleRushStrikes = 0;
+let puzzleRushTimer = 0;
+let puzzleRushInterval = null;
+let currentRushPuzzle = null;
 
 function loadDailyPuzzle() {
     const puzzle = getDailyPuzzle();
+    if (!puzzle) {
+        alert("Puzzles are still loading, please wait a moment!");
+        return;
+    }
     chess = new Chess(puzzle.fen);
     moveHistory = [];
     currentMoveIdx = -1;
@@ -2883,11 +3200,98 @@ function loadDailyPuzzle() {
             <div style="font-size:0.8rem;color:#94a3b8;">Find the best continuation. ${chess.turn() === 'w' ? 'White' : 'Black'} to move.</div>`;
     }
     
-    // Track if user solves it
     window._dailyPuzzleSolution = puzzle.solution;
     window._dailyPuzzleStep = 0;
     window._dailyPuzzleActive = true;
+    puzzleRushActive = false;
 }
+
+function startPuzzleRush() {
+    if (!ALL_PUZZLES.length) {
+        alert("Puzzles are still loading!");
+        return;
+    }
+    
+    // Switch to Academy tab if not already
+    document.querySelector('.tab-btn[data-tab="academy"]').click();
+    
+    puzzleRushActive = true;
+    puzzleRushScore = 0;
+    puzzleRushStrikes = 0;
+    puzzleRushTimer = 180; // 3 minutes
+    
+    // UI update
+    const hud = document.getElementById('coachHintHud');
+    const hintText = document.getElementById('coachHintText');
+    if (hud) hud.classList.add('active');
+    
+    loadNextRushPuzzle();
+    
+    if (puzzleRushInterval) clearInterval(puzzleRushInterval);
+    puzzleRushInterval = setInterval(() => {
+        puzzleRushTimer--;
+        updateRushUI();
+        if (puzzleRushTimer <= 0) {
+            endPuzzleRush("Time's Up!");
+        }
+    }, 1000);
+}
+
+function loadNextRushPuzzle() {
+    currentRushPuzzle = ALL_PUZZLES[Math.floor(Math.random() * ALL_PUZZLES.length)];
+    chess = new Chess(currentRushPuzzle.fen);
+    moveHistory = [];
+    currentMoveIdx = -1;
+    flipped = chess.turn() === 'b';
+    buildBoard();
+    updateMovesUI();
+    
+    window._dailyPuzzleSolution = currentRushPuzzle.solution;
+    window._dailyPuzzleStep = 0;
+    window._dailyPuzzleActive = true; // REUSE the same variable for move checking!
+    
+    updateRushUI();
+}
+
+function updateRushUI() {
+    const hintText = document.getElementById('coachHintText');
+    if (hintText) {
+        const mins = Math.floor(puzzleRushTimer / 60);
+        const secs = puzzleRushTimer % 60;
+        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+        
+        hintText.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <strong style="color:#f43f5e; font-size:1.1rem;">⚡ Puzzle Rush</strong>
+                <span style="font-family:monospace; font-size:1.2rem; color:${puzzleRushTimer < 30 ? '#ef4444' : '#fff'};">${timeStr}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                <span style="color:#4ade80;">Score: <strong>${puzzleRushScore}</strong></span>
+                <span style="color:#ef4444;">Strikes: <strong>${'X'.repeat(puzzleRushStrikes)}</strong></span>
+            </div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Find the best move for ${chess.turn() === 'w' ? 'White' : 'Black'}.</div>
+        `;
+    }
+}
+
+function endPuzzleRush(reason) {
+    clearInterval(puzzleRushInterval);
+    puzzleRushActive = false;
+    window._dailyPuzzleActive = false;
+    
+    const hintText = document.getElementById('coachHintText');
+    if (hintText) {
+        hintText.innerHTML = `
+            <div style="text-align:center;">
+                <strong style="color:#ef4444; font-size:1.2rem;">${reason}</strong>
+                <div style="font-size:1.5rem; margin:10px 0; color:#4ade80;">Final Score: ${puzzleRushScore}</div>
+                <button class="btn btn-primary" onclick="startPuzzleRush()">Play Again</button>
+            </div>
+        `;
+    }
+}
+
+document.getElementById('btnStartPuzzleRush')?.addEventListener('click', startPuzzleRush);
 
 // Inject daily puzzle button into the Play tab
 const newGameBtn = document.getElementById('newGameBtn');

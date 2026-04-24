@@ -1,0 +1,3016 @@
+[
+  {
+    "fen": "3rrbk1/2p3R1/1p2q2Q/3p4/1P6/2B4P/6P1/3R2K1 b - - 0 33",
+    "solution": [
+      "Bxg7",
+      "Qxg7#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "rq2kb1r/1b1p1pp1/p3pn2/1p5p/4P1n1/1NN1BB2/PPP1QPPP/R4RK1 w kq - 2 14",
+    "solution": [
+      "h3",
+      "Qh2#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r1b1r1k1/pp1p1p1Q/2n2Bp1/2p1qp2/2B1P3/3P1R2/PPP3PP/R5K1 b - - 0 16",
+    "solution": [
+      "Kxh7",
+      "Rh3+",
+      "Kg8",
+      "Rh8#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "5k2/5p1p/6p1/1p2q3/2p1p1n1/1P2P3/P1R1QPPP/6K1 w - - 0 26",
+    "solution": [
+      "Qxg4",
+      "Qa1+",
+      "Rc1",
+      "Qxc1+",
+      "Qd1",
+      "Qxd1#"
+    ],
+    "title": "Backrankmate Endgame Long",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r2qkb1r/pp2nppp/4p3/1N1pP3/8/4BQ1P/PP3PP1/R4RK1 b kq - 4 14",
+    "solution": [
+      "a6",
+      "Nd6+",
+      "Qxd6",
+      "exd6"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r2q1rk1/p1p1bpp1/2p1bn1p/8/2Pp3B/1PNBPP2/P5PP/R2Q1RK1 w - - 0 14",
+    "solution": [
+      "exd4",
+      "Qxd4+",
+      "Bf2",
+      "Qxc3"
+    ],
+    "title": "Advantage Fork Opening",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "8/p5k1/1pp2pp1/4Pp1p/5P1P/2P3P1/PP4K1/8 b - - 0 35",
+    "solution": [
+      "fxe5",
+      "fxe5",
+      "Kf7",
+      "Kf3",
+      "Ke6",
+      "Kf4"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r1k1R3/pppr1B2/5p1p/8/8/8/PPP2PPP/2K5 b - - 1 20",
+    "solution": [
+      "Rd8",
+      "Be6+",
+      "Kb8",
+      "Rxd8#"
+    ],
+    "title": "Backrankmate Deflection Endgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "k2r3r/pp6/6R1/3P2Pp/2P2B1n/P1N4q/1P3P2/R2Q2K1 w - - 1 24",
+    "solution": [
+      "Qf1",
+      "Nf3#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "7r/2Q2pb1/3ppk1p/5Bp1/3P4/1N2P1P1/Pr2qPP1/R5KR w - - 6 29",
+    "solution": [
+      "Qxd6",
+      "Qxf2+",
+      "Kh2",
+      "Qxg2#"
+    ],
+    "title": "Fork Mate Matein2",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "7r/2N2p1p/p2p4/1p6/6b1/8/P3kB1P/2RR3K w - - 2 35",
+    "solution": [
+      "Bd4",
+      "Bf3+",
+      "Kg1",
+      "Rg8+",
+      "Bg7",
+      "Rxg7#"
+    ],
+    "title": "Endgame Long Mate",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "8/8/3q3k/5Q2/4p3/4P2P/5pK1/8 w - - 0 42",
+    "solution": [
+      "Qf4+",
+      "Qxf4",
+      "exf4",
+      "e3"
+    ],
+    "title": "Tactical Endgame Queenendgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r3k2r/pp3p2/1qN1p2p/3p4/P7/8/1PP2bPP/R2QKB1R w KQkq - 0 17",
+    "solution": [
+      "Kd2",
+      "Qe3#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r3k2r/ppp2p1p/3b1p2/4p3/8/2PB4/bPPQ1PPP/2KR3R w kq - 0 14",
+    "solution": [
+      "b3",
+      "Ba3#"
+    ],
+    "title": "Doublebishopmate Mate Matein1",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r1b1k1nr/pppp1ppp/5q2/2b1n3/4P3/2N2N2/PPPP2PP/R1BQKB1R w KQkq - 0 6",
+    "solution": [
+      "Nxe5",
+      "Qf2#"
+    ],
+    "title": "Mate Matein1 Onemove",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "rnb1k2r/p1p2ppp/1p3n2/2b1N1B1/3qP3/3P4/PPP3PP/RN1QKB1R w KQkq - 1 8",
+    "solution": [
+      "Nf3",
+      "Qf2#"
+    ],
+    "title": "Mate Matein1 Onemove",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "6k1/p4p2/1p5R/3r2p1/1P2b1P1/P3B2P/5P2/6K1 w - - 1 35",
+    "solution": [
+      "Rh5",
+      "Rd1+",
+      "Kh2",
+      "Rh1+",
+      "Kg3",
+      "Rg1+"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "5k2/pp3ppp/4p3/3p4/1Pn2q2/2P3P1/P3Qn1P/R2R3K w - - 1 30",
+    "solution": [
+      "Kg2",
+      "Ne3+",
+      "Qxe3",
+      "Qxe3"
+    ],
+    "title": "Tactical Endgame Fork",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r1b2kn1/pppp2p1/2n2p2/2b1p2Q/2B1q3/4N2N/PPPPK2P/R1B5 b - - 1 13",
+    "solution": [
+      "Bxe3",
+      "Qf7#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r3k3/1p4R1/3pQ3/pP2p3/4q3/4Pr2/8/7K b - - 4 38",
+    "solution": [
+      "Kf8",
+      "Qg8#"
+    ],
+    "title": "Endgame Mate Matein1",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r4rk1/5p2/1q2pnRP/p2p4/1ppP4/2P1P3/PPQN1P2/2K4R b - - 0 21",
+    "solution": [
+      "fxg6",
+      "Qxg6+",
+      "Kh8",
+      "Qg7#"
+    ],
+    "title": "Kingsideattack Mate Matein2",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r3r1k1/pp3pp1/2p2q1p/3pP3/P3bP2/2P1N1P1/1P1Q1K1P/R3R3 b - - 0 23",
+    "solution": [
+      "Rxe5",
+      "Ng4",
+      "Qf5",
+      "Nxe5"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "3R4/5kpp/8/p2p1p2/r2P4/2p1P2P/2Rn1PP1/6K1 w - - 0 44",
+    "solution": [
+      "Rxd5",
+      "Ra1+",
+      "Kh2",
+      "Nf1+"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r1b2r2/pp2bpkp/1qn1p2p/3pP3/3P4/5N2/PP1QBPPP/R3KN1R w KQ - 6 12",
+    "solution": [
+      "Ng3",
+      "Bb4",
+      "O-O-O",
+      "Bxd2+"
+    ],
+    "title": "Tactical Master Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "1k4r1/7p/1p4r1/pPp1qp2/P1Pp1R2/3Q2NP/2P4K/5R2 w - - 4 32",
+    "solution": [
+      "R1f3",
+      "Rxg3",
+      "Rxg3",
+      "Qxf4"
+    ],
+    "title": "Advantage Deflection Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "3R2k1/5pp1/2b4p/2b5/p1P5/P4P1P/6P1/5K2 b - - 4 36",
+    "solution": [
+      "Kh7",
+      "Rc8",
+      "Bxa3",
+      "Rxc6"
+    ],
+    "title": "Advantage Endgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r5k1/pp1qrppp/2nb1n2/6N1/3P1p2/2P5/PPQN2PP/R1B2RK1 w - - 4 15",
+    "solution": [
+      "Nde4",
+      "Nxe4",
+      "Qxe4",
+      "Rxe4"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "5r1k/R5bp/6p1/p2Bq3/p3P3/6PK/7P/4Q3 w - - 7 39",
+    "solution": [
+      "Rxa5",
+      "Qh5+",
+      "Kg2",
+      "Qf3+"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "2kr3r/1pq2pp1/p1pbb3/7p/Q2P2n1/5N2/PP1B1PPP/2R1RBK1 w - - 1 20",
+    "solution": [
+      "Ba5",
+      "Bxh2+",
+      "Nxh2",
+      "Qxh2#"
+    ],
+    "title": "Kingsideattack Mate Matein2",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r4rk1/pp3p1p/2p3p1/q3bb2/3Pn3/1Q1BPN2/PP2KPPP/2R4R w - - 0 18",
+    "solution": [
+      "Nxe5",
+      "Qd2+",
+      "Kf3",
+      "Qxf2#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "3r1rk1/ppp3pp/3q4/3nR3/5P2/2P2Q2/PP4PP/RNB4K b - - 0 17",
+    "solution": [
+      "Qxe5",
+      "fxe5",
+      "Rxf3",
+      "gxf3"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "2kr3r/2p2p2/p4q2/1p6/P2PQ3/1PP3p1/6PP/3RR1K1 w - - 0 28",
+    "solution": [
+      "h3",
+      "Qf2+",
+      "Kh1",
+      "Rxh3+",
+      "gxh3",
+      "Qh2#"
+    ],
+    "title": "Endgame Long Mate",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "2kr1b1r/pp3ppp/2p1pq2/6B1/2P3Q1/7P/P4PP1/1R3RK1 b - - 3 19",
+    "solution": [
+      "Qg6",
+      "Bxd8",
+      "Qxg4",
+      "hxg4"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r3r1k1/ppp2p2/1b5Q/3PP2n/2B3bq/2N5/PP4PP/R4R1K w - - 1 18",
+    "solution": [
+      "Rxf7",
+      "Ng3#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "8/8/p1p5/1pKp3k/3P2p1/P1Q3P1/1Pq5/8 b - - 21 59",
+    "solution": [
+      "Qxc3+",
+      "bxc3",
+      "Kg6",
+      "Kxc6"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r2Rrk1q/p3Np2/1pp5/8/P1Q1P1pP/2P2P2/1P3bP1/3R3K w - - 5 34",
+    "solution": [
+      "Rxa8",
+      "Qxh4#"
+    ],
+    "title": "Kingsideattack Mate Matein1",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r5k1/p5pp/1p2b2r/3p4/2pQ1P1q/2P1P2P/P1P1B1P1/R5K1 b - - 0 25",
+    "solution": [
+      "Bxh3",
+      "Qxd5+",
+      "Be6",
+      "Qxa8+"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50"
+  },
+  {
+    "fen": "r4rk1/p1q2pb1/2p1b1pp/3np3/2B1N2P/4BP2/PPP3P1/2KRQ2R w - - 0 16",
+    "solution": [
+      "g4",
+      "Nxe3",
+      "Bxe6",
+      "Nxd1"
+    ],
+    "title": "Advantage Master Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3k2Q1/q7/3pB1p1/2pP1p2/2P2P2/rp2PK1P/8/8 b - - 2 37",
+    "solution": [
+      "Kc7",
+      "Qc8+",
+      "Kb6",
+      "Qc6+",
+      "Ka5",
+      "Qb5#"
+    ],
+    "title": "Endgame Long Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r2r2k/Q1R4p/4q1p1/4Bb2/8/8/PP3PPP/3R2K1 b - - 0 28",
+    "solution": [
+      "Qxe5",
+      "Rxh7+",
+      "Kg8",
+      "Qf7#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/Rp1r4/2p5/P1P1kp2/1P6/4K3/8 w - - 2 57",
+    "solution": [
+      "a5",
+      "f3+",
+      "Kf2",
+      "Rd2+"
+    ],
+    "title": "Tactical Endgame Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2k1r/pppp2pp/5q2/4n3/2Bp4/8/PPP2PPP/RN1QR1K1 w - - 2 13",
+    "solution": [
+      "Qxd4",
+      "Nf3+",
+      "gxf3",
+      "Qxd4"
+    ],
+    "title": "Advantage Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/pp3k1p/3B2p1/2P5/1P6/4n2P/P4qP1/2Q4K w - - 0 33",
+    "solution": [
+      "Kh2",
+      "Qxg2#"
+    ],
+    "title": "Endgame Mate Matein1",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/7p/4K2P/8/4k3/8/8/8 b - - 4 53",
+    "solution": [
+      "Kf4",
+      "Kf6",
+      "Ke4",
+      "Kg7",
+      "Kf5",
+      "Kxh7",
+      "Kf6",
+      "Kg8"
+    ],
+    "title": "Tactical Endgame Pawnendgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "Qn1qk2r/p4ppp/2p5/2bn4/4pPb1/2N5/PPPP2PP/R1B1KBNR w KQk - 1 9",
+    "solution": [
+      "h3",
+      "Qh4+",
+      "g3",
+      "Qxg3#"
+    ],
+    "title": "Mate Matein2 Opening",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/p1p3p1/bp2p2p/5p2/2qPB3/2P5/2Q2PPP/R4RK1 w - - 0 24",
+    "solution": [
+      "Ra4",
+      "Qxf1#"
+    ],
+    "title": "Kingsideattack Mate Matein1",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r3k1/R1r2qp1/4p2p/3p1p2/3P4/2P3QP/5PP1/R5K1 w - - 7 35",
+    "solution": [
+      "R1a6",
+      "Rxa7",
+      "Rxa7",
+      "Qxa7"
+    ],
+    "title": "Tactical Endgame Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r2q1rk1/p4pbp/1pp1p1p1/4n3/2PpN3/1P4P1/PB2PP1P/1R1Q1RK1 w - - 0 16",
+    "solution": [
+      "Qxd4",
+      "Nf3+",
+      "exf3",
+      "Bxd4"
+    ],
+    "title": "Tactical Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "4r3/2R3pk/1n2p2p/p6N/6PP/8/P7/6K1 b - - 0 40",
+    "solution": [
+      "Rg8",
+      "Nf6+",
+      "Kh8",
+      "Nxg8"
+    ],
+    "title": "Advantage Endgame Pin",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r2b1k1/5ppp/1r2p3/2Q5/p3P3/5P2/P1P3PP/2KR4 w - - 5 26",
+    "solution": [
+      "Rd8",
+      "Rb1+",
+      "Kd2",
+      "Rxd8+"
+    ],
+    "title": "Advantage Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r7/3R1pkp/2p1p1p1/3bB3/1r6/2R4P/5PP1/6K1 b - - 1 24",
+    "solution": [
+      "Kf8",
+      "Bd6+",
+      "Kg7",
+      "Bxb4",
+      "Ra1+",
+      "Kh2"
+    ],
+    "title": "Advantage Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "7R/8/p2kp3/2r4p/p4K2/6PP/P7/8 b - - 3 39",
+    "solution": [
+      "Kd5",
+      "Rxh5+",
+      "e5+",
+      "Rxe5+"
+    ],
+    "title": "Tactical Endgame Rookendgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p7/2R3p1/4Nnk1/2P4p/7K/Pr6/8 b - - 3 50",
+    "solution": [
+      "Kf4",
+      "Nd3+",
+      "Kg5",
+      "Nxb2"
+    ],
+    "title": "Tactical Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1n1q2rk/p3b1p1/1pr1p1RB/2p1P3/4N3/2PP1N1P/P3B2K/6R1 b - - 0 28",
+    "solution": [
+      "gxh6",
+      "Rxh6#"
+    ],
+    "title": "Kingsideattack Mate Matein1",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2k3pp/4p3/1R3p2/1Pr2K1P/6P1/5P2/8 w - - 7 37",
+    "solution": [
+      "Ke5",
+      "Re4#"
+    ],
+    "title": "Endgame Mate Matein1",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "4r2k/2q1r3/2p4Q/p5P1/1p1Pp1P1/2P1N2P/PP6/4bRK1 b - - 0 28",
+    "solution": [
+      "Rh7",
+      "Rf8+",
+      "Rxf8",
+      "Qxf8#"
+    ],
+    "title": "Kingsideattack Mate Matein2",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/1n4p1/4kp1p/7P/1B2KPP1/8/8 b - - 0 54",
+    "solution": [
+      "Nd5+",
+      "Bxd5",
+      "Kxd5",
+      "Kf4"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3q4/1p6/p4N2/5QPk/4Pn2/2P4r/1P3K2/8 b - - 4 40",
+    "solution": [
+      "Kh4",
+      "Qxf4#"
+    ],
+    "title": "Endgame Hangingpiece Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/2p5/7R/2B4P/KP2knp1/P1P5/8 w - - 0 45",
+    "solution": [
+      "Rg5",
+      "Nxg5",
+      "hxg5",
+      "g2"
+    ],
+    "title": "Advancedpawn Advantage Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "4Q3/p4r2/1pp1k1pR/5p2/4p1q1/8/PP3P2/5K2 b - - 3 46",
+    "solution": [
+      "Re7",
+      "Rxg6+",
+      "Qxg6",
+      "Qxg6+"
+    ],
+    "title": "Advantage Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r3k1/p4pp1/1p5p/1Q6/8/5P2/qP4PP/3R2K1 b - - 3 30",
+    "solution": [
+      "Qc4",
+      "Rd8+",
+      "Rxd8",
+      "Qxc4",
+      "Rd1+",
+      "Kf2"
+    ],
+    "title": "Advantage Deflection Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3r4/p1P1kppp/4pn2/qB2B3/4P3/2N4P/PP3PP1/3R2K1 b - - 0 22",
+    "solution": [
+      "Rc8",
+      "Bd6#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/7p/1P1n4/7P/4p3/8/2pBK3/1k6 b - - 1 47",
+    "solution": [
+      "Nc4",
+      "b7",
+      "c1=Q",
+      "Bxc1"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r5/2r3k1/1p2pp1p/p2pQ1p1/3P4/4P1P1/PPq2P1R/KR6 w - - 0 30",
+    "solution": [
+      "Qxe6",
+      "Qxb1+",
+      "Kxb1",
+      "Rc1#"
+    ],
+    "title": "Attraction Endgame Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r3r3/1p1n2pk/2p1pq1p/2P5/1p2R3/P2Q1N1P/5PP1/R5K1 b - - 1 24",
+    "solution": [
+      "Qxa1+",
+      "Re1+",
+      "Kh8",
+      "Rxa1"
+    ],
+    "title": "Tactical Discoveredattack Discoveredcheck",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r6/p2n1pkp/4p1p1/2Np4/1r6/1P1K1P1P/P3R1P1/2R5 b - - 5 36",
+    "solution": [
+      "Rc8",
+      "Nxe6+",
+      "fxe6",
+      "Rxc8"
+    ],
+    "title": "Advantage Discoveredattack Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/Q7/7r/8/6K1/1r2k1p1/6P1/8 b - - 2 64",
+    "solution": [
+      "Ke2",
+      "Qa2+",
+      "Ke3",
+      "Qxb3+"
+    ],
+    "title": "Tactical Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1bq1rk1/1p3pp1/p2bp2p/8/4Q3/2PB4/PP3PPP/R1B2RK1 b - - 0 13",
+    "solution": [
+      "b5",
+      "Qh7#"
+    ],
+    "title": "Mate Matein1 Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r4rk1/p1p2p1p/1p2p1p1/2n1q3/8/P1B1PQP1/1P3P1P/2R2RK1 b - - 3 18",
+    "solution": [
+      "Qe4",
+      "Qf6",
+      "e5",
+      "Bxe5",
+      "Qxe5",
+      "Qxe5"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r3r1k1/1p3p1p/p1pq2p1/3pNn2/3P2b1/1PPQ4/P1B2PPP/R3R1K1 b - - 3 27",
+    "solution": [
+      "Ng7",
+      "Nxg4",
+      "Rxe1+",
+      "Rxe1"
+    ],
+    "title": "Advantage Hangingpiece Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b1kbnN/ppp3pp/3p4/8/8/2NP4/PPP4P/R2QKBq1 b Qq - 3 15",
+    "solution": [
+      "Bh3",
+      "Qh5+",
+      "g6",
+      "Qxh3"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r3k2r/pp2bpp1/2pqnnp1/3pN1B1/3P2PP/2N5/PPP1QP2/2K1R2R b kq - 2 15",
+    "solution": [
+      "Nxg5",
+      "hxg5",
+      "Rxh1",
+      "Rxh1"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3r2k1/6pp/8/5Q2/2pP4/2Pq2P1/5RKP/8 b - - 2 35",
+    "solution": [
+      "Qxc3",
+      "Qf7+",
+      "Kh8",
+      "Qf8+",
+      "Rxf8",
+      "Rxf8#"
+    ],
+    "title": "Backrankmate Endgame Long",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r2R2k/3P2p1/p4q1p/8/2P5/5P2/P4P1P/6K1 b - - 1 34",
+    "solution": [
+      "Qf8",
+      "Rxf8+",
+      "Rxf8",
+      "c5",
+      "Rd8",
+      "c6"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/6kp/p2P2b1/2p5/2P5/P5P1/1rPR1K2/8 b - - 0 40",
+    "solution": [
+      "Rxc2",
+      "Rxc2",
+      "Bxc2",
+      "d7"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/5pkp/PQ4p1/4p3/RP1pP3/8/2rq1PPP/5BK1 w - - 0 36",
+    "solution": [
+      "Qb5",
+      "Qxf2+",
+      "Kh1",
+      "Rc1"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r4k1r/p3nppp/3Qp1b1/8/B7/P1q5/2P2PPP/3R1RK1 b - - 5 18",
+    "solution": [
+      "Bxc2",
+      "Qd8+",
+      "Rxd8",
+      "Rxd8#"
+    ],
+    "title": "Backrankmate Mate Matein2",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "7r/1p3p2/p1n2p2/3kpN1P/1PR5/P2P1P2/1K5P/8 b - - 0 29",
+    "solution": [
+      "Rxh5",
+      "Rc5+",
+      "Ke6",
+      "Ng7+"
+    ],
+    "title": "Advantage Endgame Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/k6p/p4p1P/p1p1pP2/K1P1P3/1P6/8 w - - 1 49",
+    "solution": [
+      "Kxa4",
+      "Kb6",
+      "Ka3",
+      "Kb5",
+      "Ka2",
+      "Ka4"
+    ],
+    "title": "Tactical Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/Q5b1/p2kp3/1p2qpN1/1P6/P7/4nPP1/5K2 b - - 5 46",
+    "solution": [
+      "Kd5",
+      "Qc5#"
+    ],
+    "title": "Endgame Master Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1k1r3r/1b1p1p2/p3p3/1p2Pn2/3n2Np/P1Q5/1P3PPP/1B2NRK1 w - - 2 26",
+    "solution": [
+      "Bxf5",
+      "Ne2+",
+      "Kh1",
+      "Nxc3"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/R5p1/5q1p/8/3p4/1P4Q1/P3rPPP/5RK1 w - - 2 38",
+    "solution": [
+      "Qg4",
+      "Qxf2+",
+      "Rxf2",
+      "Re1+",
+      "Rf1",
+      "Rexf1#"
+    ],
+    "title": "Endgame Long Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "rnbqkb1r/ppp3pp/5n2/3P1p2/4pB2/2N5/PP3PPP/R2QKBNR b KQkq - 0 7",
+    "solution": [
+      "Bb4",
+      "Qa4+",
+      "c6",
+      "Qxb4"
+    ],
+    "title": "Tactical Fork Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3r2k1/ppp1bppp/2n5/8/4P1b1/1P3N2/PBP1P1PP/2K2B1R w - - 2 16",
+    "solution": [
+      "h3",
+      "Bxf3",
+      "exf3",
+      "Bg5+",
+      "Kb1",
+      "Rd1+"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1R3rk1/p2q1ppp/3bpn2/3p4/Q2P4/2N3P1/P3PP1P/2B2RK1 b - - 0 17",
+    "solution": [
+      "Qxa4",
+      "Rxf8+",
+      "Kxf8",
+      "Nxa4"
+    ],
+    "title": "Tactical Intermezzo Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r4r1k/ppp1b1pp/3qQn2/6B1/8/2N5/PPP2PPP/R4RK1 w - - 3 14",
+    "solution": [
+      "Qb3",
+      "Ng4",
+      "g3",
+      "Bxg5"
+    ],
+    "title": "Advantage Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "rn2qr1k/p2n2pp/1p6/2bRp1B1/2B3Q1/7P/PPP2PP1/1K1R4 b - - 1 17",
+    "solution": [
+      "Nf6",
+      "Bxf6",
+      "gxf6",
+      "Rd8",
+      "Qxd8",
+      "Rxd8"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/1p4pp/p7/3R1N2/4rn2/6KP/PPR2PP1/8 w - - 1 34",
+    "solution": [
+      "Rd4",
+      "Ne2+",
+      "Rxe2",
+      "Rxe2"
+    ],
+    "title": "Tactical Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1b4p1/p3p1Pr/1p1p4/3N4/2PB4/PP3k1r/1K3R2 b - - 20 41",
+    "solution": [
+      "Ke3",
+      "Rf3+",
+      "Kd2",
+      "Nb3+",
+      "Ke1",
+      "Rf1#"
+    ],
+    "title": "Endgame Long Mate",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r1r1k1/pb2qpbp/1p1p1np1/4P3/3B1P2/1P3BP1/PQ1N3P/1R2R1K1 b - - 0 21",
+    "solution": [
+      "Bxf3",
+      "exf6",
+      "Qxe1+",
+      "Rxe1",
+      "Rxe1+",
+      "Kf2"
+    ],
+    "title": "Tactical Fork Long",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1r3k1/1pB1pp1p/6p1/1p1Pn3/1R6/1P4PP/P1R2P2/6K1 w - - 5 29",
+    "solution": [
+      "Rxb5",
+      "Nf3+",
+      "Kf1",
+      "Nd4"
+    ],
+    "title": "Advantage Endgame Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/p4pp1/1p3q1p/2p1R3/2Q5/2P2N1P/P1P2PPK/2r5 w - - 4 24",
+    "solution": [
+      "Qa6",
+      "Qf4+",
+      "g3",
+      "Qxf3",
+      "Re8+",
+      "Kh7",
+      "Qd3+",
+      "Qxd3"
+    ],
+    "title": "Advantage Deflection Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r3rk1/p4pp1/4p2p/1Q2Pn2/1b1P4/4BN2/q4PPP/2R2RK1 w - - 1 19",
+    "solution": [
+      "Ra1",
+      "Qxa1",
+      "Rxa1",
+      "Rxb5"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1p5p/6p1/2P2k2/1P6/P3qp1Q/8/5K2 b - - 5 43",
+    "solution": [
+      "Ke4",
+      "Qe6+",
+      "Kd4",
+      "Qxe3+",
+      "Kxe3",
+      "b5",
+      "g5",
+      "c6"
+    ],
+    "title": "Tactical Endgame Master",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r2r1k/pp3pp1/1b5p/4P3/1q2RB2/1B1p1N2/PP2K1Q1/6R1 w - - 0 39",
+    "solution": [
+      "Kxd3",
+      "Rfd8+",
+      "Nd4",
+      "Rxd4+",
+      "Rxd4",
+      "Qxd4+"
+    ],
+    "title": "Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r1r3k/2q1b1pp/p7/3Q2pP/3B4/Pp6/1P3P2/1K1N2RR w - - 1 28",
+    "solution": [
+      "Qe5",
+      "Qc2+",
+      "Ka1",
+      "Qc1#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2r2/p1p1qppk/1p1pp3/3Q4/8/2P2N2/P1P2PPP/R3R1K1 b - - 0 14",
+    "solution": [
+      "c6",
+      "Qh5+",
+      "Kg8",
+      "Ng5",
+      "Qxg5",
+      "Qxg5"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r2r2/1p2k1p1/p5p1/P1P3N1/3bPBpP/3K2P1/2P5/7R b - - 0 29",
+    "solution": [
+      "Rfd8",
+      "Bd6+",
+      "Rxd6",
+      "cxd6+",
+      "Kxd6",
+      "Kxd4"
+    ],
+    "title": "Tactical Endgame Exposedking",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5k2/7q/4Q3/1p6/6P1/8/6K1/8 w - - 1 62",
+    "solution": [
+      "Qf5+",
+      "Qxf5",
+      "gxf5",
+      "b4",
+      "Kf1",
+      "b3",
+      "Ke1",
+      "b2"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "3r2k1/5ppp/b3p3/3q4/3r4/p2PQP1P/3R1NPK/R7 w - - 0 35",
+    "solution": [
+      "Rxa3",
+      "Qd6+",
+      "Kh1",
+      "Qxa3"
+    ],
+    "title": "Tactical Fork Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2q2/p3p1bk/2p3p1/3pn2p/8/2NB3P/PPPBQ1P1/5RK1 b - - 1 17",
+    "solution": [
+      "Qd8",
+      "Qxh5+",
+      "Kg8",
+      "Bxg6",
+      "Nxg6",
+      "Qxg6"
+    ],
+    "title": "Advantage Deflection Long",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/5kpp/2p2p2/P1Bpn3/1P6/7P/r4PP1/4R1K1 b - - 2 31",
+    "solution": [
+      "Ke6",
+      "f4",
+      "Kf5",
+      "fxe5"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "7k/pQ4p1/2p4p/4r3/3r1p1n/6N1/PP2R1PP/6K1 b - - 0 30",
+    "solution": [
+      "fxg3",
+      "Qb8+",
+      "Kh7",
+      "Qxe5"
+    ],
+    "title": "Tactical Endgame Fork",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "7R/8/8/P5p1/5k2/1KP3r1/7p/8 b - - 1 51",
+    "solution": [
+      "Rg2",
+      "a6",
+      "Re2",
+      "a7"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "1r1r2k1/2p3b1/p1q4p/3pP1pb/P2B1p2/1B3P2/1P4PP/R2QR1K1 w - - 7 29",
+    "solution": [
+      "e6",
+      "Bxd4+",
+      "Qxd4",
+      "Rxb3"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "4r1k1/1ppbrpp1/7p/p2P4/3q1P2/P2B1P2/1P1Q2PP/3RR2K w - - 5 26",
+    "solution": [
+      "Bh7+",
+      "Kxh7",
+      "Rxe7",
+      "Qxd2",
+      "Rxd2",
+      "Rxe7"
+    ],
+    "title": "Advantage Hangingpiece Long",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "2r2r2/1b4pk/p4q1p/2p2p1Q/4pP2/2P1R2N/PP4PP/2R3K1 b - - 4 32",
+    "solution": [
+      "Qg6",
+      "Ng5+",
+      "Qxg5",
+      "fxg5"
+    ],
+    "title": "Tactical Middlegame Pin",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b1r1k1/ppp2ppp/2nb1q2/4N3/2BPQB2/8/PPP3PP/2KR3R w - - 5 13",
+    "solution": [
+      "Bxf7+",
+      "Qxf7",
+      "Nxf7",
+      "Rxe4"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5r2/pppk2pp/3p1r2/8/3PPn2/2P2PQq/PP2B2P/R3KR2 b Q - 2 21",
+    "solution": [
+      "Qxg3+",
+      "hxg3",
+      "Nxe2",
+      "Kxe2"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5k2/p1R4R/1p4p1/3r3q/3P4/2P2rQp/PP5K/8 b - - 4 36",
+    "solution": [
+      "Rxg3",
+      "Rc8+",
+      "Rd8",
+      "Rxd8#"
+    ],
+    "title": "Endgame Mate Matein2",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r4rk1/p3b1pp/1qB1bp2/1p2p3/2p2P2/3PR1P1/PPPN3P/R1BQ2K1 w - - 1 16",
+    "solution": [
+      "Bxa8",
+      "Qxe3+",
+      "Kg2",
+      "Rxa8"
+    ],
+    "title": "Advantage Hangingpiece Intermezzo",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/8/4R1kp/4p3/4r2P/6PK/8 b - - 1 50",
+    "solution": [
+      "Kh4",
+      "g3+",
+      "Rxg3",
+      "Rxe4+",
+      "Kg5",
+      "Kxg3"
+    ],
+    "title": "Tactical Deflection Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "r2q1rk1/4N1bp/p2p2p1/2p3N1/Pp4P1/1Q5P/1P1n1P2/5RK1 b - - 0 21",
+    "solution": [
+      "Kh8",
+      "Qg8+",
+      "Rxg8",
+      "Nf7#"
+    ],
+    "title": "Kingsideattack Mate Matein2",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/5pp1/3p3p/4p1N1/8/PR6/1p3PPP/6K1 w - - 0 33",
+    "solution": [
+      "Ne4",
+      "Rc8",
+      "g3",
+      "Rc1+"
+    ],
+    "title": "Tactical Endgame Quietmove",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "4r1kb/3q1p1p/1p1p1PpB/p2P4/2Pp4/6Q1/1P4PP/5RK1 b - - 2 26",
+    "solution": [
+      "Re3",
+      "Bxe3",
+      "dxe3",
+      "Qxe3"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/8/8/p1pR4/P1Pb4/1P1p2P1/6P1/1R3K2 w - - 3 38",
+    "solution": [
+      "Ke1",
+      "Bc3+",
+      "Kd1",
+      "Rf1#"
+    ],
+    "title": "Endgame Mate Matein2",
+    "difficulty": "\u2b50\u2b50"
+  },
+  {
+    "fen": "8/3k4/p6p/1p2Q1pP/3P2b1/1PP2qP1/P3p3/1K2R3 w - - 3 44",
+    "solution": [
+      "d5",
+      "Qd3+",
+      "Kb2",
+      "Qd2+",
+      "Ka3",
+      "Qxe1"
+    ],
+    "title": "Advantage Endgame Fork",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/1p3p1p/4p1p1/1P1pP3/P7/4r3/7P/1R4K1 b - - 0 33",
+    "solution": [
+      "Rxe5",
+      "a5",
+      "d4",
+      "a6",
+      "Rxb5",
+      "Rxb5"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2kr2r1/ppq1bbBQ/2p1p3/2npP3/8/2P2N2/PPB2PPP/R4RK1 w - - 3 21",
+    "solution": [
+      "Bf6",
+      "Bxf6",
+      "exf6",
+      "Rh8"
+    ],
+    "title": "Advantage Master Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4k3/3n3P/p2PN1K1/8/1p6/2b5/8/8 b - - 0 51",
+    "solution": [
+      "b3",
+      "Ng7+",
+      "Bxg7",
+      "Kxg7"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r3r1k1/7p/p2qP1p1/1pRp1p2/8/1P2Q2P/PB3PP1/7K b - - 0 32",
+    "solution": [
+      "Qxe6",
+      "Qd4",
+      "Qe5",
+      "Qxe5",
+      "Rxe5",
+      "Bxe5"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r5k1/pb2r1p1/1p2pQ2/2b1N3/5P2/PP5P/4p2K/3R2R1 w - - 0 33",
+    "solution": [
+      "Rde1",
+      "Bxg1+",
+      "Rxg1",
+      "e1=Q",
+      "Qxe6+",
+      "Rxe6"
+    ],
+    "title": "Advancedpawn Advantage Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5q1k/4b1p1/2b1p3/2pp2n1/8/2P2PB1/PP2QP1P/R4RK1 w - - 3 25",
+    "solution": [
+      "h4",
+      "Nxf3+",
+      "Kg2",
+      "d4"
+    ],
+    "title": "Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5k2/p4p2/1p6/3p1R2/7Q/P2Pr1KP/6P1/6q1 w - - 3 40",
+    "solution": [
+      "Rf3",
+      "Qe1+",
+      "Kg4",
+      "Qxh4+",
+      "Kxh4",
+      "Rxf3"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/7p/1P1R3P/8/2k5/3p3r/3K4 w - - 3 49",
+    "solution": [
+      "b6",
+      "Rh1+",
+      "Ke2",
+      "Re1+"
+    ],
+    "title": "Tactical Endgame Rookendgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2qk2r/4bpp1/4pn1p/pp1pPb2/2p2P1B/P1P1P3/1P2B1PP/RN1Q1RK1 b kq - 0 13",
+    "solution": [
+      "Bxb1",
+      "exf6",
+      "Bxf6",
+      "Bxf6"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2rkb3/1p6/6P1/5q2/3R4/Q1P1K3/8 b - - 4 37",
+    "solution": [
+      "Kc6",
+      "Qd5#"
+    ],
+    "title": "Dovetailmate Endgame Mate",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r4/ppN1kppp/5n2/8/1n3Nb1/4P3/1B3PPP/R3KB1R w KQ - 0 18",
+    "solution": [
+      "Rc1",
+      "Nc2+",
+      "Rxc2",
+      "Rd1#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b1r1k1/pp1n1pb1/3p1q1p/2pP2p1/2P1B3/4PNB1/PPQ2PPP/2KR3R w - - 1 15",
+    "solution": [
+      "h4",
+      "Rxe4",
+      "hxg5",
+      "hxg5"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2r2k1/pp3pp1/5q1p/4p3/3p4/2N1P3/PPQ2P1R/2K4R w - - 0 25",
+    "solution": [
+      "exd4",
+      "exd4",
+      "Kb1",
+      "dxc3"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2b5/2p2p2/k7/1qQ1P3/1p6/1N3P2/1PP5/2K5 w - - 3 38",
+    "solution": [
+      "Qxc7",
+      "Qf1+",
+      "Kd2",
+      "Qf2+",
+      "Kd3",
+      "Bf5+",
+      "Kc4",
+      "Qxc2+",
+      "Kxb4",
+      "Qxc7"
+    ],
+    "title": "Tactical Deflection Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1r3pkp/1b4p1/2Rp4/7P/1qP3P1/1P2QP2/2B3K1 w - - 5 33",
+    "solution": [
+      "Qe5+",
+      "f6",
+      "Bh6+",
+      "Kxh6",
+      "Qf4+",
+      "Kg7"
+    ],
+    "title": "Advantage Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/3RP3/p1Pn4/1pN1k2p/8/rP1K4/8 b - - 0 40",
+    "solution": [
+      "a4",
+      "Rxd5",
+      "Kxd5",
+      "e7"
+    ],
+    "title": "Advancedpawn Advantage Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r3k2r/ppp3Np/3p2pB/2b1p3/2B1P3/2NP3q/PPP2P2/R2R2K1 b - - 3 17",
+    "solution": [
+      "Kd8",
+      "Bg5+",
+      "Kd7",
+      "Be6+",
+      "Qxe6",
+      "Nxe6"
+    ],
+    "title": "Advantage Fork Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r1rk1/1p3p1p/p1q1b1p1/4P2P/2p2P2/P5R1/2Q1B1P1/3R2K1 b - - 1 25",
+    "solution": [
+      "Bf5",
+      "Qxf5",
+      "Rxd1+",
+      "Bxd1"
+    ],
+    "title": "Tactical Middlegame Pin",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4r1k1/p5bp/1q4p1/2pPrp2/1pP2N2/6PP/P4QB1/1R3RK1 w - - 2 25",
+    "solution": [
+      "Ne6",
+      "R5xe6",
+      "dxe6",
+      "Bd4"
+    ],
+    "title": "Advantage Clearance Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2qr1k1/pb2bppp/2p2n2/3pN1B1/2P5/4P3/PPQ2PPP/3RKB1R w K - 3 13",
+    "solution": [
+      "Be2",
+      "Bb4+",
+      "Kf1",
+      "Rxe5"
+    ],
+    "title": "Tactical Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2k5/pp3p2/5q2/2b1p1p1/4P1Pr/1nN2BK1/PPP3P1/R2Q4 w - - 3 23",
+    "solution": [
+      "Nd5",
+      "Qf4+",
+      "Nxf4",
+      "exf4#"
+    ],
+    "title": "Mate Matein2 Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1r6/6p1/5p1p/r1kp4/Pp3q2/2pR3P/2Q2PP1/3R2K1 b - - 4 39",
+    "solution": [
+      "Rd8",
+      "Rxc3+",
+      "bxc3",
+      "Qxc3+",
+      "Kd6",
+      "Qxa5"
+    ],
+    "title": "Advantage Endgame Fork",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/p4pp1/1p4rp/2p1P3/3p1P2/P2PnP2/2P2R1P/2B1R2K b - - 4 25",
+    "solution": [
+      "Ng2",
+      "Rxg2",
+      "Rxg2",
+      "Kxg2"
+    ],
+    "title": "Advantage Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2R5/4b1pk/1r5p/2pPN3/1p2P3/3P4/4K1PP/8 w - - 1 39",
+    "solution": [
+      "Nd7",
+      "b3",
+      "d6",
+      "Bxd6",
+      "Nxb6",
+      "b2",
+      "Nc4",
+      "b1=Q"
+    ],
+    "title": "Advancedpawn Advantage Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/5ppp/pp6/3q4/P2R2Q1/8/1Pr1r1PP/5R1K b - - 3 26",
+    "solution": [
+      "h5",
+      "Qxe2",
+      "Rxe2",
+      "Rxd5"
+    ],
+    "title": "Advantage Endgame Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2qkb1r/pp2pppp/3p1nb1/4n3/4P1PN/2PB3P/PP3P2/RNBQK2R b KQkq - 0 11",
+    "solution": [
+      "Bxe4",
+      "Bxe4",
+      "Nxe4",
+      "Qa4+",
+      "Nc6",
+      "Qxe4"
+    ],
+    "title": "Advantage Fork Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4rbk1/ppq2rpp/2p2n2/8/8/1Q2B1N1/PPP2PPP/R3R1K1 w - - 5 18",
+    "solution": [
+      "Bxa7",
+      "Rxe1+",
+      "Rxe1",
+      "Qa5",
+      "Re2",
+      "Qxa7"
+    ],
+    "title": "Advantage Fork Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r1r2/pp3pk1/2p1pRp1/6Qp/2P5/P7/1q4PP/5R1K b - - 1 31",
+    "solution": [
+      "Rd2",
+      "Rxg6+",
+      "fxg6",
+      "Qe7+",
+      "Kh6",
+      "Qxf8+",
+      "Qg7",
+      "Qf4+",
+      "Kh7",
+      "Qxd2"
+    ],
+    "title": "Advantage Clearance Deflection",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p1N3pp/5k2/2PB2b1/1P4b1/P6r/6K1/4R3 b - - 0 31",
+    "solution": [
+      "Rd3",
+      "Ne8+",
+      "Kg6",
+      "Be4+"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2Q2kpp/1p1p2r1/1PnN4/2P1n3/6P1/1r3PK1/8 b - - 6 41",
+    "solution": [
+      "Ke6",
+      "Qe7+",
+      "Kf5",
+      "Ne3#"
+    ],
+    "title": "Endgame Master Mate",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4r1k/pp4pp/1qpp1b2/4p3/N3P3/3Q4/PPP2PPP/3RR1K1 b - - 3 16",
+    "solution": [
+      "Qd4",
+      "Qb3",
+      "b5",
+      "Rxd4"
+    ],
+    "title": "Advantage Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6n1/2p3k1/1p1p2P1/p2P1K1P/P1P5/1P6/8/8 b - - 2 53",
+    "solution": [
+      "Nh6+",
+      "Ke6",
+      "Ng8",
+      "Kd7"
+    ],
+    "title": "Tactical Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4rk1/4qp2/p2p2np/1p3b1Q/2p1P3/2P5/PPB3PP/RN2R1K1 b - - 0 20",
+    "solution": [
+      "Qh4",
+      "Qxh4",
+      "Nxh4",
+      "exf5"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "7k/Q1p3p1/5p1p/3q4/3Pr3/4P3/P4P1P/1R4K1 w - - 2 26",
+    "solution": [
+      "Qc5",
+      "Rg4+",
+      "Kf1",
+      "Qh1+",
+      "Ke2",
+      "Qxb1"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/8/3K2kp/8/2P1P3/8/8 w - - 0 50",
+    "solution": [
+      "c4",
+      "h4",
+      "Ke4",
+      "Kg4",
+      "c5",
+      "h3",
+      "Ke5",
+      "h2",
+      "c6",
+      "h1=Q"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4rk1/pp3ppp/4p3/3pB1qB/Q1p5/2PbP3/PP1N1P1P/R3K2R w KQ - 0 15",
+    "solution": [
+      "Bxg7",
+      "Qxh5",
+      "Qd1",
+      "Qxd1+",
+      "Rxd1",
+      "Kxg7"
+    ],
+    "title": "Advantage Hangingpiece Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "Qr5k/5pp1/5N1p/4q3/4P3/8/7P/6RK w - - 6 36",
+    "solution": [
+      "Ra1",
+      "gxf6",
+      "Qxb8+",
+      "Qxb8"
+    ],
+    "title": "Tactical Endgame Hangingpiece",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2rk1/5p1p/p3pP2/1p1p4/5q1n/1P5P/P1P1QPB1/1K1R2R1 b - - 2 21",
+    "solution": [
+      "Qxf6",
+      "Bxd5+",
+      "Ng6",
+      "Bxa8"
+    ],
+    "title": "Advantage Discoveredattack Discoveredcheck",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r1r3/5R2/p7/6P1/5P2/PB3bR1/1PP2k1P/2K5 w - - 1 35",
+    "solution": [
+      "g6",
+      "Re1+",
+      "Kd2",
+      "Rd1#"
+    ],
+    "title": "Endgame Mate Matein2",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p7/6P1/4p3/R4pK1/1r2k2P/8/8 b - - 0 47",
+    "solution": [
+      "f3",
+      "g7",
+      "Rb8",
+      "Ra3+"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1r2r1k1/3p1pb1/p2q2pp/1p3P2/3p4/P6Q/BPP3PP/4RRK1 b - - 0 23",
+    "solution": [
+      "g5",
+      "Rxe8+",
+      "Rxe8",
+      "f6"
+    ],
+    "title": "Tactical Kingsideattack Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r3kr/1pq1b1p1/p1n1p1P1/3p1pB1/3P3p/P3Q3/1PP1N3/1K4RR b - - 4 26",
+    "solution": [
+      "Bxg5",
+      "Qxe6+",
+      "Kf8",
+      "Rxg5"
+    ],
+    "title": "Tactical Intermezzo Kingsideattack",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2R3k1/rb3ppp/pn2p3/4P3/1P1P1P2/P4B2/6PP/5RK1 b - - 0 23",
+    "solution": [
+      "Nxc8",
+      "Rc1",
+      "Nb6",
+      "Rc7",
+      "Bxf3",
+      "Rxa7"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4r2k/p7/3p4/2pPbr1p/2P1RR2/2B3qP/P3Q3/7K w - - 1 33",
+    "solution": [
+      "Rxf5",
+      "Qxh3+",
+      "Kg1",
+      "Rg8+"
+    ],
+    "title": "Tactical Fork Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6rr/p1k1qp2/Ppn1p3/3pP1b1/QP1n1NNp/3P3P/3B2PK/1R2R3 b - - 2 32",
+    "solution": [
+      "Kb8",
+      "b5",
+      "Bxf4+",
+      "Bxf4",
+      "Rxg4",
+      "hxg4"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5Q2/8/8/8/pn6/k6r/8/2K5 w - - 2 83",
+    "solution": [
+      "Qd6",
+      "Rc3+",
+      "Kd2",
+      "Rd3+",
+      "Qxd3+",
+      "Nxd3"
+    ],
+    "title": "Tactical Endgame Exposedking",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6rk/pq3p1p/1p3RrB/1Pp1p3/2PnP2Q/P5P1/6KP/1R6 w - - 2 28",
+    "solution": [
+      "Rbf1",
+      "Rg4",
+      "Qxg4",
+      "Rxg4",
+      "Rxf7",
+      "Qxe4+"
+    ],
+    "title": "Capturingdefender Tactical Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r3k1/3n1pp1/pq2r1p1/2p5/3b4/BP5P/P2N1PP1/R1Q1R1K1 w - - 0 23",
+    "solution": [
+      "Bb2",
+      "Rxe1+",
+      "Qxe1",
+      "Bxb2",
+      "Nc4",
+      "Qf6",
+      "Nxb2",
+      "Qxb2"
+    ],
+    "title": "Advantage Middlegame Verylong",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r3k1/p4p1p/Pn2p1p1/2rpP1P1/5P2/4B1P1/2P4R/R6K b - - 2 28",
+    "solution": [
+      "Rxc2",
+      "Rxc2",
+      "Rxc2",
+      "Bxb6",
+      "axb6",
+      "a7"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p4k2/2p3PP/2P2K2/8/2b5/P7/8 b - - 0 42",
+    "solution": [
+      "Kg8",
+      "Ke6",
+      "Bd2",
+      "h7+"
+    ],
+    "title": "Advancedpawn Bishopendgame Tactical",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r5/2r3k1/p1q1b1pp/3pn3/3R4/4P1N1/PQ4PP/R5K1 b - - 7 32",
+    "solution": [
+      "Qc1+",
+      "Rxc1",
+      "Rxc1+",
+      "Nf1"
+    ],
+    "title": "Advantage Defensivemove Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/5ppk/6qp/P1p1p3/2B4Q/1P2PbP1/5P1P/6K1 w - - 1 37",
+    "solution": [
+      "a6",
+      "Qb1+",
+      "Bf1",
+      "Be2",
+      "Qh3",
+      "Bxa6"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r4/ppq3kp/2p1Qpp1/2P1b3/1P1rRp2/P4P1P/2B3P1/4R1K1 b - - 6 31",
+    "solution": [
+      "Qd7",
+      "Rxe5",
+      "fxe5",
+      "Qxe5+",
+      "Kg8",
+      "Bb3+"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/ppqb1p1p/2p2Bp1/3p4/8/2P2Q2/PP3PPP/4R1K1 b - - 0 19",
+    "solution": [
+      "Re8",
+      "Rxe8+",
+      "Bxe8",
+      "Qe3",
+      "Qd6",
+      "Qxe8+"
+    ],
+    "title": "Advantage Endgame Kingsideattack",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1Q3Rkp/p5p1/1p2q3/2p5/P6P/1b2r1P1/7K b - - 0 37",
+    "solution": [
+      "Kh6",
+      "Rxh7+",
+      "Kg5",
+      "h4+",
+      "Kf5",
+      "Qf3+"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2rq1r2/4pBkp/pn1P1bp1/1p2N3/3PR3/P4Q2/1P3PPP/3R2K1 w - - 1 25",
+    "solution": [
+      "Be6",
+      "Bxe5",
+      "dxe7",
+      "Qxe7",
+      "Qe3",
+      "Qxe6"
+    ],
+    "title": "Advantage Long Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/3k4/1p6/1Pp1K3/2P5/8/8 b - - 2 54",
+    "solution": [
+      "Kc6",
+      "Ke5",
+      "Kd7",
+      "Kd5"
+    ],
+    "title": "Tactical Endgame Pawnendgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1p6/p1p3r1/1kP5/7R/5P1P/5K2/8 w - - 0 54",
+    "solution": [
+      "Rg4",
+      "Rxg4",
+      "fxg4",
+      "Kxc5"
+    ],
+    "title": "Tactical Endgame Rookendgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "rn1r2k1/pp2qppp/4pn2/6B1/2B1b2N/8/PPP1QPPP/2KR3R b - - 7 15",
+    "solution": [
+      "Bc6",
+      "Nf5",
+      "Rxd1+",
+      "Rxd1"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1bq3k/pppnp2r/5nQb/3p4/8/3B1N2/PPPP1PPP/RNB1K2R w KQ - 2 11",
+    "solution": [
+      "Ng5",
+      "Ne5",
+      "Qxh6",
+      "Rxh6"
+    ],
+    "title": "Advantage Opening",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4r1k1/5pp1/5n1p/P5r1/7q/1QP1p1PP/1P3P2/R3RBK1 w - - 0 27",
+    "solution": [
+      "Kh2",
+      "Ng4+",
+      "Kg2",
+      "Nxf2"
+    ],
+    "title": "Tactical Middlegame Pin",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2kr4/1pq2p2/p3p1p1/2b1n2p/Q1P2B2/7P/P3BPP1/1R4K1 b - - 1 24",
+    "solution": [
+      "Bd6",
+      "c5",
+      "Qc6",
+      "Qxc6+"
+    ],
+    "title": "Tactical Middlegame Queensideattack",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r3kbnr/p2n2pp/2pp2q1/4P2b/2P1Pp2/P1N2N1P/4BP1R/1RBQK3 b kq - 0 21",
+    "solution": [
+      "Nxe5",
+      "Nxe5",
+      "Qg1+",
+      "Kd2",
+      "Qxd1+",
+      "Bxd1"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/4k3/5pK1/1p2p2P/2p2b2/5P2/1PB5/8 b - - 3 34",
+    "solution": [
+      "Ke6",
+      "h6",
+      "Bxh6",
+      "Kxh6"
+    ],
+    "title": "Bishopendgame Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p2k4/2p5/8/Q7/2B2p2/PP1K1q2/8 w - - 0 40",
+    "solution": [
+      "Kd3",
+      "Qe2+",
+      "Kd4",
+      "f2",
+      "Qxa7+",
+      "Ke6"
+    ],
+    "title": "Advancedpawn Tactical Defensivemove",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r4r/1b4k1/2q1p1p1/2p5/1p1pR1QP/pP1P1PP1/P1P5/4R1K1 b - - 0 30",
+    "solution": [
+      "Rh6",
+      "Rxe6",
+      "Qxf3",
+      "Re7+",
+      "Kf8",
+      "Rf1",
+      "Qxf1+",
+      "Kxf1",
+      "Kxe7",
+      "Qg5+",
+      "Kd7",
+      "Qxh6"
+    ],
+    "title": "Advantage Fork Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1k1r1b1r/n1p3p1/p5p1/1pn1P3/P2B2Pq/2P2Q1P/1PB1K3/R6R b - - 0 24",
+    "solution": [
+      "Ne6",
+      "Bxa7+",
+      "Kxa7",
+      "axb5",
+      "Rd2+",
+      "Kxd2"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/7p/p1p4k/1p1p4/3Qpq2/2P2NpP/PP4K1/8 w - - 0 44",
+    "solution": [
+      "Nd2",
+      "c5",
+      "Qxc5",
+      "Qxd2+"
+    ],
+    "title": "Advantage Deflection Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r2k1/p3qp1p/6p1/P7/3r4/2Q4P/n4PP1/1RR2BK1 w - - 2 31",
+    "solution": [
+      "Qc7",
+      "R4d7",
+      "Qc5",
+      "Nxc1",
+      "Qxe7",
+      "Rxe7"
+    ],
+    "title": "Tactical Long Master",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r1rk1/pp2npp1/1q2b2p/3p4/4n3/PBP2N1P/1P1N1PP1/R2Q1RK1 w - - 4 16",
+    "solution": [
+      "Nxe4",
+      "dxe4",
+      "Nd4",
+      "Rxd4"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6r1/4p3/3p1kp1/2pP1n2/1p2pRP1/1P6/4RP1P/6K1 w - - 0 40",
+    "solution": [
+      "gxf5",
+      "gxf5+",
+      "Kf1",
+      "Kg5",
+      "Rexe4",
+      "fxe4"
+    ],
+    "title": "Advantage Discoveredattack Discoveredcheck",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1p6/8/3kp2p/4p1p1/4K1P1/PP4PP/8 w - - 0 36",
+    "solution": [
+      "h4",
+      "b5",
+      "a3",
+      "Kc4",
+      "Kxe4",
+      "Kb3"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5r2/p2R4/1p3pk1/PQ4p1/4p1q1/4P1P1/6PK/8 w - - 3 34",
+    "solution": [
+      "axb6",
+      "Rh8+",
+      "Kg1",
+      "Qxg3"
+    ],
+    "title": "Tactical Deflection Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "q2r2k1/5pbp/p5p1/1p6/2pP1P2/P1N1P1Pb/1P1B1R1P/1Q4K1 b - - 4 21",
+    "solution": [
+      "Rxd4",
+      "exd4",
+      "Bxd4",
+      "Qe4",
+      "Qxe4",
+      "Nxe4"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1bq1r2/2p2p1k/pb1p1pnp/1p2p2Q/1P2P2N/P1PP1N2/B4PPP/R4RK1 w - - 6 17",
+    "solution": [
+      "Bxf7",
+      "Nf4",
+      "Bg6+",
+      "Kg7",
+      "Nf5+",
+      "Bxf5"
+    ],
+    "title": "Advantage Defensivemove Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r3kb1r/pp1q1p1p/8/2np2p1/5N2/6P1/PPQPPP1P/R1B2RK1 w kq - 0 16",
+    "solution": [
+      "Qc3",
+      "d4",
+      "Nh5",
+      "dxc3"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "rnb2r1k/2q2p1p/p2p1bp1/1p2pN2/4P1QN/3B3R/PPP2PPP/R5K1 b - - 1 19",
+    "solution": [
+      "gxf5",
+      "Nxf5",
+      "Bxf5",
+      "Qxf5"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1K6/1p6/2k5/p7/P1p5/2P5/1P6/8 b - - 3 47",
+    "solution": [
+      "b5",
+      "Ka7",
+      "b4",
+      "Ka6"
+    ],
+    "title": "Tactical Endgame Master",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1r6/6k1/b2p1p2/2qP1Pp1/1pP1P1P1/3Q4/3BK3/7R w - - 4 38",
+    "solution": [
+      "Qh3",
+      "Qxc4+",
+      "Kf2",
+      "Qe2+",
+      "Kg1",
+      "Qd1+"
+    ],
+    "title": "Tactical Endgame Exposedking",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r4/1p2k3/2p2pn1/N3p1p1/P3P1Pp/2Pn1P2/1P2K2P/R1B5 w - - 1 21",
+    "solution": [
+      "Nxb7",
+      "Nxc1+",
+      "Rxc1",
+      "Nf4+"
+    ],
+    "title": "Advantage Endgame Master",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4rbk1/pp1qr1p1/2pN3p/4P2b/3P4/6Q1/PP3RPP/5RK1 w - - 0 30",
+    "solution": [
+      "Nxe8",
+      "Rxe8",
+      "Qb3+",
+      "Qd5",
+      "Qxd5+",
+      "cxd5"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5r1k/ppp3pp/1bp2rq1/4B3/Q1BP4/2P4b/PP1N2PK/4R2R w - - 0 21",
+    "solution": [
+      "Bg3",
+      "Bxg2",
+      "Rhf1",
+      "Bxf1"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/3k1p1p/8/3Pp3/4K3/3P2P1/1pB4P/b7 b - - 1 36",
+    "solution": [
+      "Kd6",
+      "Bb1",
+      "f5+",
+      "Kxf5"
+    ],
+    "title": "Bishopendgame Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5r1k/ppp1nBp1/3pN3/7p/3P3P/2P2RK1/PP3QP1/1q5r b - - 6 26",
+    "solution": [
+      "Rxf7",
+      "Rxf7",
+      "Qd3+",
+      "Qf3"
+    ],
+    "title": "Advantage Hangingpiece Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2R5/p4ppk/1p6/6Q1/8/7P/q4PPK/4r3 b - - 0 35",
+    "solution": [
+      "Qe6",
+      "Qh5+",
+      "Qh6",
+      "Qxf7"
+    ],
+    "title": "Tactical Deflection Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r2r2/p4p1k/4q2N/3pn1p1/4p1RQ/2P1P2P/PP4P1/5RK1 w - - 1 27",
+    "solution": [
+      "Nxf7+",
+      "gxh4",
+      "Ng5+",
+      "Kh6",
+      "Nxe6",
+      "Rxf1+",
+      "Kxf1",
+      "Nxg4"
+    ],
+    "title": "Advantage Kingsideattack Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1k1r1b1r/4q3/QBpp4/4p3/4P2p/5p2/P5PP/4R1K1 b - - 0 28",
+    "solution": [
+      "Rd7",
+      "Rb1",
+      "Rb7",
+      "Ba7+",
+      "Kc8",
+      "Qxc6+",
+      "Qc7",
+      "Qe8+"
+    ],
+    "title": "Tactical Discoveredattack Exposedking",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/p3k3/1p1pP3/5P2/1P6/6K1/8 w - - 0 53",
+    "solution": [
+      "Kf3",
+      "a5",
+      "Ke3",
+      "a4",
+      "bxa4",
+      "bxa4",
+      "Kd4",
+      "a3",
+      "Kc3",
+      "d4+",
+      "Kxd4",
+      "a2"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2rk1/qp3pp1/p3p2p/8/8/P5P1/1PBB2P1/2RQ3K b - - 0 21",
+    "solution": [
+      "Rd8",
+      "Be3",
+      "Rxd1+",
+      "Rxd1",
+      "Kf8",
+      "Bxa7",
+      "Rxa7",
+      "Rd8+",
+      "Ke7",
+      "Rxc8"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "rnb1r2k/ppp2Qb1/2qpN3/8/3P3P/2P5/PP3P2/RN2K1R1 b Q - 0 18",
+    "solution": [
+      "Qe4+",
+      "Kd1",
+      "Re7",
+      "Qxe7"
+    ],
+    "title": "Tactical Defensivemove Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/1p6/p1p2kPp/P6P/5K2/8/8 b - - 2 43",
+    "solution": [
+      "b5",
+      "axb5",
+      "a4",
+      "b6",
+      "a3",
+      "b7",
+      "a2",
+      "b8=Q",
+      "a1=Q",
+      "Qc8+",
+      "Kg6",
+      "Qg8+"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3Q4/4rRbk/p1qp2p1/1p2r2p/2p1P1bP/6N1/PP4P1/1B3R1K b - - 11 37",
+    "solution": [
+      "Qd7",
+      "Qf8",
+      "Rxf7",
+      "Rxf7",
+      "Qxf7",
+      "Qxf7"
+    ],
+    "title": "Advantage Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "Q7/8/3B4/2p5/Krkn4/8/8/8 w - - 1 54",
+    "solution": [
+      "Ka3",
+      "Nb5+",
+      "Ka2",
+      "Nc3+",
+      "Ka1",
+      "Rb1#"
+    ],
+    "title": "Arabianmate Endgame Exposedking",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "2r2rk1/p4pp1/1p2p2p/4N3/q2P2PP/P7/1PnQ1P2/1K1R2R1 w - - 1 26",
+    "solution": [
+      "g5",
+      "Qb3",
+      "Rg3",
+      "Nxa3+",
+      "Ka1",
+      "Nc2+"
+    ],
+    "title": "Tactical Long Master",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2q1rk1/1R1b1pp1/2n2n1p/3p1B2/2pP1B2/5N2/2Q2PPP/1R4K1 b - - 4 22",
+    "solution": [
+      "Qc8",
+      "Bxd7",
+      "Nxd7",
+      "Rc7"
+    ],
+    "title": "Advantage Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4Q3/6pk/p7/4Pq1p/2r2P2/P5P1/1P5P/5RK1 w - - 2 36",
+    "solution": [
+      "e6",
+      "Qc5+",
+      "Rf2",
+      "Rc2",
+      "Qxh5+",
+      "Qxh5"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/5p2/3bbq2/p2p2pp/N2Pn3/P3PN1P/4BPP1/2Q3K1 w - - 0 31",
+    "solution": [
+      "Nc5",
+      "Bxc5",
+      "dxc5",
+      "g4"
+    ],
+    "title": "Advantage Master Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "5rk1/p3ppbp/bq3np1/3p4/3P4/1BN2Q2/PrPB1PPP/R3K2R w KQ - 4 15",
+    "solution": [
+      "Nxd5",
+      "Nxd5",
+      "Qxd5",
+      "Bxd4"
+    ],
+    "title": "Tactical Discoveredattack Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "1Q5r/p3nkpp/3p2q1/3P4/4P3/B1r2B1b/P4PPP/R4RK1 w - - 2 20",
+    "solution": [
+      "Qxh8",
+      "Rxf3",
+      "g3",
+      "Rxa3"
+    ],
+    "title": "Tactical Middlegame Pin",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p7/1p3k2/8/n1K1P3/3N4/P7/8 b - - 0 44",
+    "solution": [
+      "Nc5",
+      "Nxc5",
+      "bxc5",
+      "Kd5"
+    ],
+    "title": "Tactical Endgame Knightendgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/5p1p/p5p1/3b4/1pqN1Q2/4R3/PP4PK/2r5 b - - 3 36",
+    "solution": [
+      "Rf1",
+      "Re8+",
+      "Kg7",
+      "Nf5+",
+      "Kf6",
+      "Qe5+"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2p5/2B2k2/pp6/2bP1K2/P1P5/1P5p/8 w - - 0 47",
+    "solution": [
+      "Be4",
+      "Ke6",
+      "Kg3",
+      "Bd5",
+      "Kxh2",
+      "Bxe4"
+    ],
+    "title": "Bishopendgame Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6n1/6P1/6N1/8/1p6/1k5P/5K2/8 w - - 3 58",
+    "solution": [
+      "h4",
+      "Kc3",
+      "h5",
+      "b3",
+      "Ne5",
+      "b2"
+    ],
+    "title": "Advancedpawn Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/6k1/pp2p3/3pPpp1/PPpP1n2/2P3KP/2R5/8 w - - 2 39",
+    "solution": [
+      "h4",
+      "Nh5+",
+      "Kf2",
+      "g4"
+    ],
+    "title": "Advantage Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/1p1R3p/pB4p1/P3bpK1/4r2P/6P1/2P2P2/8 w - - 3 34",
+    "solution": [
+      "Bc5",
+      "Rg4+",
+      "Kh6",
+      "Rxh4+",
+      "gxh4",
+      "Bf4#"
+    ],
+    "title": "Deflection Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4r2k/1pQ2p2/p4N1p/5P2/1P6/P1Pn1K2/4r3/6R1 w - - 1 36",
+    "solution": [
+      "Qxf7",
+      "R8e3+",
+      "Kg4",
+      "Ne5+",
+      "Kh5",
+      "Rh2#"
+    ],
+    "title": "Endgame Exposedking Fork",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/6kp/p4r2/1p6/4P3/P4R2/5KP1/8 w - - 1 48",
+    "solution": [
+      "Ke3",
+      "Rxf3+",
+      "Kxf3",
+      "Kf6"
+    ],
+    "title": "Tactical Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4r2/ppp1qpk1/3p1n2/2bNp3/2B1P1pR/3P2B1/PPPK1P2/7R b - - 3 18",
+    "solution": [
+      "Nxd5",
+      "Rxg4+",
+      "Qg5+",
+      "Rxg5+"
+    ],
+    "title": "Tactical Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6k1/pp6/3br2p/6pq/3R2R1/1P5P/P1P2KQ1/8 w - - 5 30",
+    "solution": [
+      "h4",
+      "Qf7+",
+      "Qf3",
+      "Rf6",
+      "Qxf6",
+      "Qxf6+"
+    ],
+    "title": "Advantage Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/pp4bk/2q2npp/2P1Bp2/5P1P/1Q2p1P1/P3Pn2/3R1RK1 w - - 1 30",
+    "solution": [
+      "Qxe3",
+      "Nh3+",
+      "Kh2",
+      "Ng4+",
+      "Kxh3",
+      "Nxe3"
+    ],
+    "title": "Tactical Exposedking Fork",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "N1bk4/pp1p1R2/5bB1/4p3/4n3/8/PB2r3/2K5 b - - 5 24",
+    "solution": [
+      "Rf2",
+      "Rf8+",
+      "Ke7",
+      "Re8+",
+      "Kd6",
+      "Bxe4",
+      "Rxb2",
+      "Kxb2"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "7k/pb3Bpp/1p6/2b2p2/3q4/P1Nn3P/1P1Q1PP1/3R2K1 w - - 5 27",
+    "solution": [
+      "Na4",
+      "Qe4",
+      "Qg5",
+      "Bxf2+",
+      "Kh1",
+      "Bh4"
+    ],
+    "title": "Advantage Discoveredattack Kingsideattack",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3kr2r/2p2p1p/1p2p3/pQ1PP3/4q1n1/B5K1/P1P4P/3R1R2 b - - 4 25",
+    "solution": [
+      "Kc8",
+      "Qa6+",
+      "Kb8",
+      "Bd6",
+      "Qxe5+",
+      "Bxe5"
+    ],
+    "title": "Tactical Long Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p3kp2/2pp1nr1/4p1B1/bq2P2Q/bP1P3N/P3N3/1K1R3R w - - 0 30",
+    "solution": [
+      "Rhf1",
+      "Bxb3",
+      "Rd2",
+      "Bd1+",
+      "Ka1",
+      "Bxe2"
+    ],
+    "title": "Advantage Discoveredattack Discoveredcheck",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3q3k/3n4/3PQ2p/p3P1r1/P1P4b/2N1p2P/1r6/R5RK b - - 1 32",
+    "solution": [
+      "Nxe5",
+      "Qxh6+",
+      "Kg8",
+      "Qxh4",
+      "Rh2+",
+      "Kxh2",
+      "Nf3+",
+      "Kh1",
+      "Nxh4",
+      "Rxg5+"
+    ],
+    "title": "Tactical Fork Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r1rk1/1p2q1pp/p1b2n2/2p1p3/P1P1N2P/1P2QNP1/2PR1P2/2K4R w - - 2 19",
+    "solution": [
+      "Nxf6+",
+      "Qxf6",
+      "Rhd1",
+      "e4",
+      "Kb1",
+      "exf3",
+      "Rxd8",
+      "Rxd8",
+      "Rxd8+",
+      "Qxd8"
+    ],
+    "title": "Tactical Middlegame Verylong",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/8/3k2K1/6nP/6P1/8/8 b - - 4 57",
+    "solution": [
+      "Ne5",
+      "Kf5",
+      "Nc4",
+      "h5",
+      "Nd6+",
+      "Kg6"
+    ],
+    "title": "Tactical Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "Q6r/p1pqk1bp/3ppnp1/2n5/4P3/2N2N2/PB3PPP/R3R1K1 w - - 2 15",
+    "solution": [
+      "e5",
+      "Rxa8",
+      "exf6+",
+      "Kxf6",
+      "Ne4+",
+      "Kf7",
+      "Nxc5",
+      "dxc5"
+    ],
+    "title": "Advantage Middlegame Verylong",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "4R3/R6p/Pp1q2pk/1Pp2r2/3r4/3P1p1P/2P2PK1/4Q3 w - - 0 43",
+    "solution": [
+      "Kh1",
+      "Rh4",
+      "Qe3+",
+      "Qf4",
+      "Qxf4+",
+      "Rfxf4",
+      "Kg1",
+      "Rxh3",
+      "Re4",
+      "Rf5",
+      "Rg4",
+      "Re5",
+      "Kf1",
+      "Re2",
+      "Rg3",
+      "Rh1+"
+    ],
+    "title": "Advantage Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3R4/5p1k/p5pp/6q1/1P4P1/P3rP1P/2Q5/6K1 w - - 0 35",
+    "solution": [
+      "Rd7",
+      "Qf4",
+      "Qf2",
+      "Rxf3",
+      "Qxf3",
+      "Qxf3"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r2qr1k1/3n1pp1/p2bp2p/1p1b2NQ/5P2/3BB3/PPP3PP/R4RK1 b - - 1 17",
+    "solution": [
+      "hxg5",
+      "fxg5",
+      "f5",
+      "gxf6",
+      "Nxf6",
+      "Rxf6"
+    ],
+    "title": "Advantage Enpassant Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4r2/ppk4p/n2N2p1/2p5/4Pb2/2P4P/PP2B2R/1K1R4 w - - 0 25",
+    "solution": [
+      "e5",
+      "Bxh2",
+      "Nb5+",
+      "Kb6",
+      "Rd6+",
+      "Ka5",
+      "Na3",
+      "Rf4"
+    ],
+    "title": "Tactical Defensivemove Hangingpiece",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/p4p1k/1p4p1/3pQr2/3P3p/5qP1/PPB2P1K/5R2 w - - 6 35",
+    "solution": [
+      "Bd1",
+      "hxg3+",
+      "Kg1",
+      "gxf2+",
+      "Kh2",
+      "Qd3",
+      "Be2",
+      "Qd2",
+      "Qxf5",
+      "gxf5"
+    ],
+    "title": "Advancedpawn Advantage Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r4r1k/pp1q1pb1/2npbn1p/2p1p3/4P3/1BPP1Q2/PP3P1N/RNB2KR1 b - - 9 17",
+    "solution": [
+      "Bxb3",
+      "Bxh6",
+      "Bxh6",
+      "Qxf6+",
+      "Kh7",
+      "Ng4",
+      "Qe6",
+      "axb3",
+      "Qxf6",
+      "Nxf6+"
+    ],
+    "title": "Advantage Deflection Exposedking",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r6r/pp2kB2/1bpR1p2/4p1p1/6b1/1QP3p1/PP3PP1/4R1K1 w - - 2 23",
+    "solution": [
+      "Rd2",
+      "Bxf2+",
+      "Rxf2",
+      "Rh1+",
+      "Kxh1",
+      "gxf2"
+    ],
+    "title": "Advancedpawn Advantage Fork",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "3r2rk/p3b2p/2n2p2/2pnNPPq/1p1p3P/3P1Q2/PPP3B1/R1B1R1K1 b - - 0 24",
+    "solution": [
+      "Qxh4",
+      "Nf7+",
+      "Kg7",
+      "Re4"
+    ],
+    "title": "Tactical Fork Master",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/8/2B4p/3nk1p1/P3p3/7P/8/6K1 w - - 0 41",
+    "solution": [
+      "Bxd5",
+      "Kxd5",
+      "Kf2",
+      "h5",
+      "Ke3",
+      "g4",
+      "hxg4",
+      "h4",
+      "a5",
+      "h3",
+      "a6",
+      "Kc6",
+      "a7",
+      "Kb7",
+      "a8=R",
+      "Kxa8"
+    ],
+    "title": "Tactical Endgame Quietmove",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2q2p1p/R2bpkp1/2p5/4pP2/3r3P/1Q4P1/R5K1 b - - 3 38",
+    "solution": [
+      "Kf5",
+      "Ra7",
+      "Rd1+",
+      "Rxd1"
+    ],
+    "title": "Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r3r1k1/ppp2ppN/3p4/2bq1b1Q/3p4/3B1P2/PPP4P/R1B3K1 b - - 2 22",
+    "solution": [
+      "g6",
+      "Nf6+",
+      "Kg7",
+      "Qh4",
+      "Rh8",
+      "Qxh8+",
+      "Rxh8",
+      "Nxd5",
+      "Bxd3",
+      "cxd3"
+    ],
+    "title": "Advantage Fork Middlegame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "6R1/2q2pp1/6kp/1pr5/p2Q1P2/2P3PP/1P5K/8 b - - 4 37",
+    "solution": [
+      "f6",
+      "Qe4+",
+      "Rf5",
+      "Rf8",
+      "Qd7",
+      "g4"
+    ],
+    "title": "Tactical Endgame Long",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/1pp5/8/PP4p1/3k1pP1/8/1bbBB3/5K2 b - - 2 41",
+    "solution": [
+      "Bd3",
+      "Bxd3",
+      "Kxd3",
+      "Be1",
+      "Kc4",
+      "a6",
+      "bxa6",
+      "bxa6",
+      "Bd4",
+      "Bf2"
+    ],
+    "title": "Bishopendgame Tactical Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "8/2r1ppk1/8/3P2pP/1Kp1Pp2/1bR5/4BP2/8 w - - 8 40",
+    "solution": [
+      "Bxc4",
+      "Rxc4+",
+      "Rxc4",
+      "Bxc4",
+      "Kxc4",
+      "f6"
+    ],
+    "title": "Tactical Defensivemove Endgame",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  },
+  {
+    "fen": "r1b2r2/1p5k/3p2pp/p1PBb3/2Pp1p2/P2P2Pq/3B1P1P/1R1QR1K1 w - - 0 26",
+    "solution": [
+      "c6",
+      "fxg3",
+      "fxg3",
+      "Rf2",
+      "Kxf2",
+      "Qxh2+"
+    ],
+    "title": "Attraction Tactical Deflection",
+    "difficulty": "\u2b50\u2b50\u2b50\u2b50\u2b50"
+  }
+]

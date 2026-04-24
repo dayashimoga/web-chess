@@ -223,10 +223,21 @@
                             <button class="btn btn-primary" id="btnConnectFriend">Connect</button>
                         </div>
                     </div>
-                    <div id="multiplayerStatus" class="engine-status mt-2 mb-2"><span class="status-dot"></span> <span id="mpStatusText">Offline</span></div>
+                    <div id="multiplayerStatus" class="engine-status mt-2 mb-2" style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display:flex; align-items:center; gap: 8px;">
+                            <div class="status-dot"></div> 
+                            <span id="mpStatusText" style="font-weight:600;">Offline</span>
+                        </div>
+                        <div id="mpPing" style="font-size: 0.7rem; color: var(--text-muted); font-family: monospace; display: none;">Ping: <span style="color:#4ade80;">-- ms</span></div>
+                    </div>
                     
                     <div id="multiplayerControls" class="hidden">
-                        <div class="control-group mt-3">
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 15px;">
+                            <div class="player-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #a78bfa); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 0 10px var(--primary-glow); border: 2px solid rgba(255,255,255,0.2);">🧑</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 600;">VS</div>
+                            <div class="player-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f43f5e); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 0 10px rgba(239,68,68,0.2); border: 2px solid rgba(255,255,255,0.2);">🤖</div>
+                        </div>
+                        <div class="control-group">
                             <label>Play As</label>
                             <select class="input-modern" id="mpPlayerColor">
                                 <option value="w">White</option>
@@ -234,7 +245,7 @@
                                 <option value="random">Random</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary w-100" id="btnMpStart" style="background:linear-gradient(135deg, #10b981, #059669);">Start Multiplayer Game</button>
+                        <button class="btn btn-primary w-100" id="btnMpStart" style="background:linear-gradient(135deg, #10b981, #059669); margin-top: 10px;">⚡ Start Multiplayer Game</button>
                     </div>
                 </div>
                 
@@ -290,6 +301,10 @@
                             XP: <span id="academyXp">0</span>
                         </div>
                     </div>
+                    
+                    <button class="btn btn-primary w-100 mb-3" id="btnStartPuzzleRush" style="background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4);">
+                        ⚡ Start 3-Min Puzzle Rush
+                    </button>
 
                     <div id="academyCategories">
                         <div class="academy-category mb-2">
@@ -368,6 +383,7 @@
                     <button class="btn btn-secondary btn-sm" id="exportPgn" title="Export PGN">&#x1F4CB; Export PGN</button>
                     <button class="btn btn-secondary btn-sm" id="copyFen" title="Copy FEN">&#x1F4C4; Copy FEN</button>
                     <button class="btn btn-secondary btn-sm" id="flipBoard" title="Flip Board">&#x1F504; Flip</button>
+                    <button class="btn btn-secondary btn-sm" id="toggle3dBoard" title="Toggle 3D View">🧊 3D</button>
                 </div>
                 <div style="margin-top:0.35rem;padding-top:0.35rem;border-top:1px solid var(--border-color);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                     <select id="boardTheme" class="btn btn-secondary btn-sm" style="padding:3px 6px;font-size:0.72rem;">
