@@ -674,47 +674,83 @@ function renderPosition() {
                     if (alreadyClaimed) continue;
 
                     const pieceId = `${p.color}${p.type}`;
-                    // Prefer a stale piece from the last move's origin square
-                    // to prevent incorrect diagonal animation paths
                     let pieceEl = null;
-                    if (lastMoveSquares.length > 0) {
-                        const fromSqEl = document.getElementById('sq-' + lastMoveSquares[0]);
+                    let isFallback = false;
+                    
+                    // Determine explicitly where this piece should have come from if we have moveInfo
+                    let expectedFrom = null;
+                    if (window._lastMoveInfo) {
+                        const m = window._lastMoveInfo;
+                        if (sq === m.to) {
+                            expectedFrom = m.from; // Main moving piece
+                        } else if (m.flags && m.flags.includes('k')) {
+                            if (p.color === 'w' && sq === 'f1') expectedFrom = 'h1';
+                            if (p.color === 'b' && sq === 'f8') expectedFrom = 'h8';
+                        } else if (m.flags && m.flags.includes('q')) {
+                            if (p.color === 'w' && sq === 'd1') expectedFrom = 'a1';
+                            if (p.color === 'b' && sq === 'd8') expectedFrom = 'a8';
+                        }
+                    }
+                    
+                    if (expectedFrom) {
+                        const fromSqEl = document.getElementById('sq-' + expectedFrom);
                         if (fromSqEl) {
                             pieceEl = existingPieces.find(el =>
                                 el.dataset.stale === 'true' && el.dataset.pieceType === pieceId &&
                                 el.parentElement === fromSqEl
                             );
+                            // If promotion, pieceId will be 'wq' but the stale piece is 'wp'
+                            if (!pieceEl && window._lastMoveInfo && sq === window._lastMoveInfo.to && window._lastMoveInfo.flags.includes('p')) {
+                                pieceEl = existingPieces.find(el =>
+                                    el.dataset.stale === 'true' && el.dataset.pieceType[0] === p.color && el.dataset.pieceType[1] === 'p' &&
+                                    el.parentElement === fromSqEl
+                                );
+                                // Update background image for promotion
+                                if (pieceEl) {
+                                    pieceEl.dataset.pieceType = pieceId;
+                                    pieceEl.style.backgroundImage = `url(${PIECE_URLS[pieceId]})`;
+                                }
+                            }
                         }
                     }
-                    // Fallback: any stale piece of the same type
+
+                    // Fallback: any stale piece of the same type on the board
                     if (!pieceEl) {
-                        pieceEl = existingPieces.find(el =>
-                            el.dataset.stale === 'true' && el.dataset.pieceType === pieceId
-                        );
+                        // DO NOT animate fallback pieces from random squares across the board. 
+                        // We will grab them, but without animation, to prevent diagonal flying.
+                        pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
+                        if (pieceEl) isFallback = true;
                     }
+
                     if (pieceEl) {
                         pieceEl.dataset.stale = 'false';
                         
-                        // FLIP Physics Animation
-                        const beforeRect = pieceEl.getBoundingClientRect();
-                        sqEl.appendChild(pieceEl);
-                        const afterRect = pieceEl.getBoundingClientRect();
-                        
-                        if (beforeRect.left !== 0 && beforeRect.top !== 0 && (beforeRect.left !== afterRect.left || beforeRect.top !== afterRect.top)) {
-                            const dx = beforeRect.left - afterRect.left;
-                            const dy = beforeRect.top - afterRect.top;
-                            
-                            pieceEl.style.transition = 'none';
-                            pieceEl.style.transform = `translate(${dx}px, ${dy}px)`;
-                            
-                            // Force reflow
-                            pieceEl.getBoundingClientRect();
-                            
-                            pieceEl.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
-                            pieceEl.style.transform = 'translate(0, 0)';
-                        } else {
+                        if (isFallback) {
+                            sqEl.appendChild(pieceEl);
                             pieceEl.style.transition = 'none';
                             pieceEl.style.transform = 'none';
+                        } else {
+                            // FLIP Physics Animation
+                            const beforeRect = pieceEl.getBoundingClientRect();
+                            sqEl.appendChild(pieceEl);
+                            const afterRect = pieceEl.getBoundingClientRect();
+                            
+                            if (beforeRect.left !== 0 && beforeRect.top !== 0 && (beforeRect.left !== afterRect.left || beforeRect.top !== afterRect.top)) {
+                                const dx = beforeRect.left - afterRect.left;
+                                const dy = beforeRect.top - afterRect.top;
+                                
+                                pieceEl.style.transition = 'none';
+                                pieceEl.style.transform = `translate(${dx}px, ${dy}px)`;
+                                
+                                // Force reflow
+                                pieceEl.getBoundingClientRect();
+                                
+                                pieceEl.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+                                pieceEl.style.transform = 'translate(0, 0)';
+                            } else {
+                                pieceEl.style.transition = 'none';
+                                pieceEl.style.transform = 'none';
+                            }
                         }
                     } else {
                         // Create brand new piece element
@@ -728,6 +764,9 @@ function renderPosition() {
             }
         }
     }
+
+    // Clear move info so it doesn't leak into subsequent board redraws (like undo or history jumping)
+    window._lastMoveInfo = null;
 
     // Remove captured pieces (anything still marked stale)
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
@@ -978,6 +1017,7 @@ function commitMove(move) {
     }
 
     lastMoveSquares = [move.from, move.to];
+    window._lastMoveInfo = { from: move.from, to: move.to, flags: move.flags };
 
     // Truncate future history if we're branching
     if (currentMoveIdx < moveHistory.length - 1) {
@@ -2458,6 +2498,8 @@ function finishBatchAnalysis() {
     let humanColor = 'w';
     if (typeof mode !== 'undefined' && mode === 'play' && typeof aiColor !== 'undefined') {
         humanColor = (aiColor === 'w') ? 'b' : 'w';
+    } else {
+        humanColor = 'both'; // Show mistakes for both players in analyze mode
     }
     
     for (let i = 1; i < batchAnalysisResults.length; i++) {
@@ -2502,7 +2544,7 @@ function finishBatchAnalysis() {
         let badge = '✅';
         
         // Only classify and count blunders for the HUMAN player to avoiding guiding them on the engine's behalf
-        if (colorMoved === humanColor) {
+        if (colorMoved === humanColor || humanColor === 'both') {
             // CAPS: Convert centipawn loss to a 0-100 accuracy score per move
             // Formula: accuracy = max(0, 100 - (cpLoss^1.5 / 10))
             const cpLoss = Math.max(0, errorDrop);
