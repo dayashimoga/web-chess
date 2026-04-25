@@ -104,9 +104,16 @@
             
 
             
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; flex-wrap:wrap; gap:6px;">
                 <div class="opening-badge" id="openingName"></div>
-                <div style="display:flex; gap:0.5rem; margin-left:auto;">
+                <div style="display:flex; gap:4px; align-items:center;">
+                    <div class="board-size-selector" id="boardSizeSelector">
+                        <button class="board-size-btn" data-size="sm" title="Small Board">S</button>
+                        <button class="board-size-btn active" data-size="md" title="Medium Board">M</button>
+                        <button class="board-size-btn" data-size="lg" title="Large Board">L</button>
+                        <button class="board-size-btn" data-size="xl" title="Extra Large Board">XL</button>
+                    </div>
+                    <div style="width:1px; height:18px; background:var(--glass-border); margin:0 2px;"></div>
                     <button class="toolbar-btn" id="btnSoundToggle" title="Toggle Sound">🔊</button>
                     <button class="toolbar-btn" id="btnFullscreen" title="Fullscreen">⛶</button>
                 </div>

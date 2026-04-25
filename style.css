@@ -49,7 +49,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-    overflow: hidden;
+    overflow: auto;
     height: 100%;
 }
 
@@ -60,8 +60,8 @@ body {
         radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
         radial-gradient(ellipse at 80% 20%, rgba(167, 139, 250, 0.04) 0%, transparent 50%);
     color: var(--text);
-    height: 100%;
-    overflow: hidden;
+    min-height: 100%;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -123,11 +123,11 @@ body {
    MAIN LAYOUT: Viewport-locked, no page scroll
    ═══════════════════════════════════════════════════ */
 main.container {
-    height: calc(100vh - var(--nav-height));
+    min-height: calc(100vh - var(--nav-height));
     padding-top: var(--nav-height);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .hero { display: none !important; } /* Remove hero to maximize board space */
@@ -529,11 +529,60 @@ main.container {
 /* ─── Analysis Report — Scrollable ─── */
 #analysisReportContainer {
     overflow-y: auto;
-    max-height: 250px;
     scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.3) transparent;
 }
 #analysisReportContainer::-webkit-scrollbar { width: 4px; }
 #analysisReportContainer::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 3px; }
+
+/* ─── Clickable Report Items ─── */
+.report-mistake-item {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+.report-mistake-item:hover {
+    transform: translateX(3px);
+    filter: brightness(1.15);
+    border-color: rgba(255,255,255,0.1);
+}
+.report-mistake-item.active-review {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 12px var(--primary-glow);
+    transform: translateX(4px);
+}
+.report-better-move {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: rgba(34,197,94,0.08);
+    border-radius: 6px;
+    border: 1px solid rgba(34,197,94,0.12);
+}
+
+/* ─── Board Size Selector ─── */
+.board-size-selector {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.board-size-btn {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    font-size: 0.65rem; font-weight: 700;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.board-size-btn:hover { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.3); color: var(--text); }
+.board-size-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
 /* ─── Sound & Fullscreen Toggle ─── */
 .toolbar-btn {

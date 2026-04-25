@@ -2181,6 +2181,38 @@ if (btnFullscreen) {
 }
 
 // ═══════════════════════════════════════════════════
+// BOARD SIZE SELECTOR
+// ═══════════════════════════════════════════════════
+const boardSizes = {
+    sm: 'min(calc(100vh - var(--nav-height) - 80px), 420px)',
+    md: 'min(calc(100vh - var(--nav-height) - 80px), calc(100vw - 420px), 680px)',
+    lg: 'min(calc(100vh - var(--nav-height) - 40px), calc(100vw - 380px), 780px)',
+    xl: 'min(calc(100vh - var(--nav-height) - 20px), calc(100vw - 340px), 900px)'
+};
+const boardSizeSelector = document.getElementById('boardSizeSelector');
+if (boardSizeSelector) {
+    boardSizeSelector.addEventListener('click', (e) => {
+        const btn = e.target.closest('.board-size-btn');
+        if (!btn) return;
+        const size = btn.dataset.size;
+        boardSizeSelector.querySelectorAll('.board-size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelector('.chess-layout').style.setProperty('--board-size', boardSizes[size]);
+        localStorage.setItem('chess-board-size', size);
+    });
+    // Restore saved preference
+    const saved = localStorage.getItem('chess-board-size');
+    if (saved && boardSizes[saved]) {
+        boardSizeSelector.querySelectorAll('.board-size-btn').forEach(b => b.classList.remove('active'));
+        const btn = boardSizeSelector.querySelector(`[data-size="${saved}"]`);
+        if (btn) {
+            btn.classList.add('active');
+            document.querySelector('.chess-layout').style.setProperty('--board-size', boardSizes[saved]);
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════
 // GAME CLOCK (Fischer increment)
 // ═══════════════════════════════════════════════════
 let clockEnabled = false;
@@ -2612,23 +2644,25 @@ function finishBatchAnalysis() {
             }
 
             reportHtml += `
-                <div class="ac-item mb-1" style="background:${colorBox}; border:1px solid ${colorBox}; cursor:pointer; border-radius:8px; padding:0.6rem;" onclick="jumpToAnalysis(${i - 1}, '${bestMv}')">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
-                        <div style="flex:1;">
-                            <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:4px;">
-                                <span style="font-size:1rem;">${emoji}</span>
-                                <span class="ac-item-title" style="font-weight:700;">${moveNumStr} ${moveData.san}</span>
-                                <span style="font-size:0.7rem; padding:1px 6px; border-radius:4px; background:${colorBox}; font-weight:600;">${flag}</span>
-                                <span style="font-size:0.7rem; color:var(--text-muted);">(${errorDrop > 0 ? '-' : '+'}${(Math.abs(errorDrop)/100).toFixed(1)})</span>
-                            </div>
-                            <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:4px; line-height:1.4;">
-                                ${reason.whyBad}
-                            </div>
-                            <div style="font-size:0.78rem; color:#86efac; line-height:1.4;">
-                                <strong>Better:</strong> <span style="color:#4ade80; font-weight:600;">${bestSan !== '?' ? bestSan : 'N/A'}</span>
-                                ${reason.whyBetter ? ' — ' + reason.whyBetter : ''}
-                            </div>
+                <div class="report-mistake-item" id="report-item-${i}" style="background:${colorBox};" onclick="jumpToAnalysis(${i - 1}, '${bestMv}', this)">
+                    <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:5px;">
+                        <span style="font-size:1.1rem;">${emoji}</span>
+                        <span style="font-weight:700; font-size:0.88rem;">${moveNumStr} ${moveData.san}</span>
+                        <span style="font-size:0.68rem; padding:2px 8px; border-radius:12px; background:${colorBox}; font-weight:600; border:1px solid rgba(255,255,255,0.08);">${flag}</span>
+                        <span style="font-size:0.68rem; color:var(--text-muted); margin-left:auto; font-family:'JetBrains Mono',monospace;">${errorDrop > 0 ? '-' : '+'}${(Math.abs(errorDrop)/100).toFixed(1)}</span>
+                    </div>
+                    <div style="font-size:0.76rem; color:#94a3b8; line-height:1.45; margin-bottom:5px; padding-left:1.5rem;">
+                        💭 ${reason.whyBad}
+                    </div>
+                    <div class="report-better-move" style="margin-left:1.5rem;">
+                        <span style="font-size:0.85rem;">✅</span>
+                        <div style="font-size:0.76rem; line-height:1.4;">
+                            <strong style="color:#4ade80;">Better: ${bestSan !== '?' ? bestSan : 'N/A'}</strong>
+                            ${reason.whyBetter ? `<span style="color:#86efac;"> — ${reason.whyBetter}</span>` : ''}
                         </div>
+                    </div>
+                    <div style="margin-top:5px; padding-left:1.5rem; font-size:0.68rem; color:var(--text-muted);">
+                        Click to see on board →
                     </div>
                 </div>
             `;
@@ -2933,19 +2967,45 @@ function generateMoveReasoning(moveData, bestMoveUci, errorDrop, evalBefore, eva
     return { whyBad, whyBetter, whyGood };
 }
 
-window.jumpToAnalysis = function(histIdx, bestMoveUci) {
+window.jumpToAnalysis = function(histIdx, bestMoveUci, clickedEl) {
+    // Highlight the clicked report item
+    document.querySelectorAll('.report-mistake-item.active-review').forEach(el => el.classList.remove('active-review'));
+    if (clickedEl) {
+        clickedEl.classList.add('active-review');
+        clickedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     jumpToMove(histIdx - 1);
     const badMove = moveHistory[histIdx];
+    if (!badMove) return;
+    
     setTimeout(() => {
         clearTheoryHighlights();
+        
+        // Show red arrow for the bad move
         drawArrowRaw(badMove.from, badMove.to, 'rgba(239,68,68,0.85)', 'arrowhead-red');
+        
+        // Show green arrow for the better move
         if (bestMoveUci && bestMoveUci.length >= 4 && bestMoveUci !== '?') {
             drawArrowRaw(bestMoveUci.substring(0, 2), bestMoveUci.substring(2, 4), 'rgba(34,197,94,0.85)', 'arrowhead-green');
+            
+            // Highlight the correct destination square
+            const toEl = document.getElementById('sq-' + bestMoveUci.substring(2, 4));
+            if (toEl) toEl.classList.add('theory-highlight');
         }
-        const pieceEl = document.querySelector(`#sq-${badMove.from} .piece`) || document.querySelector(`#sq-${badMove.to} .piece`);
+        
+        // Highlight bad move source with red glow
+        const fromEl = document.getElementById('sq-' + badMove.from);
+        if (fromEl) {
+            fromEl.style.boxShadow = 'inset 0 0 18px rgba(239,68,68,0.6), 0 0 14px rgba(239,68,68,0.4)';
+            setTimeout(() => { fromEl.style.boxShadow = ''; }, 2500);
+        }
+        
+        // Shake the piece
+        const pieceEl = document.querySelector('#sq-' + badMove.from + ' .piece') || document.querySelector('#sq-' + badMove.to + ' .piece');
         if (pieceEl) {
             pieceEl.classList.add('shake-error');
-            setTimeout(()=> pieceEl.classList.remove('shake-error'), 500);
+            setTimeout(() => pieceEl.classList.remove('shake-error'), 500);
         }
     }, 150);
 }
