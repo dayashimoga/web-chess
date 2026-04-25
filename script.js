@@ -15,11 +15,37 @@ const PIECE_URLS = {
 Object.values(PIECE_URLS).forEach(url => { const img = new Image(); img.src = url; });
 
 // ═══════════════════════════════════════════════════
+// TOAST NOTIFICATION SYSTEM
+// ═══════════════════════════════════════════════════
+function showToast(message, type = 'info') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position:fixed;top:60px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6', warning: '#f59e0b' };
+    const bg = colors[type] || colors.info;
+    toast.style.cssText = `pointer-events:auto;padding:10px 16px;border-radius:10px;background:${bg};color:#fff;font-size:0.82rem;font-weight:600;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,0.35);opacity:0;transform:translateX(40px);transition:all 0.35s cubic-bezier(0.25,1,0.5,1);max-width:320px;`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(0)'; });
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(40px)';
+        setTimeout(() => toast.remove(), 350);
+    }, 2500);
+}
+window.showToast = showToast;
+
+// ═══════════════════════════════════════════════════
 // APPLICATION STATE
 // ═══════════════════════════════════════════════════
 let chess = new Chess();
 let flipped = false;
-let mode = 'play';      // 'play' | 'analyze' | 'academy' | 'multiplayer'
+let mode = 'play';      // 'play' | 'puzzles' | 'analyze' | 'academy' | 'multiplayer'
 let aiColor = 'b';
 let aiLevel = 5;
 let selectedSquare = null;
@@ -648,9 +674,24 @@ function renderPosition() {
                     if (alreadyClaimed) continue;
 
                     const pieceId = `${p.color}${p.type}`;
-                    let pieceEl = existingPieces.find(el =>
-                        el.dataset.stale === 'true' && el.dataset.pieceType === pieceId
-                    );
+                    // Prefer a stale piece from the last move's origin square
+                    // to prevent incorrect diagonal animation paths
+                    let pieceEl = null;
+                    if (lastMoveSquares.length > 0) {
+                        const fromSqEl = document.getElementById('sq-' + lastMoveSquares[0]);
+                        if (fromSqEl) {
+                            pieceEl = existingPieces.find(el =>
+                                el.dataset.stale === 'true' && el.dataset.pieceType === pieceId &&
+                                el.parentElement === fromSqEl
+                            );
+                        }
+                    }
+                    // Fallback: any stale piece of the same type
+                    if (!pieceEl) {
+                        pieceEl = existingPieces.find(el =>
+                            el.dataset.stale === 'true' && el.dataset.pieceType === pieceId
+                        );
+                    }
                     if (pieceEl) {
                         pieceEl.dataset.stale = 'false';
                         
@@ -669,7 +710,7 @@ function renderPosition() {
                             // Force reflow
                             pieceEl.getBoundingClientRect();
                             
-                            pieceEl.style.transition = 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)';
+                            pieceEl.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
                             pieceEl.style.transform = 'translate(0, 0)';
                         } else {
                             pieceEl.style.transition = 'none';
@@ -689,9 +730,6 @@ function renderPosition() {
     }
 
     // Remove captured pieces (anything still marked stale)
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
-    document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     document.querySelectorAll('[data-stale="true"]').forEach(p => p.remove());
     updateCapturedPieces();
     updateMovesList();
@@ -991,8 +1029,8 @@ function commitMove(move) {
         clearInterval(timerInterval);
     }
 
-    // Check Puzzle Mode Logic
-    if (window._dailyPuzzleActive && move.san) {
+    // Check Puzzle Mode Logic — only when actually in puzzles mode
+    if (mode === 'puzzles' && window._dailyPuzzleActive && move.san) {
         const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
         
         if (move.san === expectedSan) {
@@ -1046,15 +1084,17 @@ function commitMove(move) {
                 }
             } else {
                 // Engine makes the next move automatically
+                // commitMove() handles step increment via the puzzle check above,
+                // so we do NOT increment _dailyPuzzleStep here (was causing double-increment)
                 setTimeout(() => {
                     const engineSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+                    if (!engineSan) return;
                     const emove = chess.move(engineSan);
                     if (emove) {
                         commitMove(emove);
                     }
-                    window._dailyPuzzleStep++;
                     if (typeof updatePuzzleProgress === 'function') updatePuzzleProgress();
-                }, 500);
+                }, 800);
             }
         } else {
             // Wrong move
@@ -1475,9 +1515,22 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
             if (!chess.isGameOver()) requestEngineAnalysis();
         } else if (mode === 'multiplayer') {
             initMultiplayer();
+        } else if (mode === 'puzzles') {
+            evalContainer.classList.add('hidden');
+            if (engine) engine.postMessage('stop');
+            // Auto-load a puzzle when switching to Puzzles tab
+            if (!window._dailyPuzzleActive && typeof loadTrainerPuzzle === 'function') {
+                loadTrainerPuzzle();
+            }
         } else {
             evalContainer.classList.add('hidden');
             if (engine) engine.postMessage('stop');
+            // Reset puzzle state when leaving Puzzles tab to prevent
+            // puzzle validation from triggering in other modes
+            if (window._dailyPuzzleActive) {
+                window._dailyPuzzleActive = false;
+                if (typeof stopPuzzleTimer === 'function') stopPuzzleTimer();
+            }
         }
     });
 });
@@ -3152,7 +3205,7 @@ function loadTrainerPuzzle() {
     flipped = chess.turn() === 'b';
     
     buildBoard();
-    updateMovesUI();
+    updateMovesList();
     
     // Turn Badge
     const turnBadge = document.getElementById('puzzleTurnBadge');
@@ -3216,8 +3269,10 @@ function puzzleHintAction() {
     const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
     if (!expectedSan) return;
     
-    // Clear previous hints
-    document.querySelectorAll('.puzzle-hint-glow').forEach(el => el.classList.remove('puzzle-hint-glow'));
+    // Clear ALL previous hints and solve glows
+    document.querySelectorAll('.puzzle-hint-glow, .puzzle-solve-glow').forEach(el => {
+        el.classList.remove('puzzle-hint-glow', 'puzzle-solve-glow');
+    });
     
     const tempChess = new Chess(chess.fen());
     const m = tempChess.move(expectedSan);
@@ -3225,8 +3280,9 @@ function puzzleHintAction() {
         const sqEl = document.getElementById('sq-' + m.from);
         if (sqEl) {
             sqEl.classList.add('puzzle-hint-glow');
+            // Also scroll into view on mobile
+            sqEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        updatePuzzleStreak(0, true); // Using hint resets streak
         showToast("💡 Piece highlighted — now find the right square!", "info");
     }
 }
@@ -3239,22 +3295,30 @@ function puzzleSolveAction() {
     const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
     if (!expectedSan) return;
     
+    // Clear previous glows
+    document.querySelectorAll('.puzzle-hint-glow, .puzzle-solve-glow').forEach(el => {
+        el.classList.remove('puzzle-hint-glow', 'puzzle-solve-glow');
+    });
+    
+    updatePuzzleStreak(0, true); // Using solve resets streak
+    
+    // Show solve glow on from and to squares
     const tempChess = new Chess(chess.fen());
     const m = tempChess.move(expectedSan);
     if (m) {
-        updatePuzzleStreak(0, true); // Using solve resets streak
-        
-        // Show solve glow on both from and to squares
         const fromEl = document.getElementById('sq-' + m.from);
         const toEl = document.getElementById('sq-' + m.to);
         if (fromEl) fromEl.classList.add('puzzle-hint-glow');
         if (toEl) toEl.classList.add('puzzle-solve-glow');
         
-        // Programmatically execute via UI simulation
-        handleSquareClick(document.getElementById('sq-' + m.from));
+        // Execute the move directly via chess.move() + commitMove()
+        // This bypasses onSquareClick guards and is the reliable method
         setTimeout(() => {
-            handleSquareClick(document.getElementById('sq-' + m.to));
-        }, 200);
+            const actualMove = chess.move(expectedSan);
+            if (actualMove) {
+                commitMove(actualMove);
+            }
+        }, 400);
     }
 }
 
@@ -3311,7 +3375,7 @@ function loadNextRushPuzzle() {
     currentMoveIdx = -1;
     flipped = chess.turn() === 'b';
     buildBoard();
-    updateMovesUI();
+    updateMovesList();
     
     window._dailyPuzzleSolution = currentRushPuzzle.solution;
     window._dailyPuzzleStep = 0;

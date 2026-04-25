@@ -286,16 +286,31 @@ main.container {
 /* ─── Controls & UI ─── */
 .card-title { font-size: 0.88rem; font-weight: 700; letter-spacing: -0.01em; }
 
-.tabs { display: flex; gap: 2px; border-bottom: 2px solid var(--glass-border); }
+.tabs {
+    display: flex; gap: 3px; padding: 3px;
+    background: rgba(0,0,0,0.15); border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+}
 .tab-btn {
     flex: 1; padding: 7px 4px; background: transparent; border: none;
     color: var(--text-muted); font-weight: 600; cursor: pointer;
-    border-bottom: 2px solid transparent; margin-bottom: -2px;
-    font-family: inherit; font-size: 0.78rem; transition: all 0.2s;
-    white-space: nowrap;
+    font-family: inherit; font-size: 0.72rem; transition: all 0.25s;
+    white-space: nowrap; border-radius: 7px;
+    position: relative;
 }
-.tab-btn:hover { color: var(--text); }
-.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.tab-btn.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    box-shadow: 0 2px 10px var(--primary-glow);
+}
+
+/* Puzzle action button enhancements */
+#btnPuzzleHint:active, #btnPuzzleSolve:active {
+    transform: scale(0.95);
+}
+#btnPuzzleHint:hover { border-color: #3b82f6; color: #3b82f6; }
+#btnPuzzleSolve:hover { border-color: #10b981; color: #10b981; }
 
 .control-group { margin-bottom: 0.5rem; }
 .control-group label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 2px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -736,4 +751,100 @@ kbd {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.12);
     font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Tab Content Transitions ─── */
+.tab-content {
+    animation: tabSlideIn 0.25s ease-out;
+}
+.tab-content.hidden {
+    animation: none;
+}
+@keyframes tabSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Puzzle Stats Dashboard ─── */
+#puzzleStatsDash {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 0.75rem;
+}
+#puzzleStatsDash > div {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+}
+#puzzleStatsDash > div > div:first-child {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+#puzzleStatsDash > div > div:last-child {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+#pzStatSolved { color: #3b82f6 !important; }
+#pzStatAccuracy { color: #10b981 !important; }
+#pzStatBestStreak { color: #f59e0b !important; }
+#pzStatRating { color: #a78bfa !important; }
+
+/* ─── Performance: GPU layers for animated elements ─── */
+.piece {
+    will-change: transform;
+    contain: layout style;
+}
+.square {
+    contain: layout style;
+}
+
+/* ─── Button Active Feedback ─── */
+.btn:active {
+    transform: scale(0.97) !important;
+    filter: brightness(0.95);
+}
+.btn-primary:active {
+    box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+/* ─── Coach HUD enhancements ─── */
+.coach-hud {
+    transition: all 0.3s ease;
+}
+.coach-hud:not(.hidden) {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ─── Academy lesson items smooth hover ─── */
+.ac-list .btn {
+    transition: all 0.2s ease;
+}
+.ac-list .btn:hover {
+    transform: translateX(3px);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+/* ─── Scrollbar for controls panel ─── */
+.controls-column {
+    scroll-behavior: smooth;
+}
+
+/* ─── Mobile responsive improvements ─── */
+@media (max-width: 768px) {
+    .tabs {
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        font-size: 0.65rem;
+        padding: 6px 3px;
+    }
+    #puzzleStatsDash {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
