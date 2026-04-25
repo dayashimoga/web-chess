@@ -147,11 +147,12 @@
 
                 </div>
                 
-                <div class="tabs mb-3">
-                    <button class="tab-btn active" data-tab="play">Play AI</button>
-                    <button class="tab-btn" data-tab="multiplayer">👥 Friend</button>
-                    <button class="tab-btn" data-tab="analyze">Analyze</button>
-                    <button class="tab-btn" data-tab="academy"><span style="color:#facc15;">★</span> Academy</button>
+                <div class="tabs mb-3" style="display:flex; flex-wrap:wrap; gap:4px; padding:4px; background:var(--bg-light); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    <button class="tab-btn active" data-tab="play" style="flex:1; border-radius:8px;">🤖 Play AI</button>
+                    <button class="tab-btn" data-tab="puzzles" style="flex:1; border-radius:8px;">🧩 Puzzles</button>
+                    <button class="tab-btn" data-tab="multiplayer" style="flex:1; border-radius:8px;">👥 Online</button>
+                    <button class="tab-btn" data-tab="analyze" style="flex:1; border-radius:8px;">🔬 Analyze</button>
+                    <button class="tab-btn" data-tab="academy" style="flex:1; border-radius:8px;">🎓 Academy</button>
                 </div>
                 
                 <div id="tab-play" class="tab-content">
@@ -204,6 +205,95 @@
                     </div>
 
                     <button class="btn btn-primary w-100" id="newGameBtn">Start New Game</button>
+                </div>
+
+                <div id="tab-puzzles" class="tab-content hidden">
+                    <div style="text-align:center; margin-bottom:1rem;">
+                        <h3 style="margin:0; font-size:1.15rem; color:var(--text-color); letter-spacing:0.5px;">🧩 Interactive Puzzle Trainer</h3>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Sharpen your tactical vision. Solve puzzles, build streaks, climb the rating ladder.</p>
+                    </div>
+
+                    <!-- Stats Dashboard -->
+                    <div id="puzzleStatsDash" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; margin-bottom:1rem;">
+                        <div style="text-align:center; padding:8px 4px; background:rgba(59,130,246,0.08); border-radius:8px; border:1px solid rgba(59,130,246,0.15);">
+                            <div style="font-size:1.1rem; font-weight:bold; color:#3b82f6;" id="pzStatSolved">0</div>
+                            <div style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Solved</div>
+                        </div>
+                        <div style="text-align:center; padding:8px 4px; background:rgba(245,158,11,0.08); border-radius:8px; border:1px solid rgba(245,158,11,0.15);">
+                            <div style="font-size:1.1rem; font-weight:bold; color:#f59e0b;" id="pzStatAccuracy">—</div>
+                            <div style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Accuracy</div>
+                        </div>
+                        <div style="text-align:center; padding:8px 4px; background:rgba(239,68,68,0.08); border-radius:8px; border:1px solid rgba(239,68,68,0.15);">
+                            <div style="font-size:1.1rem; font-weight:bold; color:#ef4444;" id="pzStatBestStreak">0</div>
+                            <div style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Best Streak</div>
+                        </div>
+                        <div style="text-align:center; padding:8px 4px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.15);">
+                            <div style="font-size:1.1rem; font-weight:bold; color:#10b981;" id="pzStatRating">—</div>
+                            <div style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Rating</div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Difficulty Level</label>
+                        <select class="input-modern" id="puzzleDifficulty">
+                            <option value="all">🎲 Mixed (All Difficulties)</option>
+                            <option value="⭐">⭐ Easy — Beginner Patterns</option>
+                            <option value="⭐⭐">⭐⭐ Medium — Intermediate Tactics</option>
+                            <option value="⭐⭐⭐">⭐⭐⭐ Hard — Advanced Combinations</option>
+                            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ Expert — Master-Level Puzzles</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Streak + Timer Row -->
+                    <div style="display:flex; gap:8px; margin-bottom:1rem;">
+                        <div style="flex:1; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">🔥 Streak</span>
+                            <span style="font-weight:bold; font-size:1rem; color:#f59e0b;" id="puzzleStreak">0</span>
+                        </div>
+                        <div style="flex:1; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">⏱ Time</span>
+                            <span style="font-weight:bold; font-size:1rem; color:#60a5fa; font-family:'JetBrains Mono',monospace;" id="puzzleTimer">0:00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Turn Badge -->
+                    <div id="puzzleTurnBadge" style="display:none; text-align:center; padding:10px; border-radius:10px; font-weight:bold; font-size:1rem; margin-bottom:0.75rem; border:1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+                        ⚪ White to Move
+                    </div>
+                    
+                    <!-- Progress Bar (Step X of Y) -->
+                    <div id="puzzleProgressWrap" style="display:none; margin-bottom:0.75rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <span style="font-size:0.7rem; color:var(--text-muted);" id="puzzleProgressLabel">Step 0 / 0</span>
+                            <span style="font-size:0.7rem; color:var(--text-muted);" id="puzzleCategoryTag"></span>
+                        </div>
+                        <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
+                            <div id="puzzleProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius:3px; transition:width 0.4s ease;"></div>
+                        </div>
+                    </div>
+
+                    <div id="puzzleTitleText" style="text-align:center; margin-bottom:0.75rem; font-size:0.9rem; color:#fbbf24; font-weight:bold;"></div>
+
+                    <!-- Action Buttons -->
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <button class="btn btn-primary w-100" id="btnNextPuzzle" style="background: linear-gradient(135deg, #3b82f6, #2563eb); font-weight:600;">▶️ Load Next Puzzle</button>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="btn btn-secondary" id="btnPuzzleHint" style="flex:1;" title="Keyboard: H">💡 Hint</button>
+                            <button class="btn btn-secondary" id="btnPuzzleSolve" style="flex:1;" title="Keyboard: S">🎯 Solve</button>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align:center; margin-top:0.5rem; font-size:0.65rem; color:var(--text-muted);">
+                        Shortcuts: <kbd style="padding:1px 5px; border-radius:3px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); font-family:monospace;">H</kbd> Hint &nbsp;
+                        <kbd style="padding:1px 5px; border-radius:3px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); font-family:monospace;">S</kbd> Solve &nbsp;
+                        <kbd style="padding:1px 5px; border-radius:3px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); font-family:monospace;">N</kbd> Next
+                    </div>
+                    
+                    <hr style="border-color:var(--border-color); margin:1.25rem 0;">
+                    
+                    <button class="btn btn-primary w-100 mb-3" id="btnStartPuzzleRush" style="background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4); font-weight:600;">
+                        ⚡ Start 3-Min Puzzle Rush
+                    </button>
                 </div>
 
                 <div id="tab-multiplayer" class="tab-content hidden">
@@ -302,9 +392,6 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary w-100 mb-3" id="btnStartPuzzleRush" style="background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4);">
-                        ⚡ Start 3-Min Puzzle Rush
-                    </button>
 
                     <div id="academyCategories">
                         <div class="academy-category mb-2">

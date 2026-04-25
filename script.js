@@ -998,11 +998,13 @@ function commitMove(move) {
         if (move.san === expectedSan) {
             window._dailyPuzzleStep++;
             showToast("✅ Great move!", "success");
+            if (typeof updatePuzzleProgress === 'function') updatePuzzleProgress();
             
             if (window._dailyPuzzleStep >= window._dailyPuzzleSolution.length) {
                 // Solved!
                 window._dailyPuzzleActive = false;
                 document.getElementById('snd-end')?.play().catch(()=>{});
+                if (typeof stopPuzzleTimer === 'function') stopPuzzleTimer();
                 
                 if (puzzleRushActive) {
                     puzzleRushScore++;
@@ -1010,12 +1012,37 @@ function commitMove(move) {
                     updateRushUI();
                     setTimeout(loadNextRushPuzzle, 600);
                 } else {
-                    showToast("🎉 Puzzle Solved!", "success", 4000);
-                    const hintText = document.getElementById('coachHintText');
-                    if (hintText) hintText.innerHTML = `<strong style="color:#4ade80;">🎉 Brilliant! Puzzle Solved!</strong>`;
+                    // Track solved stat
+                    if (typeof pzStats !== 'undefined') { pzStats.solved++; savePuzzleStats(); }
+                    updatePuzzleStreak(1); // Increment streak
+                    
+                    const turnBadge = document.getElementById('puzzleTurnBadge');
+                    if (turnBadge) {
+                        const timeStr = typeof puzzleTimerSec !== 'undefined' 
+                            ? ` in ${Math.floor(puzzleTimerSec/60)}:${(puzzleTimerSec%60).toString().padStart(2,'0')}` 
+                            : '';
+                        turnBadge.innerHTML = `🎉 Brilliant!${timeStr} — Loading next...`;
+                        turnBadge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                        turnBadge.style.color = 'white';
+                        turnBadge.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.6)';
+                    }
+                    
+                    // Celebration burst on the board
+                    const boardEl = document.getElementById('board');
+                    if (boardEl) {
+                        boardEl.classList.add('puzzle-celebrate');
+                        setTimeout(() => boardEl.classList.remove('puzzle-celebrate'), 1000);
+                    }
+                    
                     // Add XP
                     const xpEl = document.getElementById('academyXp');
                     if (xpEl) xpEl.textContent = parseInt(xpEl.textContent) + 50;
+                    
+                    // Update progress bar to 100%
+                    const bar = document.getElementById('puzzleProgressBar');
+                    if (bar) bar.style.width = '100%';
+                    
+                    setTimeout(loadTrainerPuzzle, 1800);
                 }
             } else {
                 // Engine makes the next move automatically
@@ -1026,6 +1053,7 @@ function commitMove(move) {
                         commitMove(emove);
                     }
                     window._dailyPuzzleStep++;
+                    if (typeof updatePuzzleProgress === 'function') updatePuzzleProgress();
                 }, 500);
             }
         } else {
@@ -1044,6 +1072,7 @@ function commitMove(move) {
                     setTimeout(() => endPuzzleRush("3 Strikes! Game Over"), 500);
                 }
             } else {
+                updatePuzzleStreak(0, true); // Reset streak on error
                 showToast("❌ Incorrect move. Try again!", "error");
             }
         }
@@ -3009,10 +3038,14 @@ fetch('data/puzzles.json')
     })
     .catch(e => console.error("Failed to load puzzles:", e));
 
-function getDailyPuzzle() {
+function getRandomPuzzle(difficulty = 'all') {
     if (!ALL_PUZZLES.length) return null;
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-    return ALL_PUZZLES[dayOfYear % ALL_PUZZLES.length];
+    let pool = ALL_PUZZLES;
+    if (difficulty && difficulty !== 'all') {
+        pool = ALL_PUZZLES.filter(p => p.difficulty && p.difficulty.startsWith(difficulty));
+        if (!pool.length) pool = ALL_PUZZLES; // fallback
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 let puzzleRushActive = false;
@@ -3022,31 +3055,223 @@ let puzzleRushTimer = 0;
 let puzzleRushInterval = null;
 let currentRushPuzzle = null;
 
-function loadDailyPuzzle() {
-    const puzzle = getDailyPuzzle();
+// ─── Persistent Puzzle Stats ───
+let puzzleStreak = parseInt(localStorage.getItem('chess_puzzle_streak') || '0');
+let pzStats = JSON.parse(localStorage.getItem('chess_puzzle_stats') || '{"solved":0,"attempts":0,"bestStreak":0}');
+let puzzleTimerSec = 0;
+let puzzleTimerInterval = null;
+
+function savePuzzleStats() {
+    localStorage.setItem('chess_puzzle_stats', JSON.stringify(pzStats));
+    localStorage.setItem('chess_puzzle_streak', puzzleStreak);
+}
+
+function renderPuzzleStats() {
+    const el = id => document.getElementById(id);
+    const streakEl = el('puzzleStreak');
+    if (streakEl) streakEl.textContent = puzzleStreak;
+    
+    const solvedEl = el('pzStatSolved');
+    if (solvedEl) solvedEl.textContent = pzStats.solved;
+    
+    const accEl = el('pzStatAccuracy');
+    if (accEl) accEl.textContent = pzStats.attempts > 0 ? Math.round((pzStats.solved / pzStats.attempts) * 100) + '%' : '—';
+    
+    const bestEl = el('pzStatBestStreak');
+    if (bestEl) bestEl.textContent = pzStats.bestStreak;
+    
+    const ratingEl = el('pzStatRating');
+    if (ratingEl) {
+        // Simple Elo-like estimation based on difficulty solved
+        const base = 800;
+        const bonus = Math.min(pzStats.solved * 5, 1200);
+        const streakBonus = Math.min(pzStats.bestStreak * 10, 300);
+        const est = base + bonus + streakBonus;
+        ratingEl.textContent = pzStats.solved > 0 ? est : '—';
+    }
+}
+
+function updatePuzzleStreak(change, reset = false) {
+    if (reset) puzzleStreak = 0;
+    else puzzleStreak += change;
+    if (puzzleStreak > pzStats.bestStreak) pzStats.bestStreak = puzzleStreak;
+    savePuzzleStats();
+    renderPuzzleStats();
+}
+
+function startPuzzleTimer() {
+    clearInterval(puzzleTimerInterval);
+    puzzleTimerSec = 0;
+    const timerEl = document.getElementById('puzzleTimer');
+    if (timerEl) timerEl.textContent = '0:00';
+    puzzleTimerInterval = setInterval(() => {
+        puzzleTimerSec++;
+        if (timerEl) {
+            const m = Math.floor(puzzleTimerSec / 60);
+            const s = puzzleTimerSec % 60;
+            timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+}
+
+function stopPuzzleTimer() {
+    clearInterval(puzzleTimerInterval);
+}
+
+function updatePuzzleProgress() {
+    const wrap = document.getElementById('puzzleProgressWrap');
+    const label = document.getElementById('puzzleProgressLabel');
+    const bar = document.getElementById('puzzleProgressBar');
+    if (!wrap || !window._dailyPuzzleSolution) return;
+    
+    wrap.style.display = 'block';
+    const total = window._dailyPuzzleSolution.length;
+    const current = window._dailyPuzzleStep || 0;
+    // Only count player moves (every other move)
+    const playerTotal = Math.ceil(total / 2);
+    const playerCurrent = Math.ceil(current / 2);
+    if (label) label.textContent = `Step ${playerCurrent} / ${playerTotal}`;
+    if (bar) bar.style.width = total > 0 ? Math.round((current / total) * 100) + '%' : '0%';
+}
+
+function loadTrainerPuzzle() {
+    const diffEl = document.getElementById('puzzleDifficulty');
+    const diff = diffEl ? diffEl.value : 'all';
+    const puzzle = getRandomPuzzle(diff);
+    
     if (!puzzle) {
-        alert("Puzzles are still loading, please wait a moment!");
+        showToast("Puzzles are still loading, please wait!", "error");
         return;
     }
+    
     chess = new Chess(puzzle.fen);
     moveHistory = [];
     currentMoveIdx = -1;
+    
+    // Auto-flip board based on whose turn it is
+    flipped = chess.turn() === 'b';
+    
     buildBoard();
     updateMovesUI();
     
-    const hud = document.getElementById('coachHintHud');
-    const hintText = document.getElementById('coachHintText');
-    if (hud) hud.classList.add('active');
-    if (hintText) {
-        hintText.innerHTML = `<div style="margin-bottom:4px;"><strong style="color:#fbbf24;">🧩 Daily Puzzle: ${puzzle.title}</strong> <span style="font-size:0.7rem;">${puzzle.difficulty}</span></div>
-            <div style="font-size:0.8rem;color:#94a3b8;">Find the best continuation. ${chess.turn() === 'w' ? 'White' : 'Black'} to move.</div>`;
+    // Turn Badge
+    const turnBadge = document.getElementById('puzzleTurnBadge');
+    if (turnBadge) {
+        turnBadge.style.display = 'block';
+        if (chess.turn() === 'w') {
+            turnBadge.innerHTML = '⚪ White to Move';
+            turnBadge.style.background = 'rgba(255,255,255,0.9)';
+            turnBadge.style.color = '#000';
+            turnBadge.style.boxShadow = '0 0 15px rgba(255,255,255,0.3)';
+        } else {
+            turnBadge.innerHTML = '⚫ Black to Move';
+            turnBadge.style.background = 'rgba(0,0,0,0.8)';
+            turnBadge.style.color = '#fff';
+            turnBadge.style.boxShadow = '0 0 15px rgba(0,0,0,0.5)';
+        }
+    }
+    
+    // Puzzle Title
+    const titleText = document.getElementById('puzzleTitleText');
+    if (titleText) {
+        titleText.innerHTML = `${puzzle.title} <span style="font-size:0.75rem;opacity:0.8;margin-left:8px;">${puzzle.difficulty}</span>`;
+    }
+    
+    // Category Tag (extract from title)
+    const catTag = document.getElementById('puzzleCategoryTag');
+    if (catTag) {
+        const categories = ['Mate', 'Fork', 'Pin', 'Skewer', 'Discovered', 'Sacrifice', 'Endgame', 'Middlegame', 'Opening'];
+        const found = categories.find(c => puzzle.title && puzzle.title.toLowerCase().includes(c.toLowerCase()));
+        catTag.textContent = found ? `🏷 ${found}` : '';
     }
     
     window._dailyPuzzleSolution = puzzle.solution;
     window._dailyPuzzleStep = 0;
     window._dailyPuzzleActive = true;
     puzzleRushActive = false;
+    
+    // Track attempt
+    pzStats.attempts++;
+    savePuzzleStats();
+    
+    // Reset any UI highlights
+    document.querySelectorAll('.square').forEach(sq => {
+        sq.classList.remove('puzzle-hint-glow', 'puzzle-solve-glow');
+        sq.style.boxShadow = '';
+    });
+    
+    updatePuzzleProgress();
+    renderPuzzleStats();
+    startPuzzleTimer();
 }
+
+document.getElementById('btnNextPuzzle')?.addEventListener('click', loadTrainerPuzzle);
+document.getElementById('puzzleDifficulty')?.addEventListener('change', loadTrainerPuzzle);
+
+// ─── Hint Button ───
+document.getElementById('btnPuzzleHint')?.addEventListener('click', puzzleHintAction);
+
+function puzzleHintAction() {
+    if (!window._dailyPuzzleActive) return;
+    const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+    if (!expectedSan) return;
+    
+    // Clear previous hints
+    document.querySelectorAll('.puzzle-hint-glow').forEach(el => el.classList.remove('puzzle-hint-glow'));
+    
+    const tempChess = new Chess(chess.fen());
+    const m = tempChess.move(expectedSan);
+    if (m) {
+        const sqEl = document.getElementById('sq-' + m.from);
+        if (sqEl) {
+            sqEl.classList.add('puzzle-hint-glow');
+        }
+        updatePuzzleStreak(0, true); // Using hint resets streak
+        showToast("💡 Piece highlighted — now find the right square!", "info");
+    }
+}
+
+// ─── Solve Button ───
+document.getElementById('btnPuzzleSolve')?.addEventListener('click', puzzleSolveAction);
+
+function puzzleSolveAction() {
+    if (!window._dailyPuzzleActive) return;
+    const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+    if (!expectedSan) return;
+    
+    const tempChess = new Chess(chess.fen());
+    const m = tempChess.move(expectedSan);
+    if (m) {
+        updatePuzzleStreak(0, true); // Using solve resets streak
+        
+        // Show solve glow on both from and to squares
+        const fromEl = document.getElementById('sq-' + m.from);
+        const toEl = document.getElementById('sq-' + m.to);
+        if (fromEl) fromEl.classList.add('puzzle-hint-glow');
+        if (toEl) toEl.classList.add('puzzle-solve-glow');
+        
+        // Programmatically execute via UI simulation
+        handleSquareClick(document.getElementById('sq-' + m.from));
+        setTimeout(() => {
+            handleSquareClick(document.getElementById('sq-' + m.to));
+        }, 200);
+    }
+}
+
+// ─── Keyboard Shortcuts for Puzzle Mode ───
+document.addEventListener('keydown', e => {
+    // Only respond if puzzles tab is active
+    if (mode !== 'puzzles') return;
+    // Don't interfere with inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    
+    if (e.key === 'h' || e.key === 'H') { e.preventDefault(); puzzleHintAction(); }
+    if (e.key === 's' || e.key === 'S') { e.preventDefault(); puzzleSolveAction(); }
+    if (e.key === 'n' || e.key === 'N') { e.preventDefault(); loadTrainerPuzzle(); }
+});
+
+// Initialize stats on page load
+renderPuzzleStats();
 
 function startPuzzleRush() {
     if (!ALL_PUZZLES.length) {
@@ -3055,7 +3280,7 @@ function startPuzzleRush() {
     }
     
     // Switch to Academy tab if not already
-    document.querySelector('.tab-btn[data-tab="academy"]').click();
+    document.querySelector('.tab-btn[data-tab="puzzles"]').click();
     
     puzzleRushActive = true;
     puzzleRushScore = 0;
@@ -3135,16 +3360,7 @@ function endPuzzleRush(reason) {
 
 document.getElementById('btnStartPuzzleRush')?.addEventListener('click', startPuzzleRush);
 
-// Inject daily puzzle button into the Play tab
-const newGameBtn = document.getElementById('newGameBtn');
-if (newGameBtn) {
-    const puzzleBtn = document.createElement('button');
-    puzzleBtn.className = 'btn btn-secondary w-100';
-    puzzleBtn.style.cssText = 'margin-top:0.4rem;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;';
-    puzzleBtn.innerHTML = '🧩 Daily Puzzle';
-    puzzleBtn.addEventListener('click', loadDailyPuzzle);
-    newGameBtn.parentNode.insertBefore(puzzleBtn, newGameBtn.nextSibling);
-}
+
 
 // ═══════════════════════════════════════════════════
 // KEYBOARD SHORTCUTS

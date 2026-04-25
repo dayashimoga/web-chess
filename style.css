@@ -674,17 +674,66 @@ input:checked + .slider:before { transform: translateX(18px); background-color: 
     .board-column { max-width: 100%; }
 }
 
-/* Patched CSS */
+/* ─── Patched CSS ─── */
 .board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
 .piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
 .animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
 
-/* Patched CSS */
-.board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
-.piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
+/* ═══════════════════════════════════════════════════
+   PUZZLE TRAINER ANIMATIONS
+   ═══════════════════════════════════════════════════ */
 
-/* Patched CSS */
-.board-wrapper { min-width: 320px; min-height: 320px; flex-shrink: 0; }
-.piece { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.animate-in-piece { animation: piece-drop 0.3s ease-out forwards; }
+/* Hint glow — pulsing blue highlight on the piece to move */
+.puzzle-hint-glow {
+    box-shadow: inset 0 0 18px rgba(59, 130, 246, 0.7), 0 0 14px rgba(59, 130, 246, 0.5) !important;
+    animation: puzzle-hint-pulse 1s ease-in-out infinite;
+}
+@keyframes puzzle-hint-pulse {
+    0%, 100% { box-shadow: inset 0 0 14px rgba(59,130,246,0.5), 0 0 10px rgba(59,130,246,0.3); }
+    50%      { box-shadow: inset 0 0 24px rgba(59,130,246,0.9), 0 0 20px rgba(59,130,246,0.6); }
+}
+
+/* Puzzle solve glow — green confirmation on the destination square */
+.puzzle-solve-glow {
+    box-shadow: inset 0 0 18px rgba(34, 197, 94, 0.7), 0 0 14px rgba(34, 197, 94, 0.5) !important;
+    animation: puzzle-solve-pulse 0.6s ease-out forwards;
+}
+@keyframes puzzle-solve-pulse {
+    0%   { box-shadow: inset 0 0 8px rgba(34,197,94,0.3), 0 0 4px rgba(34,197,94,0.2); }
+    50%  { box-shadow: inset 0 0 24px rgba(34,197,94,0.9), 0 0 20px rgba(34,197,94,0.6); }
+    100% { box-shadow: inset 0 0 10px rgba(34,197,94,0.4), 0 0 6px rgba(34,197,94,0.2); }
+}
+
+/* Celebration burst particles */
+@keyframes confetti-burst {
+    0%   { transform: scale(0); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+.puzzle-celebrate::after {
+    content: '🎉';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    pointer-events: none;
+    animation: confetti-burst 0.8s ease-out forwards;
+    z-index: 100;
+}
+
+/* Puzzle turn badge animation */
+#puzzleTurnBadge {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Keyboard shortcut kbd styling */
+kbd {
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-family: 'JetBrains Mono', monospace;
+}
