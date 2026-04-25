@@ -1035,7 +1035,13 @@ function commitMove(move) {
         
         if (move.san === expectedSan) {
             window._dailyPuzzleStep++;
-            showToast("✅ Great move!", "success");
+            
+            // Check whose turn just played. Puzzles always start with Player move at step 0.
+            const wasPlayerTurn = ((window._dailyPuzzleStep - 1) % 2 === 0);
+            
+            if (wasPlayerTurn) {
+                showToast("✅ Great move!", "success");
+            }
             if (typeof updatePuzzleProgress === 'function') updatePuzzleProgress();
             
             if (window._dailyPuzzleStep >= window._dailyPuzzleSolution.length) {
@@ -1050,9 +1056,8 @@ function commitMove(move) {
                     updateRushUI();
                     setTimeout(loadNextRushPuzzle, 600);
                 } else {
-                    // Track solved stat
                     if (typeof pzStats !== 'undefined') { pzStats.solved++; savePuzzleStats(); }
-                    updatePuzzleStreak(1); // Increment streak
+                    updatePuzzleStreak(1);
                     
                     const turnBadge = document.getElementById('puzzleTurnBadge');
                     if (turnBadge) {
@@ -1065,36 +1070,33 @@ function commitMove(move) {
                         turnBadge.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.6)';
                     }
                     
-                    // Celebration burst on the board
                     const boardEl = document.getElementById('board');
                     if (boardEl) {
                         boardEl.classList.add('puzzle-celebrate');
                         setTimeout(() => boardEl.classList.remove('puzzle-celebrate'), 1000);
                     }
                     
-                    // Add XP
                     const xpEl = document.getElementById('academyXp');
                     if (xpEl) xpEl.textContent = parseInt(xpEl.textContent) + 50;
                     
-                    // Update progress bar to 100%
                     const bar = document.getElementById('puzzleProgressBar');
                     if (bar) bar.style.width = '100%';
                     
                     setTimeout(loadTrainerPuzzle, 1800);
                 }
             } else {
-                // Engine makes the next move automatically
-                // commitMove() handles step increment via the puzzle check above,
-                // so we do NOT increment _dailyPuzzleStep here (was causing double-increment)
-                setTimeout(() => {
-                    const engineSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
-                    if (!engineSan) return;
-                    const emove = chess.move(engineSan);
-                    if (emove) {
-                        commitMove(emove);
-                    }
-                    if (typeof updatePuzzleProgress === 'function') updatePuzzleProgress();
-                }, 800);
+                // Not solved yet. Engine needs to move ONLY if it's currently the engine's turn.
+                const isEngineTurn = (window._dailyPuzzleStep % 2 === 1);
+                if (isEngineTurn) {
+                    setTimeout(() => {
+                        const engineSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+                        if (!engineSan) return;
+                        const emove = chess.move(engineSan);
+                        if (emove) {
+                            commitMove(emove);
+                        }
+                    }, 800);
+                }
             }
         } else {
             // Wrong move
@@ -3287,10 +3289,10 @@ function puzzleHintAction() {
     }
 }
 
-// ─── Solve Button ───
-document.getElementById('btnPuzzleSolve')?.addEventListener('click', puzzleSolveAction);
+// ─── Move Button ───
+document.getElementById('btnPuzzleMove')?.addEventListener('click', puzzleMoveAction);
 
-function puzzleSolveAction() {
+function puzzleMoveAction() {
     if (!window._dailyPuzzleActive) return;
     const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
     if (!expectedSan) return;
@@ -3300,9 +3302,8 @@ function puzzleSolveAction() {
         el.classList.remove('puzzle-hint-glow', 'puzzle-solve-glow');
     });
     
-    updatePuzzleStreak(0, true); // Using solve resets streak
+    updatePuzzleStreak(0, true); // Using move assistance resets streak
     
-    // Show solve glow on from and to squares
     const tempChess = new Chess(chess.fen());
     const m = tempChess.move(expectedSan);
     if (m) {
@@ -3311,15 +3312,53 @@ function puzzleSolveAction() {
         if (fromEl) fromEl.classList.add('puzzle-hint-glow');
         if (toEl) toEl.classList.add('puzzle-solve-glow');
         
-        // Execute the move directly via chess.move() + commitMove()
-        // This bypasses onSquareClick guards and is the reliable method
         setTimeout(() => {
             const actualMove = chess.move(expectedSan);
             if (actualMove) {
                 commitMove(actualMove);
             }
-        }, 400);
+        }, 300);
     }
+}
+
+// ─── Solve Button ───
+document.getElementById('btnPuzzleSolve')?.addEventListener('click', puzzleSolveAction);
+
+function puzzleSolveAction() {
+    if (!window._dailyPuzzleActive) return;
+    
+    updatePuzzleStreak(0, true); // Using solve resets streak
+    
+    // Clear previous glows
+    document.querySelectorAll('.puzzle-hint-glow, .puzzle-solve-glow').forEach(el => {
+        el.classList.remove('puzzle-hint-glow', 'puzzle-solve-glow');
+    });
+    
+    function playNextMove() {
+        if(!window._dailyPuzzleActive) return;
+        const expectedSan = window._dailyPuzzleSolution[window._dailyPuzzleStep];
+        if(!expectedSan) return;
+        
+        const tempChess = new Chess(chess.fen());
+        const m = tempChess.move(expectedSan);
+        if (m) {
+            const actualMove = chess.move(expectedSan);
+            if (actualMove) {
+                commitMove(actualMove);
+                // Engine or next player move will be auto-triggered by commitMove if it's the engine's turn, 
+                // but if it's the player's turn next, we need to schedule it to auto-play!
+                // Wait, commitMove only auto-plays if (window._dailyPuzzleStep % 2 === 1).
+                // So if we want to "Solve All", we must also manually trigger the next player move.
+                setTimeout(() => {
+                    if(window._dailyPuzzleActive && window._dailyPuzzleStep % 2 === 0) {
+                        playNextMove(); // Play the next player move automatically!
+                    }
+                }, 1000); // Wait for the engine to finish its turn + some padding
+            }
+        }
+    }
+    
+    playNextMove();
 }
 
 // ─── Keyboard Shortcuts for Puzzle Mode ───
