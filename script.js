@@ -3019,15 +3019,18 @@ function drawArrowRaw(fromSq, toSq, colorStr, markerId) {
     const boardRect = boardEl.getBoundingClientRect();
     const sfRect = fEl.getBoundingClientRect();
     const stRect = tEl.getBoundingClientRect();
-    const x1 = sfRect.left + sfRect.width / 2 - boardRect.left;
-    const y1 = sfRect.top + sfRect.height / 2 - boardRect.top;
-    const x2 = stRect.left + stRect.width / 2 - boardRect.left;
-    const y2 = stRect.top + stRect.height / 2 - boardRect.top;
+    
+    // Calculate relative percentages so the arrows scale perfectly when the board resizes
+    const x1 = (((sfRect.left + sfRect.width / 2) - boardRect.left) / boardRect.width) * 100;
+    const y1 = (((sfRect.top + sfRect.height / 2) - boardRect.top) / boardRect.height) * 100;
+    const x2 = (((stRect.left + stRect.width / 2) - boardRect.left) / boardRect.width) * 100;
+    const y2 = (((stRect.top + stRect.height / 2) - boardRect.top) / boardRect.height) * 100;
+    
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', x1);
-    line.setAttribute('y1', y1);
-    line.setAttribute('x2', x2);
-    line.setAttribute('y2', y2);
+    line.setAttribute('x1', x1 + '%');
+    line.setAttribute('y1', y1 + '%');
+    line.setAttribute('x2', x2 + '%');
+    line.setAttribute('y2', y2 + '%');
     line.setAttribute('stroke', colorStr);
     line.setAttribute('stroke-width', '6');
     line.setAttribute('stroke-linecap', 'round');
