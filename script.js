@@ -605,6 +605,67 @@ function buildBoard() {
 }
 
 function renderPosition() {
+    // If there is no move info (puzzle auto-play, undo, history jump, initial render),
+    // do a fast clean re-render without FLIP animation to prevent ghost piece flying.
+    const hasAnimInfo = !!window._lastMoveInfo;
+
+    if (!hasAnimInfo) {
+        // ─── FAST PATH: Clean re-render (no animation) ───
+        document.querySelectorAll('.piece').forEach(p => p.remove());
+        document.querySelectorAll('.square').forEach(sq => {
+            sq.classList.remove('highlight', 'in-check', 'selected', 'can-capture');
+            const dot = sq.querySelector('.move-dot');
+            if (dot) dot.classList.add('hidden');
+        });
+
+        // Highlight last move
+        lastMoveSquares.forEach(s => {
+            const el = document.getElementById('sq-' + s);
+            if (el) el.classList.add('highlight');
+        });
+
+        // King in check
+        if (chess.isCheck()) {
+            const board = chess.board();
+            for (let r = 0; r < 8; r++) {
+                for (let f = 0; f < 8; f++) {
+                    const p = board[r][f];
+                    if (p && p.type === 'k' && p.color === chess.turn()) {
+                        const sq = 'abcdefgh'[f] + (8 - r);
+                        const el = document.getElementById('sq-' + sq);
+                        if (el) el.classList.add('in-check');
+                    }
+                }
+            }
+        }
+
+        // Place all pieces instantly
+        const board = chess.board();
+        for (let r = 0; r < 8; r++) {
+            for (let f = 0; f < 8; f++) {
+                const p = board[r][f];
+                if (p) {
+                    const sq = 'abcdefgh'[f] + (8 - r);
+                    const sqEl = document.getElementById('sq-' + sq);
+                    if (sqEl) {
+                        const pieceId = `${p.color}${p.type}`;
+                        const pieceEl = document.createElement('div');
+                        pieceEl.className = 'piece';
+                        pieceEl.dataset.pieceType = pieceId;
+                        pieceEl.style.backgroundImage = `url(${PIECE_URLS[pieceId]})`;
+                        sqEl.appendChild(pieceEl);
+                    }
+                }
+            }
+        }
+
+        updateCapturedPieces();
+        updateMovesList();
+        checkGameEnd();
+        return;
+    }
+
+    // ─── ANIMATED PATH: FLIP animation for interactive moves ───
     // Mark all existing pieces as stale for diff-based rendering
     const existingPieces = Array.from(document.querySelectorAll('.piece'));
     existingPieces.forEach(p => p.dataset.stale = 'true');
@@ -636,7 +697,7 @@ function renderPosition() {
         }
     }
 
-    // Draw pieces — two-pass approach to prevent scrambling
+    // Draw pieces — two-pass approach
     const board = chess.board();
 
     // PASS 1: Claim pieces already on the correct square (these never move in the DOM)
@@ -677,19 +738,17 @@ function renderPosition() {
                     let pieceEl = null;
                     let isFallback = false;
                     
-                    // Determine explicitly where this piece should have come from if we have moveInfo
+                    // Determine explicitly where this piece should have come from
                     let expectedFrom = null;
-                    if (window._lastMoveInfo) {
-                        const m = window._lastMoveInfo;
-                        if (sq === m.to) {
-                            expectedFrom = m.from; // Main moving piece
-                        } else if (m.flags && m.flags.includes('k')) {
-                            if (p.color === 'w' && sq === 'f1') expectedFrom = 'h1';
-                            if (p.color === 'b' && sq === 'f8') expectedFrom = 'h8';
-                        } else if (m.flags && m.flags.includes('q')) {
-                            if (p.color === 'w' && sq === 'd1') expectedFrom = 'a1';
-                            if (p.color === 'b' && sq === 'd8') expectedFrom = 'a8';
-                        }
+                    const m = window._lastMoveInfo;
+                    if (sq === m.to) {
+                        expectedFrom = m.from; // Main moving piece
+                    } else if (m.flags && m.flags.includes('k')) {
+                        if (p.color === 'w' && sq === 'f1') expectedFrom = 'h1';
+                        if (p.color === 'b' && sq === 'f8') expectedFrom = 'h8';
+                    } else if (m.flags && m.flags.includes('q')) {
+                        if (p.color === 'w' && sq === 'd1') expectedFrom = 'a1';
+                        if (p.color === 'b' && sq === 'd8') expectedFrom = 'a8';
                     }
                     
                     if (expectedFrom) {
@@ -700,7 +759,7 @@ function renderPosition() {
                                 el.parentElement === fromSqEl
                             );
                             // If promotion, pieceId will be 'wq' but the stale piece is 'wp'
-                            if (!pieceEl && window._lastMoveInfo && sq === window._lastMoveInfo.to && window._lastMoveInfo.flags.includes('p')) {
+                            if (!pieceEl && sq === m.to && m.flags.includes('p')) {
                                 pieceEl = existingPieces.find(el =>
                                     el.dataset.stale === 'true' && el.dataset.pieceType[0] === p.color && el.dataset.pieceType[1] === 'p' &&
                                     el.parentElement === fromSqEl
@@ -714,10 +773,8 @@ function renderPosition() {
                         }
                     }
 
-                    // Fallback: any stale piece of the same type on the board
+                    // Fallback: any stale piece of the same type — NO animation to prevent ghost flying
                     if (!pieceEl) {
-                        // DO NOT animate fallback pieces from random squares across the board. 
-                        // We will grab them, but without animation, to prevent diagonal flying.
                         pieceEl = existingPieces.find(el => el.dataset.stale === 'true' && el.dataset.pieceType === pieceId);
                         if (pieceEl) isFallback = true;
                     }
