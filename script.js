@@ -157,6 +157,11 @@ const ACADEMY_DB = {
     ]
 };
 
+import {
+    parseFEN, detectOpening, classifyEvalDiff, calcAccuracy,
+    estimateElo, algebraicToIndex, indexToAlgebraic,
+    squareColor, formatClockTime, validatePuzzleMove, calcXP
+} from './web-chess-utils.js';
 
 let academyProgress = JSON.parse(localStorage.getItem('chessAcademyXP') || '{"xp":0,"completed":[]}');
 let activeLesson = null;
@@ -238,8 +243,17 @@ function onEngineMessage(event) {
             const evalStr = document.getElementById('evalText') ? document.getElementById('evalText').textContent : '';
             const evalBadge = `<span style="padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.05); font-family:'JetBrains Mono', monospace; border:1px solid rgba(255,255,255,0.1);">${evalStr}</span>`;
             
-            const opText = currentOpeningText || "Standard Position";
-            if (hintText) hintText.innerHTML = `<strong>Opening:</strong> ${opText}<br><div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Eval:</strong> ${evalBadge}</div><div style="margin-top:6px;"><strong>Suggestion:</strong> Play <span class="text-neon-blue" style="font-weight:700;">${pvMatch[1]} &rarr; ${pvMatch[2]}</span></div>`;
+            const currentFen = chess.fen();
+            const opName = detectOpening(currentFen);
+            const opText = opName || currentOpeningText || "Standard Position";
+
+            let tacticalHint = "";
+            const lastDiff = parseFloat(evalStr) || 0; // rough heuristic
+            const classification = classifyEvalDiff(lastDiff);
+            if (classification.type === 'best') tacticalHint = " 🎯 Engine confirms this is the best continuation.";
+            else if (classification.type === 'blunder') tacticalHint = " ⚠️ Careful, this position requires precision.";
+
+            if (hintText) hintText.innerHTML = `<strong>Opening:</strong> ${opText}<br><div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Eval:</strong> ${evalBadge}</div><div style="margin-top:6px;"><strong>Suggestion:</strong> Play <span class="text-neon-blue" style="font-weight:700;">${pvMatch[1]} &rarr; ${pvMatch[2]}</span>${tacticalHint}</div>`;
             
             clearTheoryHighlights();
             const fromEl = document.getElementById(`sq-${pvMatch[1]}`);
